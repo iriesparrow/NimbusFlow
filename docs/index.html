@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Well-Being OS</title>
+<meta name="theme-color" content="#5B4FE8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Well-Being">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--p:#5B4FE8;--pl:#EEEDFD;--pm:#A9A4F0;--blk:#0a0a0a;--wht:#fafafa;--gr:#777;--lt:#e5e5e5;--ltr:#f3f3f3;--pr:#5B4FE8;--su:#D4820A;--sk:#2E9E6B;--tr:#C8321A;--sh:#1A6EC8;--b1:#C8321A;--b2:#D4820A;--b3:#2E9E6B;--b4:#1A6EC8;--b5:#8B3EC8;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+body{background:#111;font-family:'Barlow',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:10px 0 50px;color:var(--blk);}
+.topbar{width:390px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;}
+.app-ttl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#555;}
+.tbr{display:flex;align-items:center;gap:6px;}
+.bell{background:#1a1a1a;border:none;color:#cfcfcf;font-size:13px;padding:4px 8px;border-radius:8px;cursor:pointer;line-height:1;}
+.bell.on{background:#1a1650;color:#A9A4F0;}
+.sync{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;transition:all .3s;}
+.s-idle{background:#222;color:#555;}.s-load{background:#1a1650;color:#A9A4F0;}.s-ok{background:#0a2e1e;color:#2E9E6B;}.s-err{background:#2e0a0a;color:#C8321A;}
+.mnav{width:390px;display:flex;gap:3px;margin-bottom:8px;background:#1a1a1a;border-radius:10px;padding:3px;}
+.mbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 2px;border:none;border-radius:7px;background:transparent;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.mbtn.on{background:var(--wht);color:var(--blk);}
+.dnav{width:390px;display:flex;gap:4px;margin-bottom:8px;}
+.dbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:7px 2px;border:1.5px solid #333;border-radius:8px;background:#111;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.dbtn.on{border-color:var(--wht);background:var(--wht);color:var(--blk);}
+.dotrow{display:flex;justify-content:center;gap:2px;margin-top:2px;}
+.dot{width:4px;height:4px;border-radius:50%;}
+.card{width:390px;background:var(--wht);border-radius:4px;overflow:hidden;display:none;flex-direction:column;}
+.card.vis{display:flex;}
+.lhd{padding:12px 16px 8px;border-bottom:8px solid var(--blk);}
+.ey{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gr);margin-bottom:2px;}
+.ct{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;letter-spacing:-.01em;line-height:.93;text-transform:uppercase;}
+.cs{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gr);margin-top:3px;}
+.mr{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+.ml{font-size:11px;color:var(--gr);font-weight:500;}
+.bgs{display:flex;gap:3px;flex-wrap:wrap;}
+.bg{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;border:1.5px solid;}
+.bg.f{color:white;}
+.lbd{overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:530px;padding-bottom:8px;}
+.lbd::-webkit-scrollbar{width:2px;}
+.lbd::-webkit-scrollbar-thumb{background:var(--lt);}
+.thk{height:3px;background:var(--blk);margin:6px 0;}
+.thn{height:.5px;background:var(--lt);margin:0 16px;}
+.sh{display:flex;align-items:center;gap:8px;padding:8px 16px 3px;}
+.stg{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:white;padding:2px 8px;border-radius:2px;}
+.ss{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gr);letter-spacing:.04em;}
+.row{display:flex;align-items:flex-start;gap:10px;padding:7px 16px;cursor:pointer;border-bottom:.5px solid var(--lt);transition:background .1s;}
+.row:last-child{border-bottom:none;}
+.row:hover{background:var(--ltr);}
+.chk{width:14px;height:14px;border:1.5px solid var(--lt);border-radius:2px;flex-shrink:0;margin-top:2px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.row.dn .chk{background:var(--p);border-color:var(--p);}
+.row.dn .chk::after{content:'';width:7px;height:4px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg) translateY(-1px);display:block;}
+.row.dn .rn{text-decoration:line-through;color:var(--gr);}
+.rn{font-size:13px;font-weight:500;color:var(--blk);line-height:1.35;flex:1;}
+.rn .sub{display:block;font-size:11px;font-weight:400;color:var(--gr);margin-top:1px;}
+.rv{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:3px;white-space:nowrap;}
+.ef{width:100%;border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:3px 0;outline:none;transition:border-color .15s;}
+.ef:focus{border-bottom-color:var(--p);}
+textarea.ef{resize:none;min-height:55px;line-height:1.5;border:1px solid var(--lt);border-radius:4px;padding:6px 8px;margin-top:2px;}
+textarea.ef:focus{border-color:var(--p);}
+.er{padding:5px 16px;border-bottom:.5px solid var(--lt);}
+.er:last-child{border-bottom:none;}
+.el{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gr);margin-bottom:2px;}
+.sbtn{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 16px 2px;padding:9px;border-radius:6px;color:white;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:none;transition:opacity .2s;}
+.sbtn:hover{opacity:.85;}.sbtn:active{opacity:.7;}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.lft{border-top:3px solid var(--blk);padding:7px 16px;}
+.prow{display:flex;justify-content:space-between;margin-bottom:4px;}
+.pl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blk);}
+.pc{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--blk);}
+.pb{width:100%;height:5px;background:var(--ltr);border-radius:3px;overflow:hidden;margin-bottom:3px;}
+.pf{height:100%;border-radius:3px;transition:width .3s;}
+.pp{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--gr);text-align:right;}
+#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#0a0a0a;color:white;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;padding:8px 18px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap;}
+#toast.show{opacity:1;}
+.tip{background:var(--pl);border-left:3px solid var(--pm);border-radius:0 4px 4px 0;padding:7px 12px;margin:5px 16px;font-size:12px;font-style:italic;color:#2a2060;line-height:1.45;}
+.anchor{margin:10px 16px 0;padding:10px 12px;border-radius:4px;border-left:3px solid var(--pm);background:var(--pl);font-size:12px;font-style:italic;color:#2a2060;line-height:1.55;}
+.drow{padding:6px 16px;border-bottom:.5px solid var(--lt);display:flex;align-items:center;gap:10px;}
+.dlbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);flex-shrink:0;}
+input[type=date]{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:12px;color:var(--blk);padding:2px 0;outline:none;flex:1;}
+input[type=date]:focus{border-bottom-color:var(--p);}
+.snav{width:390px;display:flex;gap:3px;margin-bottom:8px;padding:3px;background:#1a1a1a;border-radius:10px;}
+.snbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:6px 2px;border:none;border-radius:7px;background:transparent;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.snbtn.on{color:white;}
+.ext{width:100%;border-collapse:collapse;font-size:12px;}
+.ext td{padding:5px 16px;border-bottom:.5px solid var(--lt);}
+.ext tr:last-child td{border-bottom:none;}
+.exn{font-weight:500;color:var(--blk);}
+.exv{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--gr);text-align:right;}
+.ext input{border:none;border-bottom:1px solid var(--lt);background:transparent;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--blk);text-align:right;outline:none;width:68px;padding:1px 0;}
+.ext input:focus{border-bottom-color:var(--p);}
+.wbtns{padding:8px 16px 4px;display:flex;gap:5px;flex-wrap:wrap;}
+.wbtn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1.5px solid var(--tr);cursor:pointer;transition:all .2s;}
+.wbtn.on{background:var(--tr);color:white;}.wbtn.off{background:transparent;color:var(--tr);}
+.bc{margin:5px 16px 0;border-radius:6px;padding:9px 12px;cursor:pointer;border:1.5px solid;transition:opacity .15s;}
+.bc:hover{opacity:.85;}
+.bnum{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.btxt{font-size:13px;font-weight:600;line-height:1.3;color:var(--blk);}
+.barr{font-size:10px;color:var(--gr);margin-top:2px;}
+/* ---- Reminders sheet ---- */
+#remOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:1000;}
+#remOverlay.show{display:flex;}
+#remSheet{width:390px;max-width:100%;background:var(--wht);border-radius:16px 16px 0 0;padding:8px 0 28px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.rs-grab{width:38px;height:4px;background:var(--lt);border-radius:3px;margin:6px auto 8px;}
+.rs-hd{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:-.01em;padding:0 16px;}
+.rs-sub{font-size:12px;color:var(--gr);padding:2px 16px 4px;}
+.rs-note{font-size:11px;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);margin:6px 16px;padding:7px 10px;border-radius:0 4px 4px 0;line-height:1.45;}
+.rs-lh{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gr);padding:10px 16px 2px;}
+.rs-item{display:flex;justify-content:space-between;gap:10px;padding:6px 16px;border-bottom:.5px solid var(--lt);font-size:12px;align-items:center;}
+.rs-item:last-child{border-bottom:none;}
+.rs-time{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--p);white-space:nowrap;}
+.rs-close{display:block;margin:10px 16px 0;width:calc(100% - 32px);padding:9px;border:1.5px solid var(--lt);background:transparent;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gr);cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔 Reminders</button><div class="sync s-idle" id="sync">Offline</div></div></div>
+<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button></div>
+<div class="dnav" id="dnav">
+<button class="dbtn on" onclick="setDay(0)" id="d0">Mon<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+<button class="dbtn" onclick="setDay(1)" id="d1">Tue<div class="dotrow"><div class="dot" style="background:#C8321A"></div></div></button>
+<button class="dbtn" onclick="setDay(2)" id="d2">Wed<div class="dotrow"><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#2E9E6B"></div></div></button>
+<button class="dbtn" onclick="setDay(3)" id="d3">Thu<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+<button class="dbtn" onclick="setDay(4)" id="d4">Fri<div class="dotrow"><div class="dot" style="background:#1A6EC8"></div></div></button>
+<button class="dbtn" onclick="setDay(5)" id="d5">Sat<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#2E9E6B"></div></div></button>
+<button class="dbtn" onclick="setDay(6)" id="d6">Sun<div class="dotrow"><div class="dot" style="background:#D4820A"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+</div>
+<div class="card vis" id="dayCard">
+<div class="lhd"><div class="ey" id="dEy">Day 1 of 7</div><div class="ct" id="dTt">Monday</div><div class="cs" id="dSb">Push 1 · Shave · Tretinoin PM</div><div class="mr"><div class="ml">Log &amp; track</div><div class="bgs" id="dBg"></div></div></div>
+<div class="drow"><div class="dlbl">Log date</div><input type="date" id="logDate"></div>
+<div class="lbd" id="dBody"></div>
+<button class="sbtn" style="background:var(--p)" onclick="saveDay()"><span class="spin" id="dSpin" style="display:none"></span><span id="dTxt">Save to Notion</span></button>
+<div class="lft"><div class="prow"><span class="pl">Daily Consistency</span><span class="pc" id="dCnt">0/0</span></div><div class="pb"><div class="pf" id="dFill" style="width:0%;background:var(--p)"></div></div><div class="pp" id="dPct">0% complete</div></div>
+</div>
+<div id="rView" style="display:none;width:390px;">
+<div class="snav">
+<button class="snbtn on" style="background:var(--pr)" onclick="setR('practice')" id="rb-practice">Practice</button>
+<button class="snbtn" onclick="setR('supps')" id="rb-supps">Supps</button>
+<button class="snbtn" onclick="setR('skin')" id="rb-skin">Skin</button>
+<button class="snbtn" onclick="setR('train')" id="rb-train">Train</button>
+<button class="snbtn" onclick="setR('beliefs')" id="rb-beliefs">Beliefs</button>
+</div>
+<div class="card vis" id="c-practice">
+<div class="lhd" style="border-bottom-color:var(--pr)"><div class="ey">Every day · 5:00 am · Ch 8-9</div><div class="ct" style="color:var(--pr)">Metaphysical<br>Practice</div><div class="cs">Meditation · Prayer · Reflection</div><div class="mr"><div class="ml">20-40 min · Beginner</div><div class="bgs"><div class="bg f" style="background:var(--pr);border-color:var(--pr)">Daily</div></div></div></div>
+<div class="lbd">
+<div class="anchor">I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming.</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Session</span><span class="ss">log completion</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Daily Anchor — read aloud</div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 1 — Breath Focus<span class="sub">10 breaths (4 in / 7 out) · observe natural breath · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 2 — Inner Body Scan<span class="sub">Feet to scalp · 10-15 sec per zone · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 3 — Enter the Gap<span class="sub">In / Out / 2-5 sec silence at emptiness · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 4 — Awaken the Heart (Metta)<span class="sub">Heart breathing · Five Wishes · Thank you x3</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">3 Gratitudes + Intention Review</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Gratitudes</span></div>
+<div class="er"><div class="el">Gratitude 1</div><input class="ef" id="g1" placeholder="I am grateful for..."></div>
+<div class="er"><div class="el">Gratitude 2</div><input class="ef" id="g2" placeholder="I am grateful for..."></div>
+<div class="er"><div class="el">Gratitude 3</div><input class="ef" id="g3" placeholder="I am grateful for..."></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Evening</span><span class="ss">8:30 pm</span></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Limiting Belief Check<span class="sub">Did any of the 5 surface today?</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Evening Reflection</div></div>
+<div class="er"><div class="el">Evening notes</div><textarea class="ef" id="eNotes" placeholder="What did you release? What peace did you find?"></textarea></div>
+<button class="sbtn" style="background:var(--pr)" onclick="savePractice()"><span class="spin" id="prSpin" style="display:none"></span><span id="prTxt">Save Session to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Session Progress</span><span class="pc" id="prCnt">0/0</span></div><div class="pb"><div class="pf" id="prFill" style="width:0%;background:var(--pr)"></div></div><div class="pp" id="prPct">0% complete</div></div>
+</div>
+<div class="card" id="c-supps">
+<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">Daily · 4 timing windows</div><div class="ct" style="color:var(--su)">Supplements</div><div class="cs">12 products · tap doses to edit</div><div class="mr"><div class="ml">Edit inline · Save syncs Notion</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)">12 items</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--su)">6:00 am</span><span class="ss">empty stomach</span></div><div class="thn"></div>
+<table class="ext"><tr><td class="exn">AG1 (Athletic Greens)</td><td class="exv"><input value="1 scoop" data-s="AG1"></td></tr><tr><td class="exn">Tru Niagen (NR)</td><td class="exv"><input value="900 mg" data-s="Niagen"></td></tr><tr><td class="exn">L-Theanine</td><td class="exv"><input value="200 mg" data-s="LTheanine"></td></tr><tr><td class="exn" style="color:var(--su);font-weight:600">Enclomiphene (Sun only)</td><td class="exv"><input value="50 mg" data-s="Enclo"></td></tr></table>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">8:00 am</span><span class="ss">with breakfast (needs fat)</span></div><div class="thn"></div>
+<table class="ext"><tr><td class="exn">D3 + K2 (5,000 IU / 100mcg)</td><td class="exv"><input value="1 softgel" data-s="D3K2"></td></tr><tr><td class="exn">CoQ10</td><td class="exv"><input value="200 mg" data-s="CoQ10"></td></tr><tr><td class="exn">Omega-3 Krill Oil</td><td class="exv"><input value="1,000 mg" data-s="Krill"></td></tr><tr><td class="exn">One A Day Men's</td><td class="exv"><input value="1 tablet" data-s="OneADay"></td></tr></table>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">12:30 + 1:00 pm</span><span class="ss">before + with lunch</span></div><div class="thn"></div>
+<table class="ext"><tr><td class="exn">ColonBroom (30-60 min before)</td><td class="exv"><input value="1 serving" data-s="ColonBroom"></td></tr><tr><td class="exn">Liposomal Vitamin C</td><td class="exv"><input value="1,000 mg" data-s="VitC"></td></tr><tr><td class="exn">B12</td><td class="exv"><input value="1,000 mcg" data-s="B12"></td></tr></table>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">8:00 pm</span><span class="ss">Mon-Fri only</span></div><div class="thn"></div>
+<table class="ext"><tr><td class="exn">Ashwagandha (rests Sat+Sun)</td><td class="exv"><input value="1,000 mg" data-s="Ashwa"></td></tr></table>
+<div class="tip">Tap any dose to edit. Save appends an update record to your Notion Well-Being OS page.</div>
+<button class="sbtn" style="background:var(--su)" onclick="saveSupps()"><span class="spin" id="suSpin" style="display:none"></span><span id="suTxt">Save Dose Updates to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Supplement Stack</span><span class="pc" style="color:var(--su)">12 items</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">Edit doses above · tap Save to sync</div></div>
+</div>
+<div class="card" id="c-skin">
+<div class="lhd" style="border-bottom-color:var(--sk)"><div class="ey">AM every day · PM varies by night</div><div class="ct" style="color:var(--sk)">Skincare</div><div class="cs">10 products · AM + PM protocols</div><div class="mr"><div class="ml">Check off steps</div><div class="bgs"><div class="bg f" style="background:var(--sk);border-color:var(--sk)">10 products</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--sk)">AM</span><span class="ss">every day · 6:15 am</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">1. CeraVe Hydrating Cleanser</div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 1</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Topicals High Roller<span class="sub">Mon/Wed/Fri only — after shave, before mist</span></div><div class="rv" style="background:#FBEAF0;color:#993556">shave</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">2. ATOBARRIER365 Mist<span class="sub">Spritz on damp skin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 2</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">3. Hyaluronic Acid (The Ordinary)<span class="sub">Pat into misted skin immediately</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 3</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">4. ATOBARRIER365 Cream<span class="sub">Ceramides + niacinamide</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">5. Elta MD UV Clear Tinted SPF 46<span class="sub">Always last — non-negotiable</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Tret</span><span class="ss">Mon + Thu</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser (double) to Mist to HA</div><div class="rv" style="background:#EAF7F1;color:var(--sk)">1-3</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Anua Azelaic Acid 10%<span class="sub">Wait 5 min before tretinoin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Tretinoin 0.025%<span class="sub">Pea-size · dry skin · avoid eye/lip corners</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">ATOBARRIER365 Cream<span class="sub">Wait 20-30 min after tretinoin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 6</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Exfol</span><span class="ss">Wed + Sat</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to BHA or Glycolic (alternate weekly)<span class="sub">Wait 5-10 min · one exfoliant only</span></div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Mist to HA to ATOBARRIER365 Cream</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Rest</span><span class="ss">Tue + Fri + Sun</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to Mist to HA to ATOBARRIER365 Cream<span class="sub">No actives — barrier repair only</span></div></div>
+<div class="tip">Never use exfoliants on tretinoin nights. Never use both BHA and glycolic on the same night.</div>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Skincare Checklist</span><span class="pc" id="skCnt">0/0</span></div><div class="pb"><div class="pf" id="skFill" style="width:0%;background:var(--sk)"></div></div><div class="pp" id="skPct">0% complete</div></div>
+</div>
+<div class="card" id="c-train">
+<div class="lhd" style="border-bottom-color:var(--tr)"><div class="ey">4x / week · 7:00 am · PPL split</div><div class="ct" style="color:var(--tr)">Training</div><div class="cs">6 workouts · tap weights to update</div><div class="mr"><div class="ml">Edit inline · Save logs to Notion</div><div class="bgs"><div class="bg f" style="background:var(--tr);border-color:var(--tr)">PPLx2</div></div></div></div>
+<div class="lbd">
+<div class="wbtns"><button class="wbtn on" id="wb-p1" onclick="showW('p1')">Push 1</button><button class="wbtn off" id="wb-l1" onclick="showW('l1')">Pull 1</button><button class="wbtn off" id="wb-legs1" onclick="showW('legs1')">Legs 1</button><button class="wbtn off" id="wb-p2" onclick="showW('p2')">Push 2</button><button class="wbtn off" id="wb-pull2" onclick="showW('pull2')">Pull 2</button><button class="wbtn off" id="wb-legs2" onclick="showW('legs2')">Legs 2</button></div>
+<div class="thn" style="margin-top:4px"></div>
+<div id="w-p1"><div class="sh"><span class="stg" style="background:var(--tr)">Push 1</span><span class="ss">Monday</span></div><table class="ext"><tr><td class="exn">Bench Press</td><td class="exv">4x10 @</td><td><input value="70 lbs" data-e="bench"></td></tr><tr><td class="exn">Seated DB OHP</td><td class="exv">3x10 @</td><td><input value="30 lbs" data-e="ohp"></td></tr><tr><td class="exn">Incline Chest Press</td><td class="exv">3x10 @</td><td><input value="95 lbs" data-e="incline"></td></tr><tr><td class="exn">Seated Cable Fly</td><td class="exv">3x10 @</td><td><input value="80 lbs" data-e="fly"></td></tr><tr><td class="exn">Tricep Pulldowns Rope</td><td class="exv">3x10 @</td><td><input value="70 lbs" data-e="tricep"></td></tr><tr><td class="exn">Egyptian Lateral Raise</td><td class="exv">4x10 @</td><td><input value="20 lbs" data-e="lateral"></td></tr></table></div>
+<div id="w-l1" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Pull 1</span><span class="ss">Tuesday</span></div><table class="ext"><tr><td class="exn">Straight Arm Pulldown</td><td class="exv">4x10 @</td><td><input value="70 lbs" data-e="s_pull"></td></tr><tr><td class="exn">Cable Face Pulls</td><td class="exv">4x10 @</td><td><input value="20 lbs" data-e="face_pull"></td></tr><tr><td class="exn">Lat Pulldown Wide</td><td class="exv">4x10 @</td><td><input value="85 lbs" data-e="lat_pull"></td></tr><tr><td class="exn">Hammer Curl DB</td><td class="exv">4x10 @</td><td><input value="60 lbs" data-e="hammer"></td></tr><tr><td class="exn">Bayesian Curl</td><td class="exv">4x10 @</td><td><input value="30 lbs" data-e="bayesian"></td></tr><tr><td class="exn">Landmine / SA Row</td><td class="exv">4x10 @</td><td><input value="15 lbs" data-e="landmine"></td></tr><tr><td class="exn">Chest Supported Row</td><td class="exv">4x10 @</td><td><input value="15 lbs" data-e="cs_row"></td></tr></table></div>
+<div id="w-legs1" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Legs 1</span><span class="ss">Thursday</span></div><table class="ext"><tr><td class="exn">Elliptical</td><td class="exv">10 min</td><td><input value="Level 6" data-e="elliptical"></td></tr><tr><td class="exn">Leg Press</td><td class="exv">12/10/8/6</td><td><input value="240 lbs" data-e="leg_press"></td></tr><tr><td class="exn">Goblet Squat</td><td class="exv">4x10 @</td><td><input value="30 lbs" data-e="goblet"></td></tr><tr><td class="exn">Leg Extension</td><td class="exv">3x10 @</td><td><input value="85 lbs" data-e="leg_ext"></td></tr><tr><td class="exn">Glute Kickback</td><td class="exv">6x10 ea @</td><td><input value="17 lbs" data-e="kickback"></td></tr><tr><td class="exn">Calf Raise (Smith)</td><td class="exv">3x20 @</td><td><input value="50 lbs" data-e="calf"></td></tr><tr><td class="exn">Reverse Lunge</td><td class="exv">4x10 @</td><td><input value="50 lbs" data-e="lunge"></td></tr></table></div>
+<div id="w-p2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Push 2</span><span class="ss">Saturday Week A</span></div><table class="ext"><tr><td class="exn">Chest Press (Incline)</td><td class="exv">1x10 @</td><td><input value="60 lbs" data-e="cp_inc"></td></tr><tr><td class="exn">Chest Press (Flat)</td><td class="exv">1x10 @</td><td><input value="60 lbs" data-e="cp_flat"></td></tr><tr><td class="exn">Incline DB Press</td><td class="exv">sets @</td><td><input value="TBD" data-e="inc_db"></td></tr><tr><td class="exn">Lateral Raise Cable R</td><td class="exv">sets @</td><td><input value="TBD" data-e="lat_r"></td></tr><tr><td class="exn">Lateral Raise Cable L</td><td class="exv">sets @</td><td><input value="TBD" data-e="lat_l"></td></tr><tr><td class="exn">Overhead Rope Tri Ext</td><td class="exv">sets @</td><td><input value="TBD" data-e="oh_tri"></td></tr><tr><td class="exn">Straight Bar Pushdown</td><td class="exv">sets @</td><td><input value="TBD" data-e="bar_push"></td></tr></table></div>
+<div id="w-pull2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Pull 2</span><span class="ss">Saturday Week B</span></div><table class="ext"><tr><td class="exn">Close Grip Chinups</td><td class="exv">sets</td><td><input value="BW" data-e="chinups"></td></tr><tr><td class="exn">Wide Grip Seated Row</td><td class="exv">sets @</td><td><input value="TBD" data-e="wg_row"></td></tr><tr><td class="exn">Reverse Fly DB</td><td class="exv">sets @</td><td><input value="TBD" data-e="rev_fly"></td></tr><tr><td class="exn">Half Kneeling Row</td><td class="exv">sets @</td><td><input value="TBD" data-e="hk_row"></td></tr><tr><td class="exn">Standing Shrugs DB</td><td class="exv">sets @</td><td><input value="TBD" data-e="shrugs"></td></tr><tr><td class="exn">Bicep Curl Cable</td><td class="exv">sets @</td><td><input value="TBD" data-e="bic_cable"></td></tr><tr><td class="exn">Preacher Curl</td><td class="exv">sets @</td><td><input value="TBD" data-e="preacher"></td></tr></table></div>
+<div id="w-legs2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Legs 2</span><span class="ss">Saturday Week C</span></div><table class="ext"><tr><td class="exn">Stiff Leg Deadlift</td><td class="exv">4x10 @</td><td><input value="90 lbs" data-e="sldl"></td></tr><tr><td class="exn">Hip Thrust (Smith)</td><td class="exv">4x10 @</td><td><input value="50 lbs" data-e="hip_thrust"></td></tr><tr><td class="exn">Travelling Lunge L</td><td class="exv">4x5 @</td><td><input value="50 lbs" data-e="lunge_l"></td></tr><tr><td class="exn">Travelling Lunge R</td><td class="exv">4x5 @</td><td><input value="50 lbs" data-e="lunge_r"></td></tr><tr><td class="exn">Leg Curl L</td><td class="exv">3x10 @</td><td><input value="50 lbs" data-e="curl_l"></td></tr><tr><td class="exn">Leg Curl R</td><td class="exv">3x10 @</td><td><input value="50 lbs" data-e="curl_r"></td></tr><tr><td class="exn">Hip Abduction</td><td class="exv">3 sets @</td><td><input value="TBD" data-e="hip_abd"></td></tr><tr><td class="exn">Calf Raise</td><td class="exv">3 sets @</td><td><input value="TBD" data-e="calf2"></td></tr></table></div>
+<div class="er" style="margin-top:6px"><div class="el">Session notes / PRs</div><textarea class="ef" id="wNotes" placeholder="Personal records, form notes, how you felt..."></textarea></div>
+<button class="sbtn" style="background:var(--tr)" onclick="saveWorkout()"><span class="spin" id="trSpin" style="display:none"></span><span id="trTxt">Save Workout to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Training Log</span><span class="pc" style="color:var(--tr)">Edit weights above</span></div><div class="pb"><div class="pf" style="width:60%;background:var(--tr)"></div></div><div class="pp">Tap Save to log to Notion</div></div>
+</div>
+<div class="card" id="c-beliefs">
+<div class="lhd" style="border-bottom-color:var(--p)"><div class="ey">Ch 12 · Active Work · Dec 2025</div><div class="ct">Limiting <span style="color:var(--p)">Beliefs</span></div><div class="cs">5 beliefs · write + save to Notion</div><div class="mr"><div class="ml">Wed / Fri / Sun evenings</div><div class="bgs"><div class="bg f" style="background:var(--p);border-color:var(--p)">5 Beliefs</div></div></div></div>
+<div class="lbd">
+<div style="padding:8px 16px 2px;font-size:12px;color:var(--gr);line-height:1.55;">Tap a belief to expand and write your deactivation work. Save appends to your Notion Limiting Beliefs page.</div>
+<div class="thk"></div>
+<div class="bc" style="background:#FEF0ED;border-color:var(--b1)" onclick="tb('b1')"><div class="bnum" style="color:var(--b1)">Belief 1</div><div class="btxt">Money is difficult to accumulate</div><div class="barr" id="ba-b1">Oprah · Madam C.J. Walker · Jan Koum · Howard Schultz</div></div>
+<div id="bw-b1" style="display:none"><div class="er"><div class="el" style="color:var(--b1)">Alternative explanations / Is it true?</div><textarea class="ef" id="b1a" placeholder="Think of Oprah, Madam C.J. Walker, Jan Koum, Howard Schultz..."></textarea></div><div class="er"><div class="el" style="color:var(--b1)">Where did this belief come from?</div><textarea class="ef" id="b1o" placeholder="What experience or person planted this?"></textarea></div><div class="er"><div class="el" style="color:var(--b1)">New replacement belief</div><input class="ef" id="b1r" placeholder="Money accumulates naturally when I..."></div></div>
+<div class="bc" style="background:#FEF5E7;border-color:var(--b2);margin-top:5px" onclick="tb('b2')"><div class="bnum" style="color:var(--b2)">Belief 2</div><div class="btxt">Money is difficult to keep</div><div class="barr" id="ba-b2">J.K. Rowling · Sara Blakely · Ralph Lauren · John Paul DeJoria</div></div>
+<div id="bw-b2" style="display:none"><div class="er"><div class="el" style="color:var(--b2)">Alternative explanations / Is it true?</div><textarea class="ef" id="b2a" placeholder="Think of J.K. Rowling, Sara Blakely, Ralph Lauren, DeJoria..."></textarea></div><div class="er"><div class="el" style="color:var(--b2)">Where did this come from?</div><textarea class="ef" id="b2o"></textarea></div><div class="er"><div class="el" style="color:var(--b2)">New replacement belief</div><input class="ef" id="b2r" placeholder="Money stays and grows because I..."></div></div>
+<div class="bc" style="background:#EAF7F1;border-color:var(--b3);margin-top:5px" onclick="tb('b3')"><div class="bnum" style="color:var(--b3)">Belief 3</div><div class="btxt">Time must be sacrificed for money</div><div class="barr" id="ba-b3">Kiyosaki · Buffett · Naval Ravikant · Tim Ferriss</div></div>
+<div id="bw-b3" style="display:none"><div class="er"><div class="el" style="color:var(--b3)">What assets earn without your time?</div><textarea class="ef" id="b3a" placeholder="Bahamas Airbnb · architectural IP · what else?"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">Where did this come from?</div><textarea class="ef" id="b3o"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">New replacement belief</div><input class="ef" id="b3r" placeholder="My assets work so my time is..."></div></div>
+<div class="bc" style="background:#EAF2FD;border-color:var(--b4);margin-top:5px" onclick="tb('b4')"><div class="bnum" style="color:var(--b4)">Belief 4</div><div class="btxt">Money requires constant monitoring</div><div class="barr" id="ba-b4">Bogle · Ramit Sethi · Morgan Housel · Charlie Munger</div></div>
+<div id="bw-b4" style="display:none"><div class="er"><div class="el" style="color:var(--b4)">What would you automate if you trusted the system?</div><textarea class="ef" id="b4a" placeholder="Think of Bogle, Sethi, Housel, Munger..."></textarea></div><div class="er"><div class="el" style="color:var(--b4)">Where did this come from?</div><textarea class="ef" id="b4o"></textarea></div><div class="er"><div class="el" style="color:var(--b4)">New replacement belief</div><input class="ef" id="b4r" placeholder="My financial system runs well without..."></div></div>
+<div class="bc" style="background:#F4EDFB;border-color:var(--b5);margin-top:5px" onclick="tb('b5')"><div class="bnum" style="color:var(--b5)">Belief 5</div><div class="btxt">Ambition requires sacrificing life</div><div class="barr" id="ba-b5">Branson · Rihanna · Li Ka-shing · Arianna Huffington</div></div>
+<div id="bw-b5" style="display:none"><div class="er"><div class="el" style="color:var(--b5)">Where has ambition coexisted with living well?</div><textarea class="ef" id="b5a" placeholder="Think of Branson, Rihanna, Li Ka-shing, Huffington..."></textarea></div><div class="er"><div class="el" style="color:var(--b5)">Where did this come from?</div><textarea class="ef" id="b5o"></textarea></div><div class="er"><div class="el" style="color:var(--b5)">New replacement belief</div><input class="ef" id="b5r" placeholder="My ambition and my life are..."></div></div>
+<button class="sbtn" style="background:var(--p);margin-top:8px" onclick="saveBeliefs()"><span class="spin" id="blSpin" style="display:none"></span><span id="blTxt">Save Belief Work to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Deactivation Work</span><span class="pc" id="blCnt" style="color:var(--p)">0/5 beliefs</span></div><div class="pb"><div class="pf" id="blFill" style="width:0%;background:var(--p)"></div></div><div class="pp" id="blPct">Write responses · tap Save</div></div>
+</div>
+</div>
+<div id="remOverlay" onclick="closeRem(event)">
+<div id="remSheet" onclick="event.stopPropagation()">
+<div class="rs-grab"></div>
+<div class="rs-hd">🔔 Reminders</div>
+<div class="rs-sub" id="rsStatus">—</div>
+<button class="sbtn" id="remToggleBtn" style="background:var(--p)" onclick="toggleReminders()">Enable Reminders</button>
+<button class="sbtn" style="background:#333" onclick="testNotif()">Send Test Notification</button>
+<div class="rs-note" id="rsNote"></div>
+<div class="rs-lh">Today's reminder times</div>
+<div id="rsList"></div>
+<button class="sbtn" style="background:var(--sk)" onclick="exportICS()">⤓ Add Week to Calendar (.ics)</button>
+<button class="rs-close" onclick="closeRem()">Close</button>
+</div>
+</div>
+<div id="toast"></div>
+<script>
+var NOTION_OS='3240ac6c9de1815abad8fcad66654830';
+var NOTION_BELIEFS='3240ac6c9de1810db4b1d6ecc814f85d';
+var curDay=0,curR='practice',curW='p1';
+var DAYS=[
+{n:'Monday',ey:'Day 1 of 7 — Training Day',sb:'Push 1 · Shave · Tretinoin PM',bg:[{t:'Push 1',c:'#C8321A'},{t:'Shave',c:'#1A6EC8'},{t:'Tret PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full 4-step + Scientific Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb fully before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > Elta MD SPF'},{t:'tr',l:'7:00am — Push 1',s:'Bench · OHP · Incline · Cable Fly · Tricep · Lateral Raise'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With oatmeal + nuts + hemp'},{t:'su',l:'12:30pm — ColonBroom',s:'30-60 min before lunch'},{t:'su',l:'1:00pm — Vitamin C + B12',s:'With lunch'},{t:'su',l:'8:00pm — Ashwagandha',s:'With or after dinner'},{t:'sk',l:'8:00pm — PM Skincare (Tretinoin night)',s:'Cleanser > Mist > HA > Azelaic Acid > Tretinoin > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:'Limiting belief check + what did you release?'}]},
+{n:'Tuesday',ey:'Day 2 of 7 — Training Day',sb:'Pull 1 · Rest PM',bg:[{t:'Pull 1',c:'#C8321A'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Pull 1',s:'Pulldown · Face Pulls · Lat Pull · Hammer · Bayesian · Row x2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
+{n:'Wednesday',ey:'Day 3 of 7 — Rest Day',sb:'Shave · Exfoliant PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Best night for Ch 12 deactivation work'}]},
+{n:'Thursday',ey:'Day 4 of 7 — Training Day',sb:'Legs 1 · Tretinoin PM',bg:[{t:'Legs 1',c:'#2E9E6B'},{t:'Tret PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Legs 1',s:'Elliptical · Leg Press · Goblet Squat · Leg Ext · Glute Kickback · Calf · Reverse Lunge'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Tretinoin night)',s:'Cleanser > Mist > HA > Azelaic Acid > Tretinoin > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
+{n:'Friday',ey:'Day 5 of 7 — Rest Day',sb:'Shave · Rest PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Rest PM',c:'#888'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:'Last dose this week'},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Good night for Ch 12 work'}]},
+{n:'Saturday',ey:'Day 6 of 7 — Training Day',sb:'Rotating Workout · Exfoliant PM',bg:[{t:'Rotating',c:'#C8321A'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'No Ashwagandha today'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Rotating Workout',s:'Week A: Push 2 · Week B: Pull 2 · Week C: Legs 2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Weekly Review',s:'Consistency · intentions · what shifts next week'}]},
+{n:'Sunday',ey:'Day 7 of 7 — Full Rest',sb:'Enclomiphene Day · Rest PM',bg:[{t:'Enclo',c:'#D4820A'},{t:'Full Rest',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full rest day — run a longer session'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine + Enclomiphene 50mg',s:'Weekly enclomiphene dose · empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast · No Ashwagandha'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Full rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream · Complete weekly reset'},{t:'pr',l:'8:30pm — Weekly Review + Belief Work',s:'Best night for Ch 12 research and writing'}]}
+];
+var TC={pr:'#5B4FE8',su:'#D4820A',sk:'#2E9E6B',tr:'#C8321A',sh:'#1A6EC8'};
+var TL={pr:'practice',su:'supps',sk:'skincare',tr:'gym',sh:'shave'};
+function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d.ey;document.getElementById('dTt').textContent=d.n;document.getElementById('dSb').textContent=d.sb;document.getElementById('dBg').innerHTML=d.bg.map(function(b){return '<div class="bg f" style="background:'+b.c+';border-color:'+b.c+'">'+b.t+'</div>';}).join('');var html='';d.items.forEach(function(it){var c=TC[it.t]||'#888',lb=TL[it.t]||'';html+='<div class="row" onclick="togDay(this)" style="color:'+c+'"><div class="chk"></div><div class="rn">'+it.l+(it.s?'<span class="sub">'+it.s+'</span>':'')+'</div><div class="rv" style="background:'+c+'18;color:'+c+'">'+lb+'</div></div><div class="thn"></div>';});html+='<div class="er" style="margin-top:6px"><div class="el">Day notes</div><textarea class="ef" id="dNotes" placeholder="Observations, how you feel..."></textarea></div><div style="height:6px"></div>';document.getElementById('dBody').innerHTML=html;updDP();var n=new Date(),y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0'),dd=String(n.getDate()).padStart(2,'0');document.getElementById('logDate').value=y+'-'+m+'-'+dd;syncUI();}
+function togDay(r){r.classList.toggle('dn');updDP();saveChecks();}
+function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.row');var done=document.getElementById('dBody').querySelectorAll('.row.dn').length,tot=rows.length;var p=tot?Math.round(done/tot*100):0;document.getElementById('dCnt').textContent=done+'/'+tot;document.getElementById('dFill').style.width=p+'%';document.getElementById('dPct').textContent=p+'% complete';}
+function setMode(m){document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',(i===0&&m==='day')||(i===1&&m==='routine'));});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';if(m==='routine')setR(curR);}
+function setDay(i){curDay=i;for(var j=0;j<7;j++){document.getElementById('d'+j).classList.toggle('on',j===i);}renderDay(i);}
+var RC={practice:'#5B4FE8',supps:'#D4820A',skin:'#2E9E6B',train:'#C8321A',beliefs:'#5B4FE8'};
+function setR(r){curR=r;['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
+function showW(w){curW=w;['p1','l1','legs1','p2','pull2','legs2'].forEach(function(id){var el=document.getElementById('w-'+id),btn=document.getElementById('wb-'+id);if(el)el.style.display=id===w?'block':'none';if(btn){btn.classList.toggle('on',id===w);btn.classList.toggle('off',id!==w);}});restoreFields();}
+function tog(r,cat){r.classList.toggle('dn');if(cat==='pr')updPR();if(cat==='sk')updSK();saveChecks();}
+function updPR(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var p=tot?Math.round(done/tot*100):0;document.getElementById('prCnt').textContent=done+'/'+tot;document.getElementById('prFill').style.width=p+'%';document.getElementById('prPct').textContent=p+'% complete';}
+function updSK(){var c=document.getElementById('c-skin');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var p=tot?Math.round(done/tot*100):0;document.getElementById('skCnt').textContent=done+'/'+tot;document.getElementById('skFill').style.width=p+'%';document.getElementById('skPct').textContent=p+'% complete';}
+function tb(b){var w=document.getElementById('bw-'+b),a=document.getElementById('ba-'+b);var open=w.style.display!=='none';w.style.display=open?'none':'block';a.textContent=open?'tap to expand':'close';}
+function setSt(s,l){var el=document.getElementById('sync');el.className='sync s-'+s;el.textContent=l;}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+function setSv(sid,tid,saving,lbl){var sp=document.getElementById(sid),tx=document.getElementById(tid);if(sp)sp.style.display=saving?'inline-block':'none';if(tx&&lbl)tx.textContent=lbl;}
+async function callN(prompt,spId,txId,ok,def){setSv(spId,txId,true);setSt('load','Syncing...');try{var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a Notion assistant. Use the Notion MCP tool to create or update pages as instructed. Respond briefly.',messages:[{role:'user',content:prompt}],mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}]})});var data=await res.json();if(data.error)throw new Error(data.error.message||'API error');setSt('ok','Synced');setSv(spId,txId,false,ok);toast('Saved to Notion');setTimeout(function(){setSv(spId,txId,false,def);},2000);}catch(err){setSt('err','Error');setSv(spId,txId,false,'Retry');toast('Error: '+err.message);setTimeout(function(){setSv(spId,txId,false,def);},3000);}}
+async function saveDay(){var d=DAYS[curDay];var date=document.getElementById('logDate').value||new Date().toISOString().split('T')[0];var notes=(document.getElementById('dNotes')||{value:''}).value||'';var rows=document.getElementById('dBody').querySelectorAll('.row');var done=[],todo=[];rows.forEach(function(r){var txt=r.querySelector('.rn');if(!txt)return;var label=txt.childNodes[0].textContent.trim();(r.classList.contains('dn')?done:todo).push(label);});var pct=done.length+todo.length>0?Math.round(done.length/(done.length+todo.length)*100):0;var content='## '+d.n+' Daily Log - '+date+'\n\n**Completion:** '+done.length+'/'+(done.length+todo.length)+' ('+pct+'%)\n\n### Completed\n'+done.map(function(x){return '- '+x;}).join('\n')+'\n\n### Not completed\n'+todo.map(function(x){return '- '+x;}).join('\n')+(notes?'\n\n### Notes\n'+notes:'');var prompt='Using the Notion MCP, create a new child page under parent ID '+NOTION_OS+' titled "'+date+' - '+d.n+' Log" with this content:\n\n'+content;await callN(prompt,'dSpin','dTxt','Saved','Save to Notion');}
+async function savePractice(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var g1=document.getElementById('g1').value,g2=document.getElementById('g2').value,g3=document.getElementById('g3').value;var ev=document.getElementById('eNotes').value;var date=new Date().toISOString().split('T')[0];var content='## Practice Session - '+date+'\n\n**Completion:** '+done+'/'+tot+'\n\n### 3 Gratitudes\n1. '+(g1||'-')+'\n2. '+(g2||'-')+'\n3. '+(g3||'-')+(ev?'\n\n### Evening Reflection\n'+ev:'');var prompt='Using the Notion MCP, create a new child page under parent ID '+NOTION_OS+' titled "'+date+' - Practice Log" with this content:\n\n'+content;await callN(prompt,'prSpin','prTxt','Saved','Save Session to Notion');}
+async function saveSupps(){var inputs=document.querySelectorAll('[data-s]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-s')+': '+inp.value);});var date=new Date().toISOString().split('T')[0];var prompt='Using the Notion MCP, append the following to page ID '+NOTION_OS+':\n\n---\n## Supplement Update - '+date+'\n'+lines.join('\n');await callN(prompt,'suSpin','suTxt','Saved','Save Dose Updates to Notion');}
+async function saveWorkout(){var wname={p1:'Push 1',l1:'Pull 1',legs1:'Legs 1',p2:'Push 2',pull2:'Pull 2',legs2:'Legs 2'};var inputs=document.querySelectorAll('#w-'+curW+' [data-e]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-e').replace(/_/g,' ')+': '+inp.value);});var notes=document.getElementById('wNotes').value;var date=new Date().toISOString().split('T')[0];var content='## '+wname[curW]+' - '+date+'\n\n### Weights\n'+lines.join('\n')+(notes?'\n\n### Notes\n'+notes:'');var prompt='Using the Notion MCP, create a new child page under parent ID '+NOTION_OS+' titled "'+date+' - '+wname[curW]+' Workout" with this content:\n\n'+content;await callN(prompt,'trSpin','trTxt','Saved','Save Workout to Notion');}
+async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var labels=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed for money','Money requires constant monitoring','Ambition requires sacrificing life'];var sections='',count=0;['b1','b2','b3','b4','b5'].forEach(function(b,i){var alt=document.getElementById(b+'a'),orig=document.getElementById(b+'o'),rep=document.getElementById(b+'r');if(!alt)return;if(alt.value||orig.value||rep.value){count++;sections+='\n\n### Belief '+(i+1)+' - '+labels[i];if(alt.value)sections+='\n\n**Alternative explanations:**\n'+alt.value;if(orig.value)sections+='\n\n**Origin:**\n'+orig.value;if(rep.value)sections+='\n\n**New belief:**\n> '+rep.value;}});if(!sections){toast('Write something first');return;}document.getElementById('blCnt').textContent=count+'/5 beliefs';document.getElementById('blFill').style.width=(count/5*100)+'%';document.getElementById('blPct').textContent=count+' of 5 beliefs written';var prompt='Using the Notion MCP, append the following to page ID '+NOTION_BELIEFS+':\n\n---\n## Deactivation Session - '+date+sections;await callN(prompt,'blSpin','blTxt','Saved','Save Belief Work to Notion');}
+
+/* ============================================================
+   LOCAL PERSISTENCE — checkboxes + inputs survive reloads.
+   Inputs (weights/doses/text) persist ongoing; checkbox
+   completion is scoped per calendar day so each morning is fresh.
+   ============================================================ */
+function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
+function fieldKey(el){return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
+function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
+document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));});
+function checksKey(){return 'wb_checks_'+todayKey();}
+function rowKey(r){var card=r.closest('.card');var ctx=card?card.id:'x';if(ctx==='dayCard')ctx+='_'+curDay;var rn=r.querySelector('.rn');var t=rn?(rn.childNodes[0]?rn.childNodes[0].textContent:rn.textContent):r.textContent;return ctx+'|'+t.trim();}
+function saveChecks(){var done=[];document.querySelectorAll('.row.dn').forEach(function(r){done.push(rowKey(r));});localStorage.setItem(checksKey(),JSON.stringify(done));}
+function restoreChecks(){var set;try{set=JSON.parse(localStorage.getItem(checksKey())||'[]');}catch(e){set=[];}var s={};set.forEach(function(k){s[k]=1;});document.querySelectorAll('.row').forEach(function(r){if(s[rowKey(r)])r.classList.add('dn');else r.classList.remove('dn');});}
+function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();}
+
+/* ============================================================
+   PWA + REMINDERS
+   ============================================================ */
+var swReg=null;
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(function(r){swReg=r;}).catch(function(){});}
+var REM_KEY='wb_rem_enabled';
+var remTimers=[];
+var WD=['MO','TU','WE','TH','FR','SA','SU'];
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent);}
+function remOn(){return localStorage.getItem(REM_KEY)==='1';}
+function realTodayIdx(){var map={1:0,2:1,3:2,4:3,5:4,6:5,0:6};return map[new Date().getDay()];}
+function parseTime(label){var m=label.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);if(!m)return null;var h=+m[1],mi=+m[2],ap=m[3].toLowerCase();if(ap==='pm'&&h!==12)h+=12;if(ap==='am'&&h===12)h=0;return h*60+mi;}
+function dayReminders(i){var d=DAYS[i],out=[];d.items.forEach(function(it){var t=parseTime(it.l);if(t==null)return;var title=it.l.replace(/^\s*\d{1,2}:\d{2}\s*(am|pm)[^—-]*[—-]\s*/i,'').trim()||it.l;out.push({min:t,hhmm:fmtMin(t),title:title,body:it.s||''});});out.sort(function(a,b){return a.min-b.min;});return out;}
+function fmtMin(m){var h=Math.floor(m/60),mi=m%60,ap=h>=12?'pm':'am',h12=h%12;if(h12===0)h12=12;return h12+':'+String(mi).padStart(2,'0')+' '+ap;}
+function fireNotif(title,body,tag){if(swReg&&swReg.active){swReg.active.postMessage({type:'notify',title:title,body:body,tag:tag});return true;}if('Notification' in window&&Notification.permission==='granted'){try{new Notification(title,{body:body,icon:'./icons/icon-192.png',tag:tag});return true;}catch(e){}}return false;}
+function scheduleReminders(){remTimers.forEach(clearTimeout);remTimers=[];if(!remOn())return;if(!('Notification' in window)||Notification.permission!=='granted')return;var now=new Date();var mins=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;dayReminders(realTodayIdx()).forEach(function(r){var delay=(r.min-mins)*60000;if(delay<=1000)return;if(delay>24*3600000)return;remTimers.push(setTimeout(function(){fireNotif('🧬 '+r.title,r.hhmm+' · '+(r.body||'Well-Being OS'),'wb-'+r.min);},delay));});}
+async function toggleReminders(){if(remOn()){localStorage.setItem(REM_KEY,'0');remTimers.forEach(clearTimeout);remTimers=[];toast('Reminders off');renderRem();return;}if(!('Notification' in window)){toast('Notifications not supported here');renderRem();return;}var p=Notification.permission;if(p!=='granted'){try{p=await Notification.requestPermission();}catch(e){p=Notification.permission;}}if(p==='granted'){localStorage.setItem(REM_KEY,'1');scheduleReminders();toast('Reminders on for today');}else{toast('Permission blocked — enable in iOS Settings');}renderRem();}
+function testNotif(){if(!('Notification' in window)){toast('Notifications not supported');return;}if(Notification.permission!=='granted'){toast('Enable reminders first');return;}var ok=fireNotif('🧬 Well-Being OS','Test reminder — notifications are working.','wb-test');toast(ok?'Test sent':'Could not send');}
+function openRem(){renderRem();document.getElementById('remOverlay').classList.add('show');}
+function closeRem(e){if(e&&e.target&&e.target.id&&e.target.id!=='remOverlay')return;document.getElementById('remOverlay').classList.remove('show');}
+function renderRem(){var on=remOn(),perm=('Notification' in window)?Notification.permission:'unsupported';var bell=document.getElementById('bellBtn');bell.classList.toggle('on',on&&perm==='granted');document.getElementById('remToggleBtn').textContent=(on&&perm==='granted')?'Turn Reminders Off':'Enable Reminders';var st=document.getElementById('rsStatus');st.textContent=(on&&perm==='granted')?('On — '+remTimers.length+' reminder(s) queued for today'):(perm==='denied'?'Blocked in Settings':'Off');var note=document.getElementById('rsNote'),msg='';if(isIOS()&&!isStandalone()){msg='To get notifications on iPhone you must install this first: tap the Share icon in Safari → <b>Add to Home Screen</b>, then open it from the new icon and enable reminders here.';}else{msg='Reminders fire while this app is open or recently backgrounded. iOS does not run it when fully closed — for alarms that always fire, use <b>Add Week to Calendar</b> below.';}note.innerHTML=msg;var list=document.getElementById('rsList'),html='';dayReminders(realTodayIdx()).forEach(function(r){html+='<div class="rs-item"><span>'+r.title+'</span><span class="rs-time">'+r.hhmm+'</span></div>';});list.innerHTML=html||'<div class="rs-item">No timed items today</div>';}
+function nextDateForWeekday(idx,h,mm){var jsTarget=[1,2,3,4,5,6,0][idx];var d=new Date();var add=(jsTarget-d.getDay()+7)%7;d.setDate(d.getDate()+add);d.setHours(h,mm,0,0);return d;}
+function icsLocal(d){function p(n){return String(n).padStart(2,'0');}return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';}
+function exportICS(){var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Well-Being OS//EN','CALSCALE:GREGORIAN'];var stamp=icsLocal(new Date())+'Z';var uid=0;for(var i=0;i<7;i++){dayReminders(i).forEach(function(r){var h=Math.floor(r.min/60),mm=r.min%60;var dt=nextDateForWeekday(i,h,mm);lines.push('BEGIN:VEVENT');lines.push('UID:wb-'+i+'-'+r.min+'-'+(uid++)+'@wellbeing');lines.push('DTSTAMP:'+stamp);lines.push('DTSTART:'+icsLocal(dt));lines.push('DURATION:PT10M');lines.push('RRULE:FREQ=WEEKLY;BYDAY='+WD[i]);lines.push('SUMMARY:'+icsEsc('🧬 '+r.title));if(r.body)lines.push('DESCRIPTION:'+icsEsc(r.body));lines.push('BEGIN:VALARM');lines.push('ACTION:DISPLAY');lines.push('DESCRIPTION:'+icsEsc(r.title));lines.push('TRIGGER:PT0M');lines.push('END:VALARM');lines.push('END:VEVENT');});}lines.push('END:VCALENDAR');var ics=lines.join('\r\n');var blob=new Blob([ics],{type:'text/calendar'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='wellbeing-reminders.ics';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);toast('Calendar file ready — open it to add');}
+function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+
+document.addEventListener('visibilitychange',function(){if(!document.hidden){scheduleReminders();renderRem();}});
+
+/* ---- init ---- */
+var dow=new Date().getDay(),dayMap={1:0,2:1,3:2,4:3,5:4,6:5,0:6};
+var today=dayMap[dow]!==undefined?dayMap[dow]:0;
+setDay(today);
+['c-supps','c-skin','c-train','c-beliefs'].forEach(function(id){var c=document.getElementById(id);if(c){c.style.display='none';c.classList.remove('vis');}});
+syncUI();
+scheduleReminders();
+renderRem();
+</script>
+</body>
+</html>
