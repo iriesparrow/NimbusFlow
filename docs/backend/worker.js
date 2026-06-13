@@ -34,8 +34,13 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (request.method !== 'POST') return json({ error: 'Use POST' }, 405, cors);
 
-    // Shared-secret gate
-    if (env.APP_SECRET && request.headers.get('X-WB-Token') !== env.APP_SECRET) {
+    // Shared-secret gate — fail CLOSED. If the secret isn't configured on the
+    // server, refuse everything (otherwise an open-CORS worker with a valid
+    // NOTION_TOKEN would let anyone who finds the URL write to your Notion).
+    if (!env.APP_SECRET) {
+      return json({ error: 'Server not configured: set APP_SECRET on the worker before use.' }, 503, cors);
+    }
+    if (request.headers.get('X-WB-Token') !== env.APP_SECRET) {
       return json({ error: 'Unauthorized — bad or missing X-WB-Token' }, 401, cors);
     }
 

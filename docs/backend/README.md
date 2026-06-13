@@ -70,7 +70,9 @@ wrangler deploy
 ## Security notes
 - Your Notion token lives only in Cloudflare's encrypted env vars — never in the
   app or in git.
-- `APP_SECRET` stops strangers from writing to your Notion if they find the URL.
+- `APP_SECRET` is **mandatory** — the worker refuses all requests (returns 503)
+  until it's set, so a misconfigured deploy can't be written to anonymously.
+  It stops strangers from writing to your Notion if they find the URL.
 - Set `ALLOW_ORIGIN` to your Pages URL to also lock down which site can call it.
 - Treat the `APP_SECRET` like a password; it's stored in your phone's
   localStorage for convenience.
