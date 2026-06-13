@@ -28,6 +28,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Create & enable the Pages site automatically if it doesn't exist yet,
+          # so no manual Settings -> Pages toggle is needed.
+          enablement: true
       - name: Upload docs/ as Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
