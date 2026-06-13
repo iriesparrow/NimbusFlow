@@ -1,0 +1,12 @@
+# Optional: only needed if you deploy with the Wrangler CLI instead of the
+# Cloudflare dashboard. See README.md in this folder.
+name = "wellbeing-notion"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# Do NOT put secrets here. Set them with:
+#   wrangler secret put NOTION_TOKEN
+#   wrangler secret put APP_SECRET
+# Optionally restrict CORS to your Pages origin:
+# [vars]
+# ALLOW_ORIGIN = "https://iriesparrow.github.io"

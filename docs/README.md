@@ -51,9 +51,20 @@ GitHub Pages settings can't be toggled from code, so do this once:
 When you change files, bump `CACHE` in `sw.js` (e.g. `v1` → `v2`) so phones pull
 the update.
 
-## Note on the "Save to Notion" buttons
-Those still call the Anthropic API directly from the browser, which won't work
-without an API key and a CORS-enabled backend (and would expose your key if it
-did). They're left in place but will show an error. The new localStorage
-persistence means the app is fully usable without Notion. If you want real Notion
-sync later, that needs a small backend — happy to build it.
+## Save to Notion (now works — needs a one-time backend)
+The **Save** buttons write to your Notion via a tiny free Cloudflare Worker that
+holds your Notion token server-side (a browser can't call Notion directly, and a
+key in client code would leak). Set it up once:
+
+➡️ **See [`backend/README.md`](./backend/README.md)** — ~10 min, no credit card.
+
+Then in the app tap **⚙ (top-right) → enter your Backend URL + secret → Test
+Connection**. After that, every Save button creates/appends real Notion pages.
+
+Until you set that up, the app still works fully offline thanks to localStorage;
+the Save buttons just prompt you to configure ⚙ first.
+
+What each button does once connected:
+- **Day / Practice / Workout** → create a new dated child page under your Well-Being OS page.
+- **Supplements** → append a dated dose-update block to the Well-Being OS page.
+- **Beliefs** → append a dated deactivation-work block to your Limiting Beliefs page.
