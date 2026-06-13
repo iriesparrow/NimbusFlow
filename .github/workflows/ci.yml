@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Throwaway Postgres for the cross-tenant isolation test. The default user is
+    # a superuser of this DB, which the test needs to SET ROLE / create the auth
+    # shim roles. This DB is disposable and contains no real data.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: testu
+          POSTGRES_PASSWORD: testpw
+          POSTGRES_DB: datum_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testu"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: app
+
+    env:
+      TEST_DATABASE_URL: postgresql://testu:testpw@localhost:5432/datum_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test (incl. cross-tenant isolation)
+        run: npm test

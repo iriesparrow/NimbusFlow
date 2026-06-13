@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Builds / Next.js
+app/.next/
+app/out/
+app/dist/
+app/build/
+
+# TypeScript / Next.js generated files
+app/*.tsbuildinfo
+app/tsconfig.tsbuildinfo
+app/next-env.d.ts
+
+# Test artifacts
+app/coverage/
+app/playwright-report/
+app/test-results/
+app/.vitest/
+
+# Env / secrets — NEVER commit real values
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Supabase local state
+app/supabase/.branches/
+app/supabase/.temp/
+app/supabase/.env
+
+# Editor / OS
+.DS_Store
+*.log
+.vscode/
+.idea/
+.turbo/
