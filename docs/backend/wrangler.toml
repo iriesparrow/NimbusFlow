@@ -7,6 +7,20 @@ compatibility_date = "2024-11-01"
 # Do NOT put secrets here. Set them with:
 #   wrangler secret put NOTION_TOKEN
 #   wrangler secret put APP_SECRET
+#   wrangler secret put VAPID_PRIVATE_JWK   # for background push
+#   wrangler secret put VAPID_SUBJECT       # e.g. mailto:you@example.com
 # Optionally restrict CORS to your Pages origin:
 # [vars]
 # ALLOW_ORIGIN = "https://iriesparrow.github.io"
+
+# --- Background push (Web Push) ---
+# KV namespace to store push subscriptions. Create it once:
+#   wrangler kv:namespace create SUBS
+# then paste the returned id below.
+# [[kv_namespaces]]
+# binding = "SUBS"
+# id = "<your-kv-namespace-id>"
+
+# Cron trigger: check every 5 minutes for due reminders and push them.
+# [triggers]
+# crons = ["*/5 * * * *"]

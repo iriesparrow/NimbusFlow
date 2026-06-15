@@ -12,11 +12,17 @@
  * Optional:
  *   ALLOW_ORIGIN  — restrict CORS to your Pages URL, e.g. https://iriesparrow.github.io
  *                   (defaults to "*", which is fine because APP_SECRET gates writes)
+ * For background push (optional — see README):
+ *   VAPID_PRIVATE_JWK — private VAPID key (JWK string); public half ships in the app
+ *   VAPID_SUBJECT     — mailto: contact for the push service
+ *   SUBS (KV binding) — stores push subscriptions; a cron trigger sends due reminders
  *
  * Actions (POST JSON body):
  *   { action: "ping" }
  *   { action: "createPage", parentId, title, markdown }
  *   { action: "appendBlocks", pageId, markdown }
+ *   { action: "logEntry", databaseId, date, category, name, completed, total, completion, notes, markdown }
+ *   { action: "saveSub" | "deleteSub" | "testPush", subscription, tz, schedule }
  */
 
 const NOTION_VERSION = '2022-06-28';
@@ -49,6 +55,12 @@ export default {
 
     const action = body.action;
     if (action === 'ping') return json({ ok: true, time: new Date().toISOString() }, 200, cors);
+
+    // Web Push actions don't need the Notion token.
+    if (action === 'saveSub' || action === 'deleteSub' || action === 'testPush') {
+      try { return await handlePush(action, body, env, cors); }
+      catch (err) { return json({ error: String(err && err.message || err) }, 502, cors); }
+    }
 
     if (!env.NOTION_TOKEN) return json({ error: 'Server missing NOTION_TOKEN' }, 500, cors);
 
@@ -120,7 +132,151 @@ export default {
       return json({ error: String(err && err.message || err) }, 502, cors);
     }
   },
+
+  // Cron trigger (configure e.g. "*/5 * * * *"): sends due reminders as push.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runSchedule(env, new Date()));
+  },
 };
+
+/* ============================================================
+   WEB PUSH — subscription storage, scheduling, and crypto
+   (VAPID per RFC 8292 + aes128gcm payload per RFC 8291)
+   ============================================================ */
+
+async function handlePush(action, body, env, cors) {
+  const sub = body.subscription;
+  if (!sub || !sub.endpoint) return json({ error: action + ' needs a subscription' }, 400, cors);
+
+  if (action === 'testPush') {
+    if (!env.VAPID_PRIVATE_JWK) return json({ error: 'Push not configured: set the VAPID_PRIVATE_JWK secret on the worker.' }, 503, cors);
+    const status = await sendPush(sub, JSON.stringify({ title: '🧬 Well-Being OS', body: 'Background push works — alerts reach you even when the app is closed.' }), env);
+    return json({ ok: status >= 200 && status < 300, status }, 200, cors);
+  }
+
+  if (!env.SUBS) return json({ error: 'Push not configured: bind a KV namespace named SUBS to the worker.' }, 503, cors);
+  const id = await subId(sub.endpoint);
+  if (action === 'deleteSub') { await env.SUBS.delete('sub:' + id); return json({ ok: true, removed: true }, 200, cors); }
+  await env.SUBS.put('sub:' + id, JSON.stringify({ sub, tz: body.tz || 'UTC', schedule: body.schedule || [] }));
+  return json({ ok: true, id, scheduled: (body.schedule || []).length }, 200, cors);
+}
+
+async function runSchedule(env, now) {
+  if (!env.SUBS || !env.VAPID_PRIVATE_JWK) return;
+  const list = await env.SUBS.list({ prefix: 'sub:' });
+  for (const k of list.keys) {
+    const v = await env.SUBS.get(k.name);
+    if (!v) continue;
+    let rec; try { rec = JSON.parse(v); } catch { continue; }
+    const { wd, min, localDate } = localNow(rec.tz || 'UTC', now);
+    for (const r of (rec.schedule || [])) {
+      if (r.wd !== wd) continue;
+      if (r.min > min || r.min < min - 4) continue; // due within the last 5-minute tick
+      const sentKey = 'sent:' + k.name.slice(4) + ':' + localDate + ':' + r.min;
+      if (await env.SUBS.get(sentKey)) continue; // already fired today
+      let status = 0;
+      try { status = await sendPush(rec.sub, JSON.stringify({ title: r.title || '🧬 Well-Being OS', body: r.body || '' }), env); } catch { status = 0; }
+      if (status === 404 || status === 410) { await env.SUBS.delete(k.name); }
+      else { await env.SUBS.put(sentKey, '1', { expirationTtl: 3600 }); }
+    }
+  }
+}
+
+function localNow(tz, date) {
+  let p = {};
+  try {
+    const f = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false, year: 'numeric', month: '2-digit', day: '2-digit' });
+    for (const part of f.formatToParts(date)) p[part.type] = part.value;
+  } catch { return { wd: -1, min: -1, localDate: '' }; }
+  const wdMap = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+  let hour = parseInt(p.hour, 10); if (hour === 24) hour = 0;
+  return { wd: wdMap[p.weekday], min: hour * 60 + parseInt(p.minute, 10), localDate: p.year + '-' + p.month + '-' + p.day };
+}
+
+async function subId(endpoint) {
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(endpoint));
+  return bufToB64url(new Uint8Array(h)).slice(0, 22);
+}
+
+async function sendPush(sub, payload, env) {
+  const endpoint = sub.endpoint;
+  const body = await encryptPayload(sub, payload);
+  const jwk = JSON.parse(env.VAPID_PRIVATE_JWK);
+  const jwt = await vapidJWT(new URL(endpoint).origin, env, jwk);
+  const k = bufToB64url(concat(new Uint8Array([4]), b64urlToBuf(jwk.x), b64urlToBuf(jwk.y)));
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Encoding': 'aes128gcm',
+      'Content-Type': 'application/octet-stream',
+      'TTL': '300',
+      'Authorization': 'vapid t=' + jwt + ', k=' + k,
+    },
+    body,
+  });
+  return res.status;
+}
+
+async function vapidJWT(audience, env, jwk) {
+  const enc = (o) => bufToB64url(new TextEncoder().encode(JSON.stringify(o)));
+  const header = enc({ typ: 'JWT', alg: 'ES256' });
+  const payload = enc({ aud: audience, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: env.VAPID_SUBJECT || 'mailto:admin@wellbeing.app' });
+  const unsigned = header + '.' + payload;
+  const key = await crypto.subtle.importKey('jwk', { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y, d: jwk.d }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, new TextEncoder().encode(unsigned));
+  return unsigned + '.' + bufToB64url(new Uint8Array(sig));
+}
+
+async function encryptPayload(sub, payload) {
+  const uaPublic = b64urlToBuf(sub.keys.p256dh);
+  const authSecret = b64urlToBuf(sub.keys.auth);
+  const asKeys = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+  const asPublic = new Uint8Array(await crypto.subtle.exportKey('raw', asKeys.publicKey));
+  const uaKey = await crypto.subtle.importKey('raw', uaPublic, { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: uaKey }, asKeys.privateKey, 256));
+
+  const hkdf = async (salt, ikm, info, len) => {
+    const key = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
+    return new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt, info }, key, len * 8));
+  };
+  const te = (s) => new TextEncoder().encode(s);
+  const keyInfo = concat(te('WebPush: info\0'), uaPublic, asPublic);
+  const ikm = await hkdf(authSecret, ecdh, keyInfo, 32);
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const cek = await hkdf(salt, ikm, te('Content-Encoding: aes128gcm\0'), 16);
+  const nonce = await hkdf(salt, ikm, te('Content-Encoding: nonce\0'), 12);
+
+  const data = te(payload);
+  const record = concat(data, new Uint8Array([2])); // 0x02 = last-record delimiter
+  const aesKey = await crypto.subtle.importKey('raw', cek, { name: 'AES-GCM' }, false, ['encrypt']);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce, tagLength: 128 }, aesKey, record));
+
+  const rs = new Uint8Array(4); new DataView(rs.buffer).setUint32(0, 4096);
+  const head = concat(salt, rs, new Uint8Array([asPublic.length]), asPublic);
+  return concat(head, ct);
+}
+
+function b64urlToBuf(s) {
+  s = String(s).replace(/-/g, '+').replace(/_/g, '/');
+  while (s.length % 4) s += '=';
+  const bin = atob(s); const b = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+  return b;
+}
+function bufToB64url(buf) {
+  const b = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function concat(...arrs) {
+  let len = 0; for (const a of arrs) len += a.length;
+  const out = new Uint8Array(len); let o = 0;
+  for (const a of arrs) { out.set(a, o); o += a.length; }
+  return out;
+}
+
+// Named exports for local testing (ignored by the Workers runtime).
+export { vapidJWT, encryptPayload, sendPush, localNow, runSchedule };
 
 /* ---------- Notion API helpers ---------- */
 async function notion(env, method, path, payload) {

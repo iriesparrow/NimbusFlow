@@ -79,3 +79,59 @@ wrangler deploy
 
 ## Updating the worker later
 Re-paste `worker.js` in the dashboard editor (or `wrangler deploy`) and Deploy.
+
+---
+
+# Background push (alerts when the app is fully closed) — optional
+
+In-app reminders only fire while the PWA is open (an iOS limitation). To get
+notifications even when the app is closed, the worker sends **Web Push** on a
+schedule. This needs three extra pieces of setup. It's optional — **Add Week to
+Calendar** in the app already gives reliable closed-app alarms without any of this.
+
+### 1. Add the VAPID keys (the push identity)
+The app already ships with the matching **public** key. You set the **private**
+key on the worker:
+1. Worker → **Settings → Variables and Secrets** → add (Encrypt):
+   - `VAPID_PRIVATE_JWK` = the private JWK string you were given
+   - `VAPID_SUBJECT` = `mailto:your-email@example.com`
+2. **Deploy**.
+
+> If you ever need to regenerate keys, the public key in `index.html`
+> (`VAPID_PUBLIC`) and the worker's `VAPID_PRIVATE_JWK` must be a matching pair.
+
+### 2. Create a KV namespace to store subscriptions
+Dashboard route:
+1. Cloudflare → **Storage & Databases → KV** → **Create namespace** → name it `wellbeing-subs`.
+2. Back in your worker → **Settings → Bindings → Add → KV namespace**:
+   - Variable name: **`SUBS`** (exactly)
+   - KV namespace: `wellbeing-subs`
+3. **Deploy**.
+
+(CLI route: `wrangler kv:namespace create SUBS`, paste the id into `wrangler.toml`, `wrangler deploy`.)
+
+### 3. Add the cron trigger (the scheduler)
+1. Worker → **Settings → Triggers → Cron Triggers → Add Cron Trigger**
+2. Schedule: **`*/5 * * * *`** (every 5 minutes) → Save.
+
+(CLI route: uncomment the `[triggers]` block in `wrangler.toml`, `wrangler deploy`.)
+
+### 4. Turn it on in the app
+1. Open the installed app → **🔔** → **Enable Reminders** (this also subscribes you to push).
+2. Tap **Test Background Push** → you should get a notification. To truly verify
+   closed-app delivery, fully close the app first, then tap it from another device
+   or just wait for the next scheduled reminder.
+
+### How it works
+- The app subscribes via the browser Push API and sends its subscription, your
+  timezone, and your weekly reminder schedule to the worker (`saveSub`), stored in KV.
+- The cron runs every 5 min, computes the local time per stored subscription, and
+  sends any reminder due in that window (deduped so each fires once per day).
+- The worker signs a VAPID JWT and encrypts each payload (aes128gcm) before posting
+  to Apple/Google's push endpoint; the service worker shows the notification.
+
+### Notes & limits
+- iOS delivers Web Push only to apps **installed to the Home Screen** (iOS 16.4+).
+- Apple may throttle/delay background pushes somewhat; exact-to-the-second delivery
+  isn't guaranteed. For hard alarms, the calendar export is still the gold standard.
+- Free Cloudflare covers this easily (KV + cron + a handful of pushes/day).

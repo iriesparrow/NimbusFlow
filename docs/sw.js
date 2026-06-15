@@ -2,7 +2,7 @@
    - Caches the app shell so it loads offline / fast
    - Handles notification clicks (focus the app)
    Bump CACHE when you change files so phones pull the new version. */
-const CACHE = 'wellbeing-os-v3';
+const CACHE = 'wellbeing-os-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -48,6 +48,19 @@ self.addEventListener('message', (e) => {
       data: { url: './index.html' }
     });
   }
+});
+
+// Background push from the server (fires even when the app is fully closed).
+self.addEventListener('push', (e) => {
+  let d = { title: '🧬 Well-Being OS', body: '' };
+  try { if (e.data) d = e.data.json(); } catch (_) { if (e.data) d.body = e.data.text(); }
+  e.waitUntil(self.registration.showNotification(d.title || '🧬 Well-Being OS', {
+    body: d.body || '',
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: d.tag || 'wb-push',
+    data: { url: './index.html' }
+  }));
 });
 
 self.addEventListener('notificationclick', (e) => {
