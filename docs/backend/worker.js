@@ -74,6 +74,47 @@ export default {
         return json({ ok: true, appended: blocks.length }, 200, cors);
       }
 
+      if (action === 'logEntry') {
+        // Upsert a row in the Well-Being Logs database (one per date+category).
+        const { databaseId, date, category, name, completed, total, completion, notes, markdown } = body;
+        if (!databaseId || !date || !category) {
+          return json({ error: 'logEntry needs databaseId, date, category' }, 400, cors);
+        }
+        const props = {
+          Name: { title: [{ text: { content: trunc(name || (date + ' ' + category), 2000) } }] },
+          Date: { date: { start: date } },
+          Category: { select: { name: category } },
+        };
+        if (typeof completed === 'number') props.Completed = { number: completed };
+        if (typeof total === 'number') props.Total = { number: total };
+        if (typeof completion === 'number') props.Completion = { number: completion };
+        if (notes) props.Notes = { rich_text: [{ text: { content: trunc(notes, 2000) } }] };
+
+        // Find an existing row for this date + category (best-effort: if the
+        // lookup fails for any reason, fall through to creating a new row so a
+        // save is never blocked by the dedupe step).
+        try {
+          const found = await notion(env, 'POST', '/v1/databases/' + clean(databaseId) + '/query', {
+            page_size: 1,
+            filter: { and: [
+              { property: 'Date', date: { equals: date } },
+              { property: 'Category', select: { equals: category } },
+            ] },
+          });
+          if (found.results && found.results.length) {
+            const id = found.results[0].id;
+            await notion(env, 'PATCH', '/v1/pages/' + id, { properties: props });
+            return json({ ok: true, id, updated: true }, 200, cors);
+          }
+        } catch (e) { /* dedupe unavailable — create a fresh row below */ }
+        const page = await notion(env, 'POST', '/v1/pages', {
+          parent: { database_id: clean(databaseId) },
+          properties: props,
+          children: mdToBlocks(markdown || '').slice(0, 100),
+        });
+        return json({ ok: true, id: page.id, url: page.url, created: true }, 200, cors);
+      }
+
       return json({ error: 'Unknown action: ' + action }, 400, cors);
     } catch (err) {
       return json({ error: String(err && err.message || err) }, 502, cors);
