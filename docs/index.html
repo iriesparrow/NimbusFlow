@@ -117,10 +117,20 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 .rs-item:last-child{border-bottom:none;}
 .rs-time{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--p);white-space:nowrap;}
 .rs-close{display:block;margin:10px 16px 0;width:calc(100% - 32px);padding:9px;border:1.5px solid var(--lt);background:transparent;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gr);cursor:pointer;}
+/* ---- Current-task highlight ---- */
+.row.now{background:var(--pl);box-shadow:inset 3px 0 0 var(--p);}
+.row.now .rn{font-weight:600;}
+/* ---- Dark mode ---- */
+:root[data-theme="dark"]{--wht:#1c1c1e;--blk:#f1f1f2;--lt:#343436;--ltr:#262628;--gr:#9a9a9e;--pl:#241f3a;}
+:root[data-theme="dark"] .anchor,:root[data-theme="dark"] .tip{color:#cbc5f5;}
+:root[data-theme="dark"] .mbtn.on{background:var(--p);color:#fff;}
+:root[data-theme="dark"] .dbtn.on{background:var(--p);color:#fff;border-color:var(--p);}
+:root[data-theme="dark"] .btxt{color:#161616;}
+:root[data-theme="dark"] .barr{color:#6a6a6a;}
 </style>
 </head>
 <body>
-<div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔</button><button class="bell" id="gearBtn" onclick="openSettings()" aria-label="Notion Sync">⚙</button><div class="sync s-idle" id="sync">Offline</div></div></div>
+<div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="themeBtn" onclick="toggleTheme()" aria-label="Theme">🌙</button><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔</button><button class="bell" id="gearBtn" onclick="openSettings()" aria-label="Notion Sync">⚙</button><div class="sync s-idle" id="sync">Offline</div></div></div>
 <div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button></div>
 <div class="dnav" id="dnav">
 <button class="dbtn on" onclick="setDay(0)" id="d0">Mon<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
@@ -285,6 +295,10 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <button class="sbtn" style="background:var(--p)" onclick="saveSettings()">Save Connection</button>
 <button class="sbtn" style="background:#333" onclick="testBackend()">Test Connection</button>
 <div class="rs-note" id="setNote"></div>
+<div class="rs-lh" style="padding-top:14px">Backup</div>
+<div class="rs-sub">Your check-offs, weights and notes live on this device. Export a backup so clearing Safari data can't lose them.</div>
+<button class="sbtn" style="background:#333" onclick="exportBackup()">⤓ Export Backup (.json)</button>
+<label class="sbtn" style="background:#555;cursor:pointer">⤒ Import Backup<input type="file" accept="application/json" style="display:none" onchange="importBackup(this)"></label>
 <button class="rs-close" onclick="closeSettings()">Close</button>
 </div>
 </div>
@@ -306,7 +320,8 @@ var DAYS=[
 ];
 var TC={pr:'#5B4FE8',su:'#D4820A',sk:'#2E9E6B',tr:'#C8321A',sh:'#1A6EC8'};
 var TL={pr:'practice',su:'supps',sk:'skincare',tr:'gym',sh:'shave'};
-function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d.ey;document.getElementById('dTt').textContent=d.n;document.getElementById('dSb').textContent=d.sb;document.getElementById('dBg').innerHTML=d.bg.map(function(b){return '<div class="bg f" style="background:'+b.c+';border-color:'+b.c+'">'+b.t+'</div>';}).join('');var html='';d.items.forEach(function(it){var c=TC[it.t]||'#888',lb=TL[it.t]||'';html+='<div class="row" onclick="togDay(this)" style="color:'+c+'"><div class="chk"></div><div class="rn">'+it.l+(it.s?'<span class="sub">'+it.s+'</span>':'')+'</div><div class="rv" style="background:'+c+'18;color:'+c+'">'+lb+'</div></div><div class="thn"></div>';});html+='<div class="er" style="margin-top:6px"><div class="el">Day notes</div><textarea class="ef" id="dNotes" placeholder="Observations, how you feel..."></textarea></div><div style="height:6px"></div>';document.getElementById('dBody').innerHTML=html;updDP();var n=new Date(),y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0'),dd=String(n.getDate()).padStart(2,'0');document.getElementById('logDate').value=y+'-'+m+'-'+dd;syncUI();}
+function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d.ey;document.getElementById('dTt').textContent=d.n;document.getElementById('dSb').textContent=d.sb;document.getElementById('dBg').innerHTML=d.bg.map(function(b){return '<div class="bg f" style="background:'+b.c+';border-color:'+b.c+'">'+b.t+'</div>';}).join('');var isToday=(i===realTodayIdx());var nowMin=new Date().getHours()*60+new Date().getMinutes();var nowIdx=-1;if(isToday){var best=1e9;d.items.forEach(function(it,idx){var t=parseTime(it.l);if(t!=null&&t>=nowMin&&t<best){best=t;nowIdx=idx;}});}var html='';d.items.forEach(function(it,idx){var c=TC[it.t]||'#888',lb=TL[it.t]||'';var nc=(idx===nowIdx)?' now':'',nid=(idx===nowIdx)?' id="nowRow"':'';html+='<div class="row'+nc+'"'+nid+' onclick="togDay(this)" style="color:'+c+'"><div class="chk"></div><div class="rn">'+it.l+(it.s?'<span class="sub">'+it.s+'</span>':'')+'</div><div class="rv" style="background:'+c+'18;color:'+c+'">'+lb+'</div></div><div class="thn"></div>';});html+='<div class="er" style="margin-top:6px"><div class="el">Day notes</div><textarea class="ef" id="dNotes" placeholder="Observations, how you feel..."></textarea></div><div style="height:6px"></div>';document.getElementById('dBody').innerHTML=html;updDP();var n=new Date(),y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0'),dd=String(n.getDate()).padStart(2,'0');document.getElementById('logDate').value=y+'-'+m+'-'+dd;syncUI();if(nowIdx>=0)setTimeout(scrollToNow,80);}
+function scrollToNow(){var el=document.getElementById('nowRow');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});}
 function togDay(r){r.classList.toggle('dn');updDP();saveChecks();}
 function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.row');var done=document.getElementById('dBody').querySelectorAll('.row.dn').length,tot=rows.length;var p=tot?Math.round(done/tot*100):0;document.getElementById('dCnt').textContent=done+'/'+tot;document.getElementById('dFill').style.width=p+'%';document.getElementById('dPct').textContent=p+'% complete';}
 function setMode(m){document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',(i===0&&m==='day')||(i===1&&m==='routine'));});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';if(m==='routine')setR(curR);}
@@ -345,7 +360,7 @@ async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var
    ============================================================ */
 function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
-function fieldKey(el){return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
+function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
 function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
 document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));});
 function checksKey(){return 'wb_checks_'+todayKey();}
@@ -389,11 +404,21 @@ function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').re
 
 document.addEventListener('visibilitychange',function(){if(!document.hidden){scheduleReminders();renderRem();}});
 
+/* ---- Theme, workout rotation, backup ---- */
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
+function toggleTheme(){setTheme((localStorage.getItem('wb_theme')||'light')==='dark'?'light':'dark');}
+function weekMod(){return Math.floor(Date.now()/(7*86400000))%3;}
+function defaultWorkout(){var t=realTodayIdx();if(t===5)return ['p2','pull2','legs2'][weekMod()];return ({0:'p1',1:'l1',3:'legs1'})[t]||'p1';}
+function exportBackup(){var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wb')===0)o[k]=localStorage.getItem(k);}var blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='wellbeing-backup-'+todayKey()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);toast('Backup downloaded');}
+function importBackup(input){var f=input.files&&input.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var o=JSON.parse(rd.result);Object.keys(o).forEach(function(k){localStorage.setItem(k,o[k]);});toast('Backup restored — reloading',3000);setTimeout(function(){location.reload();},900);}catch(e){toast('Invalid backup file',5000);}};rd.readAsText(f);input.value='';}
+
 /* ---- init ---- */
+setTheme(localStorage.getItem('wb_theme')||'light');
 var dow=new Date().getDay(),dayMap={1:0,2:1,3:2,4:3,5:4,6:5,0:6};
 var today=dayMap[dow]!==undefined?dayMap[dow]:0;
 setDay(today);
 ['c-supps','c-skin','c-train','c-beliefs'].forEach(function(id){var c=document.getElementById(id);if(c){c.style.display='none';c.classList.remove('vis');}});
+curW=defaultWorkout();showW(curW);
 syncUI();
 scheduleReminders();
 renderRem();

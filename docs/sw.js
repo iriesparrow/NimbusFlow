@@ -2,7 +2,7 @@
    - Caches the app shell so it loads offline / fast
    - Handles notification clicks (focus the app)
    Bump CACHE when you change files so phones pull the new version. */
-const CACHE = 'wellbeing-os-v4';
+const CACHE = 'wellbeing-os-v5';
 const ASSETS = [
   './',
   './index.html',
