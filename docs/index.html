@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Well-Being">
 <link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -127,6 +128,31 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 :root[data-theme="dark"] .dbtn.on{background:var(--p);color:#fff;border-color:var(--p);}
 :root[data-theme="dark"] .btxt{color:#161616;}
 :root[data-theme="dark"] .barr{color:#6a6a6a;}
+/* ---- Breath visualizer ---- */
+.bvwrap{padding:10px 16px 2px;}
+.bvmodes{display:flex;gap:5px;margin-bottom:6px;}
+.bvm{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 8px;border-radius:20px;border:1.5px solid var(--lt);background:transparent;color:var(--gr);cursor:pointer;transition:all .2s;}
+.bvstage{position:relative;height:184px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.bvring{position:absolute;width:164px;height:164px;border-radius:50%;border:1.5px dashed var(--lt);}
+.bvc{width:164px;height:164px;border-radius:50%;transform:scale(.42);will-change:transform;}
+.bvlabel{text-align:center;padding:0 0 2px;}
+.bvphase{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;}
+.bvcount{font-size:11px;color:var(--gr);margin-top:1px;min-height:14px;}
+.bvhint{font-size:11px;color:var(--gr);text-align:center;font-style:italic;padding-bottom:6px;}
+/* ---- Guides (expandable) ---- */
+.gv{cursor:pointer;}
+.gd{display:none;margin:4px 16px 8px;border:1px solid var(--lt);border-radius:6px;padding:10px 12px;font-size:12px;line-height:1.55;color:var(--blk);}
+.gd h5{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin:9px 0 3px;color:var(--pr);}
+.gd h5:first-child{margin-top:0;}
+.gd .q{font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:5px 0;}
+:root[data-theme="dark"] .gd .q{color:#cbc5f5;}
+.rot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0;padding:6px 9px;border:1px solid var(--lt);border-radius:6px;}
+.rotl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);white-space:nowrap;}
+.rotv{font-weight:600;font-size:13px;color:var(--pr);text-align:right;}
+/* ---- Belief-surfaced chips ---- */
+.bchips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 16px 6px;}
+.bchip{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1.5px solid var(--lt);color:var(--gr);cursor:pointer;background:transparent;transition:all .15s;}
+.bchip.on{background:var(--tr);border-color:var(--tr);color:#fff;}
 </style>
 </head>
 <body>
@@ -160,14 +186,52 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <div class="lhd" style="border-bottom-color:var(--pr)"><div class="ey">Every day · 5:00 am · Ch 8-9</div><div class="ct" style="color:var(--pr)">Metaphysical<br>Practice</div><div class="cs">Meditation · Prayer · Reflection</div><div class="mr"><div class="ml">20-40 min · Beginner</div><div class="bgs"><div class="bg f" style="background:var(--pr);border-color:var(--pr)">Daily</div></div></div></div>
 <div class="lbd">
 <div class="anchor">I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming.</div>
+<div class="bvwrap">
+<div class="bvmodes"><button class="bvm" id="bvm-calm" onclick="setBv('calm')">4-7 Breath</button><button class="bvm" id="bvm-gap" onclick="setBv('gap')">The Gap</button><button class="bvm" id="bvm-heart" onclick="setBv('heart')">Heart</button></div>
+<div class="bvstage" onclick="toggleBv()"><div class="bvring"></div><div class="bvc" id="bvc"></div></div>
+<div class="bvlabel"><div class="bvphase" id="bvPhase">Tap the circle to begin</div><div class="bvcount" id="bvCount"></div></div>
+<div class="bvhint" id="bvHint"></div>
+</div>
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--pr)">Session</span><span class="ss">log completion</span></div><div class="thn"></div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Daily Anchor — read aloud</div></div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 1 — Breath Focus<span class="sub">10 breaths (4 in / 7 out) · observe natural breath · 5-10 min</span></div></div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 2 — Inner Body Scan<span class="sub">Feet to scalp · 10-15 sec per zone · 5-10 min</span></div></div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 3 — Enter the Gap<span class="sub">In / Out / 2-5 sec silence at emptiness · 5-10 min</span></div></div>
-<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 4 — Awaken the Heart (Metta)<span class="sub">Heart breathing · Five Wishes · Thank you x3</span></div></div>
-<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 4 — Awaken the Heart (Metta)<span class="sub">Heart breathing · Five Wishes · Thank you x3</span></div><div class="rv gv" style="background:#EAF7F1;color:#2E9E6B" onclick="event.stopPropagation();togEx('gd-metta')">guide ▾</div></div>
+<div class="gd" id="gd-metta">
+<h5>Part A — Heart Breathing</h5>
+Breathe <b>into your heart</b> to a count of 4 — visualize breath entering through the center of your chest. Breathe out to a count of 7, exiting through the same point. Repeat 5–10 times (use the <b>Heart</b> visualizer above). Then return to natural breath and repeat:
+<div class="q">"I now open my heart fully to all living things. I love all of life."</div>
+<h5>Part B — The Five Wishes</h5>
+For each person, visualize them clearly and offer:
+<div class="q">1. May you be happy<br>2. May you be healthy and strong<br>3. May you be safe, on the inside and out<br>4. May you awaken to your highest potential<br>5. May you live with ease<br><br>Conclude each person: "I love you, I love you, I love you."</div>
+<h5>Send the wishes to, in order</h5>
+<b>1 · Loved ones</b> — <span id="rotLoved"></span><br><span style="color:var(--gr)">Deceased (†): visualize them in their highest, most luminous state.</span><br>
+<b>2 · Yourself</b> — <i>"Havard, may you be happy…"</i><br>
+<b>3 · A stranger</b> and <b>4 · Someone difficult</b> — today's rotation:
+<div class="rot"><span class="rotl">Stranger today</span><span class="rotv" id="rotStranger"></span></div>
+<div class="rot"><span class="rotl">Difficult person today</span><span class="rotv" id="rotDifficult"></span></div>
+<b>5 · All of humanity</b> — visualize the whole planet and shift to "we": <i>May we all be happy… healthy… safe… awaken… live with ease.</i>
+<h5>Part C — Close with gratitude</h5>
+<div class="q">"Thank you. Thank you. Thank you."</div>
+<h5>Edit your rotation lists</h5>
+<div class="el" style="margin-top:4px">Loved ones (comma-separated)</div><input class="ef" id="mettaLoved" value="Daddy (Havard Cooper) †, Mummy (Alice Cooper), Grandpa †, Grandaddy †, Alyssa, Nathan, Havanna">
+<div class="el" style="margin-top:8px">Strangers (rotates daily)</div><input class="ef" id="mettaStrangers" value="Door person at the building, Trader Joe's clerk, Front desk at the office">
+<div class="el" style="margin-top:8px">Difficult people (rotates daily)</div><input class="ef" id="mettaDifficult" value="Liam, Nick, Mori, Brian">
+</div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div><div class="rv gv" style="background:var(--pl);color:var(--pr)" onclick="event.stopPropagation();togEx('gd-prayer')">guide ▾</div></div>
+<div class="gd" id="gd-prayer">
+<i>Perform immediately after meditation, while vibration is elevated.</i>
+<h5>1 · I Surrender</h5>Release all preconceived notions. Feel the physiological release of every need, worry, and desire to Universal Intelligence.
+<h5>2 · I Know</h5>Heighten awareness of your connection to Universal mind. Acknowledge the oneness and the presence.
+<h5>3 · I Am Ready</h5>Invite the Universe to make whatever changes are required for your evolution. Give full permission for upgrades to limiting beliefs.
+<h5>4 · I Forgive and I Love</h5>Replace guilt and regret with love. Forgive yourself, forgive others, wish happiness and prosperity to all.
+<h5>5 · I Declare</h5>State your intentions clearly, in the present tense:
+<div class="q">"I trust the abundance already in motion. I receive with ease and calm. The money follows the work I've already done."</div>
+<h5>6 · I Thank</h5>Step into the future. Experience the reality of each intention already manifested. Celebrate precisely as if it just happened.
+<h5>7 · I Devote</h5>Reaffirm commitment to your co-creative relationship with the Universe. Move forward with 100% belief, faith, trust, and knowing.
+</div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">3 Gratitudes + Intention Review</div></div>
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--pr)">Gratitudes</span></div>
@@ -176,7 +240,15 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <div class="er"><div class="el">Gratitude 3</div><input class="ef" id="g3" placeholder="I am grateful for..."></div>
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--pr)">Evening</span><span class="ss">8:30 pm</span></div>
-<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Limiting Belief Check<span class="sub">Did any of the 5 surface today?</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Limiting Belief Check<span class="sub">Tap any belief that surfaced today — it goes into your practice log</span></div><div class="rv gv" style="background:#FEF0ED;color:var(--tr)" onclick="event.stopPropagation();togEx('gd-bcheck')">guide ▾</div></div>
+<div class="bchips" id="bChips"></div>
+<div class="gd" id="gd-bcheck">
+The evening check is deactivation work (Ch 12): noticing a belief <i>as it operates</i> is what weakens it. The five under active work:
+<h5>The 5 beliefs</h5>
+1. Money is difficult to accumulate<br>2. Money is difficult to keep<br>3. Time must be sacrificed in exchange for money<br>4. Money requires constant monitoring to prevent loss<br>5. Ambition can drive wealth, but requires sacrificing other life areas
+<h5>When one surfaces</h5>
+Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and recall one of your enshrined counter-examples. Then write the fuller deactivation work in the <b>Beliefs</b> tab on Wed / Fri / Sun evenings.
+</div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Evening Reflection</div></div>
 <div class="er"><div class="el">Evening notes</div><textarea class="ef" id="eNotes" placeholder="What did you release? What peace did you find?"></textarea></div>
 <button class="sbtn" style="background:var(--pr)" onclick="savePractice()"><span class="spin" id="prSpin" style="display:none"></span><span id="prTxt">Save Session to Notion</span></button>
@@ -327,7 +399,7 @@ function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.ro
 function setMode(m){document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',(i===0&&m==='day')||(i===1&&m==='routine'));});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';if(m==='routine')setR(curR);}
 function setDay(i){curDay=i;for(var j=0;j<7;j++){document.getElementById('d'+j).classList.toggle('on',j===i);}renderDay(i);}
 var RC={practice:'#5B4FE8',supps:'#D4820A',skin:'#2E9E6B',train:'#C8321A',beliefs:'#5B4FE8'};
-function setR(r){curR=r;['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
+function setR(r){curR=r;if(r!=='practice')stopBv();['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
 function showW(w){curW=w;['p1','l1','legs1','p2','pull2','legs2'].forEach(function(id){var el=document.getElementById('w-'+id),btn=document.getElementById('wb-'+id);if(el)el.style.display=id===w?'block':'none';if(btn){btn.classList.toggle('on',id===w);btn.classList.toggle('off',id!==w);}});restoreFields();}
 function tog(r,cat){r.classList.toggle('dn');if(cat==='pr')updPR();if(cat==='sk')updSK();saveChecks();}
 function updPR(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var p=tot?Math.round(done/tot*100):0;document.getElementById('prCnt').textContent=done+'/'+tot;document.getElementById('prFill').style.width=p+'%';document.getElementById('prPct').textContent=p+'% complete';}
@@ -348,7 +420,7 @@ function renderSettings(){var c=notionCfg();document.getElementById('setUrl').va
 function saveSettings(){var u=document.getElementById('setUrl').value.trim().replace(/\/+$/,'');var s=document.getElementById('setSecret').value.trim();localStorage.setItem('wb_notion_url',u);localStorage.setItem('wb_notion_secret',s);toast('Connection saved');renderSettings();}
 async function testBackend(){saveSettings();var cfg=notionCfg();if(!cfg.url){toast('Enter a backend URL');return;}var n=document.getElementById('setNote');n.textContent='Testing...';try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify({action:'ping'})});var data=await res.json().catch(function(){return {};});if(res.ok&&data&&data.ok){n.innerHTML='✅ Connected — backend reachable and secret accepted.';toast('Backend OK');}else{n.innerHTML='⚠️ Reached backend but got: '+((data&&data.error)||('HTTP '+res.status));}}catch(err){n.innerHTML='❌ Could not reach backend: '+err.message;}}
 async function saveDay(){var d=DAYS[curDay];var date=document.getElementById('logDate').value||new Date().toISOString().split('T')[0];var notes=(document.getElementById('dNotes')||{value:''}).value||'';var rows=document.getElementById('dBody').querySelectorAll('.row');var done=[],todo=[];rows.forEach(function(r){var txt=r.querySelector('.rn');if(!txt)return;var label=txt.childNodes[0].textContent.trim();(r.classList.contains('dn')?done:todo).push(label);});var pct=done.length+todo.length>0?Math.round(done.length/(done.length+todo.length)*100):0;var total=done.length+todo.length,completion=total?done.length/total:0;var md='### Completed\n'+done.map(function(x){return '- '+x;}).join('\n')+'\n\n### Not completed\n'+todo.map(function(x){return '- '+x;}).join('\n');await logEntry('Day',date,date+' · '+d.n,{completed:done.length,total:total,completion:completion,notes:notes,markdown:md},'dSpin','dTxt','Saved','Save to Notion');}
-async function savePractice(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var g1=document.getElementById('g1').value,g2=document.getElementById('g2').value,g3=document.getElementById('g3').value;var ev=document.getElementById('eNotes').value;var date=new Date().toISOString().split('T')[0];var completion=tot?done/tot:0;var md='### 3 Gratitudes\n1. '+(g1||'-')+'\n2. '+(g2||'-')+'\n3. '+(g3||'-')+(ev?'\n\n### Evening Reflection\n'+ev:'');await logEntry('Practice',date,date+' · Practice',{completed:done,total:tot,completion:completion,notes:ev,markdown:md},'prSpin','prTxt','Saved','Save Session to Notion');}
+async function savePractice(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var g1=document.getElementById('g1').value,g2=document.getElementById('g2').value,g3=document.getElementById('g3').value;var ev=document.getElementById('eNotes').value;var date=new Date().toISOString().split('T')[0];var completion=tot?done/tot:0;var surf=getBSurf();var md='### 3 Gratitudes\n1. '+(g1||'-')+'\n2. '+(g2||'-')+'\n3. '+(g3||'-')+'\n\n### Limiting beliefs surfaced today\n'+(surf.length?surf.sort().map(function(i){return '- '+BELIEFS_FULL[i];}).join('\n'):'- None')+(ev?'\n\n### Evening Reflection\n'+ev:'');await logEntry('Practice',date,date+' · Practice',{completed:done,total:tot,completion:completion,notes:ev,markdown:md},'prSpin','prTxt','Saved','Save Session to Notion');}
 async function saveSupps(){var inputs=document.querySelectorAll('[data-s]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-s')+': '+inp.value);});var date=new Date().toISOString().split('T')[0];var md='### Doses\n'+lines.join('\n');await logEntry('Supplements',date,date+' · Supplements',{markdown:md},'suSpin','suTxt','Saved','Save Dose Updates to Notion');}
 async function saveWorkout(){var wname={p1:'Push 1',l1:'Pull 1',legs1:'Legs 1',p2:'Push 2',pull2:'Pull 2',legs2:'Legs 2'};var inputs=document.querySelectorAll('#w-'+curW+' [data-e]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-e').replace(/_/g,' ')+': '+inp.value);});var notes=document.getElementById('wNotes').value;var date=new Date().toISOString().split('T')[0];var md='### Weights\n'+lines.join('\n')+(notes?'\n\n### Notes\n'+notes:'');await logEntry('Workout',date,date+' · '+wname[curW],{notes:notes,markdown:md},'trSpin','trTxt','Saved','Save Workout to Notion');}
 async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var labels=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed for money','Money requires constant monitoring','Ambition requires sacrificing life'];var sections='',count=0;['b1','b2','b3','b4','b5'].forEach(function(b,i){var alt=document.getElementById(b+'a'),orig=document.getElementById(b+'o'),rep=document.getElementById(b+'r');if(!alt)return;if(alt.value||orig.value||rep.value){count++;sections+='\n\n### Belief '+(i+1)+' - '+labels[i];if(alt.value)sections+='\n\n**Alternative explanations:**\n'+alt.value;if(orig.value)sections+='\n\n**Origin:**\n'+orig.value;if(rep.value)sections+='\n\n**New belief:**\n> '+rep.value;}});if(!sections){toast('Write something first');return;}document.getElementById('blCnt').textContent=count+'/5 beliefs';document.getElementById('blFill').style.width=(count/5*100)+'%';document.getElementById('blPct').textContent=count+' of 5 beliefs written';var md=sections;await logEntry('Beliefs',date,date+' · Beliefs',{completed:count,total:5,completion:count/5,markdown:md},'blSpin','blTxt','Saved','Save Belief Work to Notion');}
@@ -362,12 +434,12 @@ function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMont
 function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
 function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
 function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
-document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));});
+document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();});
 function checksKey(){return 'wb_checks_'+todayKey();}
 function rowKey(r){var card=r.closest('.card');var ctx=card?card.id:'x';if(ctx==='dayCard')ctx+='_'+curDay;var rn=r.querySelector('.rn');var t=rn?(rn.childNodes[0]?rn.childNodes[0].textContent:rn.textContent):r.textContent;return ctx+'|'+t.trim();}
 function saveChecks(){var done=[];document.querySelectorAll('.row.dn').forEach(function(r){done.push(rowKey(r));});localStorage.setItem(checksKey(),JSON.stringify(done));}
 function restoreChecks(){var set;try{set=JSON.parse(localStorage.getItem(checksKey())||'[]');}catch(e){set=[];}var s={};set.forEach(function(k){s[k]=1;});document.querySelectorAll('.row').forEach(function(r){if(s[rowKey(r)])r.classList.add('dn');else r.classList.remove('dn');});}
-function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();}
+function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();renderBChips();updMettaRot();}
 
 /* ============================================================
    PWA + REMINDERS
@@ -404,6 +476,32 @@ function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').re
 
 document.addEventListener('visibilitychange',function(){if(!document.hidden){scheduleReminders();renderRem();}});
 
+/* ============================================================
+   PRACTICE ENHANCEMENTS — breath visualizer, metta rotation,
+   prayer/belief guides
+   ============================================================ */
+var BV={
+calm:{c:'#5B4FE8',hint:'Step 1 — 10 guided breaths · in 4 · out 7 · then observe natural breath',target:10,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out — slowly',d:7,s:.42}]},
+gap:{c:'#1A6EC8',hint:'Step 3 — at complete emptiness, rest in pure silence. That is the gap.',target:0,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out',d:6,s:.42},{t:'The gap — pure silence',d:3,s:.42}]},
+heart:{c:'#2E9E6B',hint:'Step 4 — breathe through the center of your chest · 5–10 rounds',target:10,ph:[{t:'Into your heart',d:4,s:1},{t:'Out through your heart',d:7,s:.45}]}};
+var bvMode='calm',bvOn=false,bvTimer=null,bvIdx=0,bvN=0;
+function setBv(m){stopBv();bvMode=m;var M=BV[m];['calm','gap','heart'].forEach(function(k){var b=document.getElementById('bvm-'+k);if(!b)return;var on=k===m;b.style.background=on?BV[k].c:'transparent';b.style.borderColor=on?BV[k].c:'';b.style.color=on?'#fff':'';});var c=document.getElementById('bvc');if(c)c.style.background='radial-gradient(circle at 35% 30%, '+M.c+'d9, '+M.c+')';var ph=document.getElementById('bvPhase');if(ph){ph.textContent='Tap the circle to begin';ph.style.color=M.c;}var ct=document.getElementById('bvCount');if(ct)ct.textContent='';var h=document.getElementById('bvHint');if(h)h.textContent=M.hint;}
+function toggleBv(){bvOn?stopBv(true):startBv();}
+function startBv(){bvOn=true;bvN=0;bvIdx=0;runBvPhase();}
+function runBvPhase(){var M=BV[bvMode],p=M.ph[bvIdx];var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(ph)ph.textContent=p.t;if(ct)ct.textContent=M.target?('Breath '+(bvN+1)+' of '+M.target):('Cycle '+(bvN+1)+' — tap to stop');if(c){c.style.transition='transform '+p.d+'s cubic-bezier(.4,0,.6,1)';c.style.transform='scale('+p.s+')';}bvTimer=setTimeout(function(){bvIdx=(bvIdx+1)%M.ph.length;if(bvIdx===0){bvN++;if(M.target&&bvN>=M.target){finishBv();return;}}runBvPhase();},p.d*1000);}
+function finishBv(){bvOn=false;clearTimeout(bvTimer);var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(ph)ph.textContent='Complete 🙏';if(ct)ct.textContent='Return to natural, uncontrolled breath';if(c){c.style.transition='transform 3s ease-out';c.style.transform='scale(.42)';}}
+function stopBv(showPause){if(bvTimer)clearTimeout(bvTimer);bvTimer=null;if(!bvOn)return;bvOn=false;var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(showPause&&ph)ph.textContent='Paused — tap to restart';if(showPause&&ct)ct.textContent='';if(c){c.style.transition='transform 1s ease-out';c.style.transform='scale(.42)';}}
+function togEx(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
+function dayOfYear(){var n=new Date();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5);}
+function rotPick(id){var el=document.getElementById(id);if(!el)return '';var list=el.value.split(',').map(function(s){return s.trim();}).filter(Boolean);if(!list.length)return '—';return list[dayOfYear()%list.length];}
+function updMettaRot(){var l=document.getElementById('rotLoved'),s=document.getElementById('rotStranger'),d=document.getElementById('rotDifficult');var lv=document.getElementById('mettaLoved');if(l&&lv)l.textContent=lv.value;if(s)s.textContent=rotPick('mettaStrangers');if(d)d.textContent=rotPick('mettaDifficult');}
+var BELIEFS_FULL=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed in exchange for money','Money requires constant monitoring to prevent loss','Ambition requires sacrificing other life areas'];
+var BELIEFS_SHORT=['Hard to accumulate','Hard to keep','Time = money','Needs monitoring','Ambition costs life'];
+function bSurfKey(){return 'wb_bsurf_'+todayKey();}
+function getBSurf(){try{return JSON.parse(localStorage.getItem(bSurfKey())||'[]');}catch(e){return [];}}
+function togBChip(i){var s=getBSurf();var at=s.indexOf(i);if(at>=0)s.splice(at,1);else s.push(i);localStorage.setItem(bSurfKey(),JSON.stringify(s));renderBChips();}
+function renderBChips(){var el=document.getElementById('bChips');if(!el)return;var s=getBSurf();el.innerHTML=BELIEFS_SHORT.map(function(t,i){return '<button class="bchip'+(s.indexOf(i)>=0?' on':'')+'" onclick="togBChip('+i+')">'+(i+1)+' · '+t+'</button>';}).join('');}
+
 /* ---- Theme, workout rotation, backup ---- */
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
 function toggleTheme(){setTheme((localStorage.getItem('wb_theme')||'light')==='dark'?'light':'dark');}
@@ -414,6 +512,7 @@ function importBackup(input){var f=input.files&&input.files[0];if(!f)return;var 
 
 /* ---- init ---- */
 setTheme(localStorage.getItem('wb_theme')||'light');
+setBv('calm');
 var dow=new Date().getDay(),dayMap={1:0,2:1,3:2,4:3,5:4,6:5,0:6};
 var today=dayMap[dow]!==undefined?dayMap[dow]:0;
 setDay(today);
