@@ -149,6 +149,37 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 .rot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0;padding:6px 9px;border:1px solid var(--lt);border-radius:6px;}
 .rotl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);white-space:nowrap;}
 .rotv{font-weight:600;font-size:13px;color:var(--pr);text-align:right;}
+/* ---- Guided session (full-screen) ---- */
+#sess{position:fixed;inset:0;z-index:2000;display:none;flex-direction:column;background:radial-gradient(120% 90% at 50% 0%,#1b1538 0%,#0d0b1e 70%);color:#f1eefc;}
+#sess.show{display:flex;}
+.sess-top{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;}
+.sess-x{background:none;border:none;color:#8c86b8;font-size:17px;cursor:pointer;padding:4px;line-height:1;}
+.sess-bar{flex:1;height:3px;background:rgba(255,255,255,.13);border-radius:2px;overflow:hidden;}
+.sess-fill{height:100%;background:var(--pm);width:0;transition:width .35s;}
+.sess-step{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;color:#8c86b8;text-transform:uppercase;white-space:nowrap;}
+.sess-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 28px;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sess-body.ani>*{animation:slin .5s ease both;}
+@keyframes slin{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.sess-ey{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--pm);margin-bottom:14px;}
+.sess-quote{font-size:22px;line-height:1.75;font-style:italic;font-weight:400;max-width:330px;color:#efecff;}
+#sess .bvring{border-color:rgba(255,255,255,.14);}
+#sess .bvc.idle{animation:orbidle 6s ease-in-out infinite;}
+@keyframes orbidle{0%,100%{transform:scale(.42);}50%{transform:scale(.47);}}
+#sess .bvphase{font-weight:600;letter-spacing:.22em;font-size:13px;}
+#sess .bvcount{color:#8c86b8;}
+#sess .bvhint{color:#7d77a8;}
+.sess-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:-.01em;}
+.sess-bodytxt{font-size:15px;line-height:1.7;color:#cfc9ee;max-width:320px;margin-top:12px;}
+.sess-small{font-size:12px;color:#8c86b8;margin-top:16px;font-style:italic;}
+.sess-who{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:#fff;margin:6px 0 14px;line-height:1.15;max-width:330px;}
+.sess-wishes{font-size:15px;line-height:1.9;font-style:italic;color:#e4e0fa;}
+.sess-zone{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;text-transform:uppercase;line-height:1;cursor:pointer;}
+.sess-in{width:100%;max-width:320px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#fff;padding:11px 12px;font-size:14px;margin-top:9px;outline:none;font-family:'Barlow',sans-serif;}
+.sess-in::placeholder{color:#7d77a8;}
+.sess-nav{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom));}
+.sess-back{width:84px;padding:14px 0;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:#bdb7e4;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.sess-next{flex:1;padding:14px 0;border:none;border-radius:10px;background:var(--p);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+.sess-next:active,.sess-back:active{opacity:.75;}
 /* ---- Belief-surfaced chips ---- */
 .bchips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 16px 6px;}
 .bchip{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1.5px solid var(--lt);color:var(--gr);cursor:pointer;background:transparent;transition:all .15s;}
@@ -185,6 +216,7 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <div class="card vis" id="c-practice">
 <div class="lhd" style="border-bottom-color:var(--pr)"><div class="ey">Every day · 5:00 am · Ch 8-9</div><div class="ct" style="color:var(--pr)">Metaphysical<br>Practice</div><div class="cs">Meditation · Prayer · Reflection</div><div class="mr"><div class="ml">20-40 min · Beginner</div><div class="bgs"><div class="bg f" style="background:var(--pr);border-color:var(--pr)">Daily</div></div></div></div>
 <div class="lbd">
+<button class="sbtn" style="background:linear-gradient(135deg,#5B4FE8,#8B3EC8);margin-top:10px;padding:13px" onclick="openSess()">✦ Begin Guided Session · 20–40 min</button>
 <div class="anchor">I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming.</div>
 <div class="bvwrap">
 <div class="bvmodes"><button class="bvm" id="bvm-calm" onclick="setBv('calm')">4-7 Breath</button><button class="bvm" id="bvm-gap" onclick="setBv('gap')">The Gap</button><button class="bvm" id="bvm-heart" onclick="setBv('heart')">Heart</button></div>
@@ -374,6 +406,11 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <button class="rs-close" onclick="closeSettings()">Close</button>
 </div>
 </div>
+<div id="sess">
+<div class="sess-top"><button class="sess-x" onclick="closeSess()">✕</button><div class="sess-bar"><div class="sess-fill" id="sessFill"></div></div><div class="sess-step" id="sessStep"></div></div>
+<div class="sess-body ani" id="sessBody"></div>
+<div class="sess-nav"><button class="sess-back" id="sessBack" onclick="prevSl()">Back</button><button class="sess-next" id="sessNext" onclick="nextSl()">Continue</button></div>
+</div>
 <div id="toast"></div>
 <script>
 var NOTION_OS='3240ac6c9de1815abad8fcad66654830';
@@ -481,16 +518,17 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden){sch
    prayer/belief guides
    ============================================================ */
 var BV={
-calm:{c:'#5B4FE8',hint:'Step 1 — 10 guided breaths · in 4 · out 7 · then observe natural breath',target:10,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out — slowly',d:7,s:.42}]},
-gap:{c:'#1A6EC8',hint:'Step 3 — at complete emptiness, rest in pure silence. That is the gap.',target:0,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out',d:6,s:.42},{t:'The gap — pure silence',d:3,s:.42}]},
-heart:{c:'#2E9E6B',hint:'Step 4 — breathe through the center of your chest · 5–10 rounds',target:10,ph:[{t:'Into your heart',d:4,s:1},{t:'Out through your heart',d:7,s:.45}]}};
-var bvMode='calm',bvOn=false,bvTimer=null,bvIdx=0,bvN=0;
-function setBv(m){stopBv();bvMode=m;var M=BV[m];['calm','gap','heart'].forEach(function(k){var b=document.getElementById('bvm-'+k);if(!b)return;var on=k===m;b.style.background=on?BV[k].c:'transparent';b.style.borderColor=on?BV[k].c:'';b.style.color=on?'#fff':'';});var c=document.getElementById('bvc');if(c)c.style.background='radial-gradient(circle at 35% 30%, '+M.c+'d9, '+M.c+')';var ph=document.getElementById('bvPhase');if(ph){ph.textContent='Tap the circle to begin';ph.style.color=M.c;}var ct=document.getElementById('bvCount');if(ct)ct.textContent='';var h=document.getElementById('bvHint');if(h)h.textContent=M.hint;}
+calm:{c:'#5B4FE8',cl:'#A9A4F0',hint:'Step 1 — 10 guided breaths · in 4 · out 7 · then observe natural breath',target:10,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out — slowly',d:7,s:.42}]},
+gap:{c:'#1A6EC8',cl:'#7FB3E8',hint:'Step 3 — at complete emptiness, rest in pure silence. That is the gap.',target:0,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out',d:6,s:.42},{t:'The gap — pure silence',d:3,s:.42}]},
+heart:{c:'#2E9E6B',cl:'#7FD3AC',hint:'Step 4 — breathe through the center of your chest · 5–10 rounds',target:10,ph:[{t:'Into your heart',d:4,s:1},{t:'Out through your heart',d:7,s:.45}]}};
+var bvMode='calm',bvOn=false,bvTimer=null,bvIdx=0,bvN=0,bvPrefix='';
+function bvEl(n){return document.getElementById(bvPrefix+n);}
+function setBv(m){stopBv();bvMode=m;var M=BV[m];if(!bvPrefix){['calm','gap','heart'].forEach(function(k){var b=document.getElementById('bvm-'+k);if(!b)return;var on=k===m;b.style.background=on?BV[k].c:'transparent';b.style.borderColor=on?BV[k].c:'';b.style.color=on?'#fff':'';});}var c=bvEl('bvc');if(c){c.style.background='radial-gradient(circle at 35% 30%, '+M.c+'d9, '+M.c+')';if(bvPrefix){c.style.boxShadow='0 0 70px -8px '+M.c+'aa, 0 0 150px -20px '+M.c+'55';c.classList.add('idle');}}var ph=bvEl('bvPhase');if(ph){ph.textContent='Tap the circle to begin';ph.style.color=bvPrefix?(M.cl||M.c):M.c;}var ct=bvEl('bvCount');if(ct)ct.textContent='';var h=bvEl('bvHint');if(h)h.textContent=M.hint;}
 function toggleBv(){bvOn?stopBv(true):startBv();}
-function startBv(){bvOn=true;bvN=0;bvIdx=0;runBvPhase();}
-function runBvPhase(){var M=BV[bvMode],p=M.ph[bvIdx];var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(ph)ph.textContent=p.t;if(ct)ct.textContent=M.target?('Breath '+(bvN+1)+' of '+M.target):('Cycle '+(bvN+1)+' — tap to stop');if(c){c.style.transition='transform '+p.d+'s cubic-bezier(.4,0,.6,1)';c.style.transform='scale('+p.s+')';}bvTimer=setTimeout(function(){bvIdx=(bvIdx+1)%M.ph.length;if(bvIdx===0){bvN++;if(M.target&&bvN>=M.target){finishBv();return;}}runBvPhase();},p.d*1000);}
-function finishBv(){bvOn=false;clearTimeout(bvTimer);var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(ph)ph.textContent='Complete 🙏';if(ct)ct.textContent='Return to natural, uncontrolled breath';if(c){c.style.transition='transform 3s ease-out';c.style.transform='scale(.42)';}}
-function stopBv(showPause){if(bvTimer)clearTimeout(bvTimer);bvTimer=null;if(!bvOn)return;bvOn=false;var ph=document.getElementById('bvPhase'),ct=document.getElementById('bvCount'),c=document.getElementById('bvc');if(showPause&&ph)ph.textContent='Paused — tap to restart';if(showPause&&ct)ct.textContent='';if(c){c.style.transition='transform 1s ease-out';c.style.transform='scale(.42)';}}
+function startBv(){bvOn=true;bvN=0;bvIdx=0;var c=bvEl('bvc');if(c)c.classList.remove('idle');runBvPhase();}
+function runBvPhase(){var M=BV[bvMode],p=M.ph[bvIdx];var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(ph)ph.textContent=p.t;if(ct)ct.textContent=M.target?('Breath '+(bvN+1)+' of '+M.target):('Cycle '+(bvN+1)+' — tap to stop');if(c){c.style.transition='transform '+p.d+'s cubic-bezier(.4,0,.6,1)';c.style.transform='scale('+p.s+')';}bvTimer=setTimeout(function(){bvIdx=(bvIdx+1)%M.ph.length;if(bvIdx===0){bvN++;if(M.target&&bvN>=M.target){finishBv();return;}}runBvPhase();},p.d*1000);}
+function finishBv(){bvOn=false;clearTimeout(bvTimer);var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(ph)ph.textContent='Complete 🙏';if(ct)ct.textContent='Return to natural, uncontrolled breath';if(c){c.style.transition='transform 3s ease-out';c.style.transform='scale(.42)';c.classList.add('idle');}var nx=document.getElementById('sessNext');if(bvPrefix&&nx)nx.textContent='Continue ✓';}
+function stopBv(showPause){if(bvTimer)clearTimeout(bvTimer);bvTimer=null;if(!bvOn)return;bvOn=false;var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(showPause&&ph)ph.textContent='Paused — tap to restart';if(showPause&&ct)ct.textContent='';if(c){c.style.transition='transform 1s ease-out';c.style.transform='scale(.42)';if(bvPrefix)c.classList.add('idle');}}
 function togEx(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function dayOfYear(){var n=new Date();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5);}
 function rotPick(id){var el=document.getElementById(id);if(!el)return '';var list=el.value.split(',').map(function(s){return s.trim();}).filter(Boolean);if(!list.length)return '—';return list[dayOfYear()%list.length];}
@@ -501,6 +539,63 @@ function bSurfKey(){return 'wb_bsurf_'+todayKey();}
 function getBSurf(){try{return JSON.parse(localStorage.getItem(bSurfKey())||'[]');}catch(e){return [];}}
 function togBChip(i){var s=getBSurf();var at=s.indexOf(i);if(at>=0)s.splice(at,1);else s.push(i);localStorage.setItem(bSurfKey(),JSON.stringify(s));renderBChips();}
 function renderBChips(){var el=document.getElementById('bChips');if(!el)return;var s=getBSurf();el.innerHTML=BELIEFS_SHORT.map(function(t,i){return '<button class="bchip'+(s.indexOf(i)>=0?' on':'')+'" onclick="togBChip('+i+')">'+(i+1)+' · '+t+'</button>';}).join('');}
+
+/* ============================================================
+   GUIDED SESSION — full-screen slideshow through the practice
+   ============================================================ */
+var SCAN=['Left foot','Right foot','Right ankle','Left ankle','Lower left leg','Lower right leg','Left upper leg','Right upper leg','Right sit bone','Left sit bone','Lower back','Upper back','Groin','Abdominals','Chest','Left arm & hand','Right arm & hand','Neck','Jawline','Lips','Right ear','Left ear','Nose','Eyes','Right brow','Left brow','Forehead','Scalp'];
+var W5='May you be happy<br>May you be healthy and strong<br>May you be safe, on the inside and out<br>May you awaken to your highest potential<br>May you live with ease';
+var ANCHOR_TXT='"I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming."';
+var SL=[],slIdx=0,scanTimer=null,scanIdx=0;
+function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:''}).value;var lovedShort=loved.split(',').map(function(s){return s.trim();}).filter(Boolean).join(' · ');return [
+{t:'text',ey:'Metaphysical Practice',title:'Begin',body:'Find your spot. Sit tall — spine erect, feet flat on the floor. Phone on Do Not Disturb. If the body asks, take 1–2 minutes of light stretching first.',small:'20–40 min · same place, same time'},
+{t:'say',ey:'Set your intention — say aloud',quote:'"I now consciously connect to Universal Intelligence. I am open and receptive to guidance from the universe."',small:'Then let it go entirely, and begin.'},
+{t:'say',ey:'Daily Anchor — say aloud',quote:ANCHOR_TXT},
+{t:'breath',mode:'calm',ey:'Step 1 · Breath Focus'},
+{t:'text',ey:'Step 1 · continued',title:'Natural breath',body:'Release all control. Observe the breath exactly as it is — the air passing over your upper lip, slightly warmer on the way out. When the mind wanders, note it without judgment and gently return to the next inhale.',small:'Noticing the wandering IS the practice.'},
+{t:'scan',ey:'Step 2 · Inner Body Scan'},
+{t:'text',ey:'Step 2 · close',title:'One field',body:'Widen your attention. Feel the whole body at once — a single, unified field of energy. Tingling, warmth, subtle waves: all normal, and stronger with practice.'},
+{t:'breath',mode:'gap',ey:'Step 3 · Enter the Gap',small:'The quiet between thoughts — the field from which all creative intelligence arises. Continue when ready.'},
+{t:'breath',mode:'heart',ey:'Step 4 · Heart Breathing'},
+{t:'say',ey:'Say aloud',quote:'"I now open my heart fully to all living things. I love all of life."'},
+{t:'metta',ey:'Five Wishes · 1 of 5',title:'Your loved ones',who:lovedShort||'Your loved ones',note:'Deceased (†): see them in their highest, most luminous state. One at a time.'},
+{t:'metta',ey:'Five Wishes · 2 of 5',title:'Yourself',who:'"Havard, may you be happy…"',note:'Offer yourself the same tenderness.'},
+{t:'metta',ey:'Five Wishes · 3 of 5',title:'A stranger',who:rotPick('mettaStrangers'),note:'See them clearly. They want what you want.'},
+{t:'metta',ey:'Five Wishes · 4 of 5',title:'Someone difficult',who:rotPick('mettaDifficult'),note:'Rise above the memory. A sovereign soul doing their best.'},
+{t:'metta',ey:'Five Wishes · 5 of 5',title:'All of humanity',who:'The whole planet',wishes:'May we all be happy<br>May we all be healthy and strong<br>May we all be safe, on the inside and out<br>May we all awaken to our highest potential<br>May we all live with ease',note:'Shift to "we".'},
+{t:'say',ey:'Close the metta',quote:'"Thank you. Thank you. Thank you."'},
+{t:'text',ey:'Scientific Prayer · 1 of 7',title:'I Surrender',body:'Release all preconceived notions. Feel the physiological release of every need, worry, and desire to Universal Intelligence.'},
+{t:'text',ey:'Scientific Prayer · 2 of 7',title:'I Know',body:'Heighten awareness of your connection to Universal mind. Acknowledge the oneness and the presence.'},
+{t:'text',ey:'Scientific Prayer · 3 of 7',title:'I Am Ready',body:'Invite the Universe to make whatever changes are required for your evolution. Give full permission for upgrades to limiting beliefs.'},
+{t:'text',ey:'Scientific Prayer · 4 of 7',title:'I Forgive & I Love',body:'Replace guilt and regret with love. Forgive yourself, forgive others, wish happiness and prosperity to all.'},
+{t:'say',ey:'Scientific Prayer · 5 of 7 — I Declare',quote:'"I trust the abundance already in motion. I receive with ease and calm. The money follows the work I\'ve already done."',small:'Present tense. Clear. Yours.'},
+{t:'text',ey:'Scientific Prayer · 6 of 7',title:'I Thank',body:'Step into the future. Experience the reality of each intention already manifested. Celebrate precisely as if it just happened.'},
+{t:'text',ey:'Scientific Prayer · 7 of 7',title:'I Devote',body:'Reaffirm commitment to your co-creative relationship with the Universe. Move forward with 100% belief, faith, trust, and knowing.'},
+{t:'grat',ey:'3 Gratitudes',title:'I am grateful for…'},
+{t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'}
+];}
+function openSess(){stopBv();SL=buildSlides();slIdx=0;document.getElementById('sess').classList.add('show');document.body.style.overflow='hidden';renderSl();}
+function closeSess(){slCleanup();bvPrefix='';document.getElementById('sess').classList.remove('show');document.body.style.overflow='';}
+function slCleanup(){stopBv();if(scanTimer){clearInterval(scanTimer);scanTimer=null;}}
+function slHtml(s){
+if(s.t==='say')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-quote">'+s.quote+'</div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='text')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title">'+s.title+'</div>'+(s.body?'<div class="sess-bodytxt">'+s.body+'</div>':'')+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='breath')return '<div class="sess-ey">'+s.ey+'</div><div class="bvstage" onclick="toggleBv()" style="height:230px"><div class="bvring"></div><div class="bvc" id="sbvc"></div></div><div class="bvlabel"><div class="bvphase" id="sbvPhase"></div><div class="bvcount" id="sbvCount"></div></div><div class="bvhint" id="sbvHint"></div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='scan')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-zone" id="sScanZone" onclick="tickScan(true)"></div><div class="sess-bodytxt" id="sScanN"></div><div class="sess-small">10–15 seconds per zone · auto-advances · tap the zone to skip ahead</div>';
+if(s.t==='metta')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:24px;color:#8c86b8">'+s.title+'</div><div class="sess-who">'+s.who+'</div><div class="sess-wishes">'+(s.wishes||W5)+'</div><div class="sess-small">'+(s.note?s.note+'<br>':'')+'Conclude: "I love you, I love you, I love you."</div>';
+if(s.t==='grat')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:28px">'+s.title+'</div><input class="sess-in" placeholder="1." oninput="sgIn(this,1)" id="sg1"><input class="sess-in" placeholder="2." oninput="sgIn(this,2)" id="sg2"><input class="sess-in" placeholder="3." oninput="sgIn(this,3)" id="sg3"><div class="sess-small">Then review your declared intentions once.</div>';
+if(s.t==='done')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title">'+s.title+'</div><div class="sess-bodytxt">'+s.body+'</div><div class="sess-small">'+s.small+'</div>';
+return '';}
+function renderSl(){slCleanup();var s=SL[slIdx];var b=document.getElementById('sessBody');b.innerHTML=slHtml(s);b.classList.remove('ani');void b.offsetWidth;b.classList.add('ani');document.getElementById('sessFill').style.width=Math.round((slIdx+1)/SL.length*100)+'%';document.getElementById('sessStep').textContent=(slIdx+1)+' / '+SL.length;document.getElementById('sessBack').style.visibility=slIdx?'visible':'hidden';document.getElementById('sessNext').textContent=(slIdx===SL.length-1)?'Finish & Log ✓':'Continue';
+if(s.t==='breath'){bvPrefix='s';setBv(s.mode);setTimeout(function(){if(SL[slIdx]===s&&document.getElementById('sbvc'))startBv();},900);}else{bvPrefix='';}
+if(s.t==='scan'){scanIdx=0;updScan();scanTimer=setInterval(function(){tickScan(false);},12000);}
+if(s.t==='grat'){[1,2,3].forEach(function(i){var src=document.getElementById('g'+i),dst=document.getElementById('sg'+i);if(src&&dst)dst.value=src.value;});}}
+function updScan(){var z=document.getElementById('sScanZone'),n=document.getElementById('sScanN');if(!z)return;if(scanIdx>=SCAN.length){z.textContent='Whole body';if(n)n.textContent='Scan complete — feel it all as one field, then continue.';if(scanTimer){clearInterval(scanTimer);scanTimer=null;}return;}z.textContent=SCAN[scanIdx];if(n)n.textContent='Zone '+(scanIdx+1)+' of '+SCAN.length;}
+function tickScan(manual){scanIdx++;updScan();}
+function sgIn(el,i){var t=document.getElementById('g'+i);if(t)t.value=el.value;var f=loadFields();f['g'+i]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));}
+function nextSl(){if(slIdx>=SL.length-1){finishSess();return;}slIdx++;renderSl();}
+function prevSl(){if(slIdx<1)return;slIdx--;renderSl();}
+function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step 4','Scientific Prayer','3 Gratitudes'];document.querySelectorAll('#c-practice .row').forEach(function(r){var rn=r.querySelector('.rn');if(!rn)return;var t=(rn.childNodes[0]?rn.childNodes[0].textContent:'').trim();if(marks.some(function(m){return t.indexOf(m)===0;}))r.classList.add('dn');});saveChecks();updPR();closeSess();toast('Practice logged ✓ — save to Notion when ready',4500);}
 
 /* ---- Theme, workout rotation, backup ---- */
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
