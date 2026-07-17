@@ -164,6 +164,26 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 :root[data-theme="dark"] .ex-var.on{background:#38150f;}
 .ex-var b{font-size:12.5px;color:var(--blk);}
 .ex-var span{display:block;font-size:11.5px;color:var(--gr);line-height:1.45;}
+/* ---- Goals / Operating Plan ---- */
+.gl-note{font-size:12px;color:var(--gr);padding:2px 16px 6px;line-height:1.5;font-style:italic;}
+.gl-decade{font-size:20px;padding:6px 16px 12px;font-style:italic;color:var(--blk);display:flex;align-items:baseline;gap:10px;}
+.gl-decade input{flex:1;min-width:100px;border:none;border-bottom:2px solid var(--blk);font-size:26px;font-weight:800;text-align:center;background:transparent;color:var(--b5);outline:none;font-style:normal;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.02em;}
+.gl-decade input:focus{border-color:var(--b5);}
+.gl-yr{display:flex;align-items:baseline;gap:10px;padding:4px 16px;border-bottom:.5px solid var(--lt);}
+.gl-yr b{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:var(--b5);width:4.2ch;flex:none;}
+.gl-yr input{border:none;background:transparent;font-size:13px;width:100%;outline:none;color:var(--blk);font-family:'Barlow',sans-serif;}
+.gl-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 16px 6px;}
+.gl-goal{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:4px 16px;border-bottom:.5px solid var(--lt);align-items:center;}
+.gl-goal input{border:none;background:transparent;outline:none;font-family:'Barlow',sans-serif;color:var(--blk);width:100%;}
+.gl-goal .cat{font-family:'Barlow Condensed',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--b5);font-weight:700;}
+.gl-goal .what{font-size:13.5px;}
+.gl-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 16px 6px;}
+.gl-split input{width:100%;border:none;border-bottom:1px solid var(--lt);background:transparent;font-size:12.5px;padding:4px 0;outline:none;color:var(--blk);font-family:'Barlow',sans-serif;}
+.gl-split input:focus{border-color:var(--b5);}
+.gl-habit{font-size:14px;line-height:2.1;padding:4px 16px 8px;color:var(--blk);}
+.gl-habit input{border:none;border-bottom:1px solid var(--lt);background:transparent;min-width:140px;font-size:13.5px;outline:none;color:var(--b5);font-weight:600;padding:2px;font-family:'Barlow',sans-serif;}
+.gl-habit input:focus{border-color:var(--b5);}
+.gl-habit .arr{color:var(--b5);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin:0 4px;}
 /* ---- Belief evidence cards ---- */
 .ev-alt{font-size:11.5px;font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:6px 16px;line-height:1.5;}
 :root[data-theme="dark"] .ev-alt{color:#cbc5f5;}
@@ -212,7 +232,7 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 </head>
 <body>
 <div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="themeBtn" onclick="toggleTheme()" aria-label="Theme">🌙</button><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔</button><button class="bell" id="gearBtn" onclick="openSettings()" aria-label="Notion Sync">⚙</button><div class="sync s-idle" id="sync">Offline</div></div></div>
-<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button></div>
+<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button><button class="mbtn" onclick="setMode('goals')">Goals</button></div>
 <div class="dnav" id="dnav">
 <button class="dbtn on" onclick="setDay(0)" id="d0">Mon<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
 <button class="dbtn" onclick="setDay(1)" id="d1">Tue<div class="dotrow"><div class="dot" style="background:#C8321A"></div></div></button>
@@ -430,6 +450,47 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <button class="rs-close" onclick="closeSettings()">Close</button>
 </div>
 </div>
+<div class="card" id="goalsCard" style="width:390px">
+<div class="lhd" style="border-bottom-color:var(--b5)"><div class="ey">Plan the life like a business</div><div class="ct" style="color:var(--b5)">The Operating<br>Plan</div><div class="cs">Decade · Years · Quarters · Goals</div><div class="mr"><div class="ml">After Emma Grede · revisit every Sunday review</div><div class="bgs"><div class="bg f" style="background:var(--b5);border-color:var(--b5)">Goals</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--b5)">01 · The Decade</span><span class="ss">name it</span></div>
+<div class="gl-note">A headline separates who you were from who you're becoming — that's what makes the change feel possible.</div>
+<div class="gl-decade"><span>It's the</span><input id="gl_decade" placeholder="…" aria-label="Name your decade"><span>decade.</span></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">02 · The Years</span><span class="ss">one direction each</span></div>
+<div id="glYears"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">03 · The Quarters</span><span class="ss">this year, close enough to act on</span></div>
+<div class="gl-q">
+<div><div class="el">Q1 · Jan–Mar</div><textarea class="ef" id="gl_q1" placeholder="…"></textarea></div>
+<div><div class="el">Q2 · Apr–Jun</div><textarea class="ef" id="gl_q2" placeholder="…"></textarea></div>
+<div><div class="el">Q3 · Jul–Sep</div><textarea class="ef" id="gl_q3" placeholder="…"></textarea></div>
+<div><div class="el">Q4 · Oct–Dec</div><textarea class="ef" id="gl_q4" placeholder="…"></textarea></div>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">04 · The Goals</span><span class="ss">six to ten, stated plainly</span></div>
+<div class="gl-note">Categories: Personal · Professional · Health · Finances · Learning · Relationships</div>
+<div id="glGoals"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">05 · The Trade-offs</span><span class="ss">name the sacrifice on purpose</span></div>
+<div class="gl-split">
+<div><div class="el">What I'll give up</div><input id="gl_give1" placeholder="…"><input id="gl_give2" placeholder="…"><input id="gl_give3" placeholder="…"></div>
+<div><div class="el">What I'll say no to</div><input id="gl_no1" placeholder="…"><input id="gl_no2" placeholder="…"><input id="gl_no3" placeholder="…"></div>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">06 · The Habit</span><span class="ss">anchor it to a routine you keep</span></div>
+<div class="gl-habit">I'll start <input id="gl_habit" placeholder="a new habit"> <span class="arr">→</span> anchored to <input id="gl_anchorto" placeholder="e.g. the 5:00am practice">.</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">07 · The Anchor</span><span class="ss">same day every week</span></div>
+<div class="gl-split">
+<div><div class="el">Weekly review day</div><input id="gl_revday" placeholder="Sunday 8:30pm"></div>
+<div><div class="el">Landmark start date</div><input id="gl_startdate" placeholder="the day I begin"></div>
+</div>
+<button class="sbtn" style="background:var(--b5)" onclick="saveGoals()"><span class="spin" id="glSpin" style="display:none"></span><span id="glTxt">Save Plan to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">The Plan</span><span class="pc" id="glCnt" style="color:var(--b5)">0/9 goals</span></div><div class="pb"><div class="pf" id="glFill" style="width:0%;background:var(--b5)"></div></div><div class="pp" id="glPct">Fill it in · revisit weekly</div></div>
+</div>
 <div id="exOverlay" class="ov" onclick="closeEx(event)">
 <div class="sheet" onclick="event.stopPropagation()"><div class="rs-grab"></div><div id="exBody"></div><button class="rs-close" onclick="closeEx()">Close</button></div>
 </div>
@@ -460,7 +521,7 @@ function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d
 function scrollToNow(){var el=document.getElementById('nowRow');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});}
 function togDay(r){r.classList.toggle('dn');updDP();saveChecks();}
 function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.row');var done=document.getElementById('dBody').querySelectorAll('.row.dn').length,tot=rows.length;var p=tot?Math.round(done/tot*100):0;document.getElementById('dCnt').textContent=done+'/'+tot;document.getElementById('dFill').style.width=p+'%';document.getElementById('dPct').textContent=p+'% complete';}
-function setMode(m){document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',(i===0&&m==='day')||(i===1&&m==='routine'));});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';if(m==='routine')setR(curR);}
+function setMode(m){var modes=['day','routine','goals'];document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',modes[i]===m);});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';var g=document.getElementById('goalsCard');if(g){g.style.display=m==='goals'?'flex':'none';g.classList.toggle('vis',m==='goals');}if(m!=='routine')stopBv();if(m==='routine')setR(curR);}
 function setDay(i){curDay=i;for(var j=0;j<7;j++){document.getElementById('d'+j).classList.toggle('on',j===i);}renderDay(i);}
 var RC={practice:'#5B4FE8',supps:'#D4820A',skin:'#2E9E6B',train:'#C8321A',beliefs:'#5B4FE8'};
 function setR(r){curR=r;if(r!=='practice')stopBv();['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
@@ -498,12 +559,12 @@ function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMont
 function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
 function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
 function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
-document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();});
+document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();if(el.id&&el.id.indexOf('gl_')===0)updGL();});
 function checksKey(){return 'wb_checks_'+todayKey();}
 function rowKey(r){var card=r.closest('.card');var ctx=card?card.id:'x';if(ctx==='dayCard')ctx+='_'+curDay;var rn=r.querySelector('.rn');var t=rn?(rn.childNodes[0]?rn.childNodes[0].textContent:rn.textContent):r.textContent;return ctx+'|'+t.trim();}
 function saveChecks(){var done=[];document.querySelectorAll('.row.dn').forEach(function(r){done.push(rowKey(r));});localStorage.setItem(checksKey(),JSON.stringify(done));}
 function restoreChecks(){var set;try{set=JSON.parse(localStorage.getItem(checksKey())||'[]');}catch(e){set=[];}var s={};set.forEach(function(k){s[k]=1;});document.querySelectorAll('.row').forEach(function(r){if(s[rowKey(r)])r.classList.add('dn');else r.classList.remove('dn');});}
-function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();renderBChips();updMettaRot();}
+function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();renderBChips();updMettaRot();updGL();}
 
 /* ============================================================
    PWA + REMINDERS
@@ -623,6 +684,28 @@ function sgIn(el,i){var t=document.getElementById('g'+i);if(t)t.value=el.value;v
 function nextSl(){if(slIdx>=SL.length-1){finishSess();return;}slIdx++;renderSl();}
 function prevSl(){if(slIdx<1)return;slIdx--;renderSl();}
 function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step 4','Scientific Prayer','3 Gratitudes'];document.querySelectorAll('#c-practice .row').forEach(function(r){var rn=r.querySelector('.rn');if(!rn)return;var t=(rn.childNodes[0]?rn.childNodes[0].textContent:'').trim();if(marks.some(function(m){return t.indexOf(m)===0;}))r.classList.add('dn');});saveChecks();updPR();closeSess();toast('Practice logged ✓ — save to Notion when ready',4500);}
+
+/* ============================================================
+   GOALS — The Operating Plan (after Emma Grede)
+   ============================================================ */
+function renderGoalsUI(){var y0=new Date().getFullYear();var yh='';for(var i=0;i<10;i++){var y=y0+i;yh+='<div class="gl-yr"><b>'+y+'</b><input id="gl_y'+y+'" placeholder="direction for the year" aria-label="Direction for '+y+'"></div>';}var yw=document.getElementById('glYears');if(yw)yw.innerHTML=yh;var gh='';for(var j=1;j<=9;j++){gh+='<div class="gl-goal"><input class="cat" id="gl_cat'+j+'" placeholder="category"><input class="what" id="gl_goal'+j+'" placeholder="the goal, stated plainly"></div>';}var gw=document.getElementById('glGoals');if(gw)gw.innerHTML=gh;}
+function glv(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function updGL(){var n=0;for(var j=1;j<=9;j++)if(glv('gl_goal'+j))n++;var c=document.getElementById('glCnt');if(c)c.textContent=n+'/9 goals';var f=document.getElementById('glFill');if(f)f.style.width=Math.round(n/9*100)+'%';var p=document.getElementById('glPct');if(p)p.textContent=n?'The plan is taking shape':'Fill it in · revisit weekly';}
+async function saveGoals(){var date=new Date().toISOString().split('T')[0];var y0=new Date().getFullYear();var md='';
+if(glv('gl_decade'))md+='## The Decade\nIt\'s the **'+glv('gl_decade')+'** decade.\n\n';
+var yl=[];for(var i=0;i<10;i++){var y=y0+i;if(glv('gl_y'+y))yl.push('- **'+y+'** — '+glv('gl_y'+y));}
+if(yl.length)md+='## The Years\n'+yl.join('\n')+'\n\n';
+var ql=[];['1','2','3','4'].forEach(function(q){if(glv('gl_q'+q))ql.push('- **Q'+q+'** — '+glv('gl_q'+q));});
+if(ql.length)md+='## The Quarters ('+y0+')\n'+ql.join('\n')+'\n\n';
+var gl=[],n=0;for(var j=1;j<=9;j++){if(glv('gl_goal'+j)){n++;gl.push('- '+(glv('gl_cat'+j)?'**'+glv('gl_cat'+j)+'** — ':'')+glv('gl_goal'+j));}}
+if(gl.length)md+='## The Goals\n'+gl.join('\n')+'\n\n';
+var gv=[],no=[];[1,2,3].forEach(function(k){if(glv('gl_give'+k))gv.push('- '+glv('gl_give'+k));if(glv('gl_no'+k))no.push('- '+glv('gl_no'+k));});
+if(gv.length)md+='## What I\'ll give up\n'+gv.join('\n')+'\n\n';
+if(no.length)md+='## What I\'ll say no to\n'+no.join('\n')+'\n\n';
+if(glv('gl_habit')||glv('gl_anchorto'))md+='## The Habit\nI\'ll start **'+(glv('gl_habit')||'…')+'**, anchored to **'+(glv('gl_anchorto')||'…')+'**.\n\n';
+if(glv('gl_revday')||glv('gl_startdate'))md+='## The Anchor\n- Weekly review: '+(glv('gl_revday')||'—')+'\n- Landmark start: '+(glv('gl_startdate')||'—');
+if(!md){toast('Write something first');return;}
+await logEntry('Goals',date,date+' · Operating Plan',{completed:n,total:9,completion:n/9,markdown:md},'glSpin','glTxt','Saved','Save Plan to Notion');}
 
 /* ============================================================
    EXERCISE GUIDE — muscle heat-map + cues + variations
@@ -763,6 +846,7 @@ var today=dayMap[dow]!==undefined?dayMap[dow]:0;
 setDay(today);
 ['c-supps','c-skin','c-train','c-beliefs'].forEach(function(id){var c=document.getElementById(id);if(c){c.style.display='none';c.classList.remove('vis');}});
 curW=defaultWorkout();showW(curW);
+renderGoalsUI();
 wireExInfo();
 injectEv();
 syncUI();
