@@ -206,6 +206,8 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 @keyframes slin{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 .sess-ey{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--pm);margin-bottom:14px;}
 .sess-quote{font-size:22px;line-height:1.75;font-style:italic;font-weight:400;max-width:330px;color:#efecff;}
+.sess-quote.med{font-size:16.5px;line-height:1.8;text-align:left;}
+.sess-quote.long{font-size:14.5px;line-height:1.8;text-align:left;}
 #sess .bvring{border-color:rgba(255,255,255,.14);}
 #sess .bvc.idle{animation:orbidle 6s ease-in-out infinite;}
 @keyframes orbidle{0%,100%{transform:scale(.42);}50%{transform:scale(.47);}}
@@ -297,17 +299,7 @@ For each person, visualize them clearly and offer:
 <div class="el" style="margin-top:8px">Difficult people (rotates daily)</div><input class="ef" id="mettaDifficult" value="Liam, Nick, Mori, Brian">
 </div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div><div class="rv gv" style="background:var(--pl);color:var(--pr)" onclick="event.stopPropagation();togEx('gd-prayer')">guide ▾</div></div>
-<div class="gd" id="gd-prayer">
-<i>Perform immediately after meditation, while vibration is elevated.</i>
-<h5>1 · I Surrender</h5>Release all preconceived notions. Feel the physiological release of every need, worry, and desire to Universal Intelligence.
-<h5>2 · I Know</h5>Heighten awareness of your connection to Universal mind. Acknowledge the oneness and the presence.
-<h5>3 · I Am Ready</h5>Invite the Universe to make whatever changes are required for your evolution. Give full permission for upgrades to limiting beliefs.
-<h5>4 · I Forgive and I Love</h5>Replace guilt and regret with love. Forgive yourself, forgive others, wish happiness and prosperity to all.
-<h5>5 · I Declare</h5>State your intentions clearly, in the present tense:
-<div class="q">"I trust the abundance already in motion. I receive with ease and calm. The money follows the work I've already done."</div>
-<h5>6 · I Thank</h5>Step into the future. Experience the reality of each intention already manifested. Celebrate precisely as if it just happened.
-<h5>7 · I Devote</h5>Reaffirm commitment to your co-creative relationship with the Universe. Move forward with 100% belief, faith, trust, and knowing.
-</div>
+<div class="gd" id="gd-prayer"></div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">3 Gratitudes + Intention Review</div></div>
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--pr)">Gratitudes</span></div>
@@ -638,6 +630,15 @@ function renderBChips(){var el=document.getElementById('bChips');if(!el)return;v
    GUIDED SESSION — full-screen slideshow through the practice
    ============================================================ */
 var SCAN=['Left foot','Right foot','Right ankle','Left ankle','Lower left leg','Lower right leg','Left upper leg','Right upper leg','Right sit bone','Left sit bone','Lower back','Upper back','Groin','Abdominals','Chest','Left arm & hand','Right arm & hand','Neck','Jawline','Lips','Right ear','Left ear','Nose','Eyes','Right brow','Left brow','Forehead','Scalp'];
+var PRAYER=[
+{n:'I Surrender',q:'I Surrender—I now fully and completely let go and release all worries and desires. I surrender every aspect of my life to the infinite, loving intelligence of the Universe. I realize I cannot do everything myself or solve every problem—I need help. I now fully surrender my ego and all human logic. I open myself completely to the guidance and help of the Universe—I Surrender.'},
+{n:'I Know',q:'I Know—I know we are one and always connected, and I know you are fully present to me—and in me—in this moment and hear every word I speak. I know you are already helping me. I know you are fully aware of every aspect of my life and already know all my desires. We are one—I Know.'},
+{n:'I Am Ready',q:'I Am Ready—I understand I co-create my reality through my thoughts, words, actions, and vibrations. I know that my thinking is the cause of all my challenges. I am ready to have all of my limiting beliefs and thought patterns upgraded now. I give full permission for the Universe to change whatever needs to change for me to be the person the Universe needs me to be—I Am Ready.'},
+{n:'I Forgive and I Love',q:'I Forgive, and I Love—I know I am forgiven for any harm I have ever caused. I now forgive anyone who has ever hurt or harmed me. I love all people. No matter how anyone acts, I know we are all doing the best we can. I wish happiness and prosperity to all. I commit to using the power of love in all circumstances and in all situations—I Forgive and I Love.'},
+{n:'I Declare',q:'I Declare—Now, in this state of surrender, knowing, oneness, readiness, forgiveness, and Universal Love, I come into direct connection with the pure, creative intelligence of the Universe.<br><br>I declare that ______________________.<br>I give thanks, and so it is.<br><br>I declare that ______________________.<br>I give thanks, and so it is.'},
+{n:'I Thank',q:'I Thank—I now give thanks for the manifestation of these intentions. I fully accept their absolute reality in my life now.'},
+{n:'I Devote',q:'I Devote—I now devote myself to mastering the power of Universal Love, and I commit to using it in all circumstances, especially challenges. I now turn all my intentions over to the Universe for manifestation and know I am always being supplied with exactly what I need. I move forward in a spirit of joy, enthusiasm, excitement, expectancy, peace, and love. I dedicate myself to be of maximum service to all, to live in a manner that exemplifies love, and to always be responsive to Universal guidance.<br><br>I let go and let the Universe bring these co-creations—or creations even better—into reality now. This magnificent power created the galaxies, the moon, sun, stars, our beautiful planet, the sky, the mountains, the oceans, and everything in it. This is a power which knows no difficulty, for which nothing is hard. To this power, I submit these intentions with a firm knowing they shall all be made so.<br><br>I now let go—and go forth with 100% belief, 100% faith, 100% trust, and 100% knowing.<br><br>Thank you. Thank you. Thank you. And so it is.'}];
+var PRAYER_SMALL={4:'(Repeat until you have submitted all your requests.) · Your standing declaration: "I trust the abundance already in motion. I receive with ease and calm. The money follows the work I\'ve already done."'};
 var W5='May you be happy<br>May you be healthy and strong<br>May you be safe, on the inside and out<br>May you awaken to your highest potential<br>May you live with ease';
 var ANCHOR_TXT='"I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming."';
 var SL=[],slIdx=0,scanTimer=null,scanIdx=0;
@@ -658,16 +659,12 @@ function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:
 {t:'metta',ey:'Five Wishes · 4 of 5',title:'Someone difficult',who:rotPick('mettaDifficult'),note:'Rise above the memory. A sovereign soul doing their best.'},
 {t:'metta',ey:'Five Wishes · 5 of 5',title:'All of humanity',who:'The whole planet',wishes:'May we all be happy<br>May we all be healthy and strong<br>May we all be safe, on the inside and out<br>May we all awaken to our highest potential<br>May we all live with ease',note:'Shift to "we".'},
 {t:'say',ey:'Close the metta',quote:'"Thank you. Thank you. Thank you."'},
-{t:'text',ey:'Scientific Prayer · 1 of 7',title:'I Surrender',body:'Release all preconceived notions. Feel the physiological release of every need, worry, and desire to Universal Intelligence.'},
-{t:'text',ey:'Scientific Prayer · 2 of 7',title:'I Know',body:'Heighten awareness of your connection to Universal mind. Acknowledge the oneness and the presence.'},
-{t:'text',ey:'Scientific Prayer · 3 of 7',title:'I Am Ready',body:'Invite the Universe to make whatever changes are required for your evolution. Give full permission for upgrades to limiting beliefs.'},
-{t:'text',ey:'Scientific Prayer · 4 of 7',title:'I Forgive & I Love',body:'Replace guilt and regret with love. Forgive yourself, forgive others, wish happiness and prosperity to all.'},
-{t:'say',ey:'Scientific Prayer · 5 of 7 — I Declare',quote:'"I trust the abundance already in motion. I receive with ease and calm. The money follows the work I\'ve already done."',small:'Present tense. Clear. Yours.'},
-{t:'text',ey:'Scientific Prayer · 6 of 7',title:'I Thank',body:'Step into the future. Experience the reality of each intention already manifested. Celebrate precisely as if it just happened.'},
-{t:'text',ey:'Scientific Prayer · 7 of 7',title:'I Devote',body:'Reaffirm commitment to your co-creative relationship with the Universe. Move forward with 100% belief, faith, trust, and knowing.'},
 {t:'grat',ey:'3 Gratitudes',title:'I am grateful for…'},
 {t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'}
 ];
+// Scientific Prayer: one full read-aloud screen per step, inserted before gratitudes.
+var pr=PRAYER.map(function(p,i){return {t:'pray',ey:'Scientific Prayer · '+(i+1)+' of 7',title:p.n,quote:p.q,small:PRAYER_SMALL[i]||null};});
+Array.prototype.splice.apply(out,[out.length-2,0].concat(pr));
 // Weekend sessions (Sat/Sun) close with a review of the Operating Plan.
 if(realTodayIdx()>=5)out.splice(out.length-1,0,{t:'plan'});
 return out;}
@@ -682,6 +679,7 @@ if(s.t==='scan')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-zone
 if(s.t==='metta')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:24px;color:#8c86b8">'+s.title+'</div><div class="sess-who">'+s.who+'</div><div class="sess-wishes">'+(s.wishes||W5)+'</div><div class="sess-small">'+(s.note?s.note+'<br>':'')+'Conclude: "I love you, I love you, I love you."</div>';
 if(s.t==='grat')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:28px">'+s.title+'</div><input class="sess-in" placeholder="1." oninput="sgIn(this,1)" id="sg1"><input class="sess-in" placeholder="2." oninput="sgIn(this,2)" id="sg2"><input class="sess-in" placeholder="3." oninput="sgIn(this,3)" id="sg3"><div class="sess-small">Then review your declared intentions once.</div>';
 if(s.t==='done')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title">'+s.title+'</div><div class="sess-bodytxt">'+s.body+'</div><div class="sess-small">'+s.small+'</div>';
+if(s.t==='pray'){var cls=s.quote.length>700?' long':(s.quote.length>350?' med':'');return '<div class="sess-ey">'+s.ey+' — read aloud</div><div class="sess-title" style="font-size:24px;margin-bottom:12px">'+s.title+'</div><div class="sess-quote'+cls+'">'+s.quote+'</div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');}
 if(s.t==='plan')return planSlideHtml();
 return '';}
 function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -850,6 +848,7 @@ b5:{alt:'The people with the most sustained ambition and largest outcomes also h
 {n:'LeBron James',tag:'sleeps 10–12h · $1B+ active',s:'Reportedly spends about $1.5M a year on his body and treats 10–12 hours of sleep as non-negotiable. Two decades at the top, a family he\'s visibly present for, a school he founded — and he became a billionaire while still playing.',k:'Recovery, family, and longevity weren\'t what he traded away for ambition — they were the mechanism of it.'}]}};
 function injectEv(){['b1','b2','b3','b4','b5'].forEach(function(b){var host=document.getElementById('bw-'+b);if(!host||document.getElementById('ev-'+b))return;var d=EVID[b];if(!d)return;var html='<div id="ev-'+b+'"><div class="ev-alt"><b>Alternative explanation:</b> '+d.alt+'</div>';d.people.forEach(function(p,i){var id=b+'p'+i;html+='<div class="evp"><div class="evp-h" onclick="togEvp(\''+id+'\')"><span>'+p.n+'</span><small>'+p.tag+' ▾</small></div><div class="evp-d" id="evp-'+id+'">'+p.s+'<span class="kl">Key lesson: '+p.k+'</span>'+(p.q?'<span class="qq">'+p.q+'</span>':'')+'</div></div>';});html+='</div>';host.insertAdjacentHTML('afterbegin',html);});}
 function togEvp(id){var el=document.getElementById('evp-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
+function injectPrayer(){var el=document.getElementById('gd-prayer');if(!el||el.children.length)return;el.innerHTML='<i>Perform immediately after meditation, while vibration is elevated. Read each step aloud in full.</i>'+PRAYER.map(function(p,i){return '<h5>'+(i+1)+' · '+p.n+'</h5><div class="q">'+p.q+'</div>'+(i===4?'<div style="font-size:11px;color:var(--gr);margin:2px 0 4px">'+PRAYER_SMALL[4]+'</div>':'');}).join('');}
 
 /* ---- Theme, workout rotation, backup ---- */
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
@@ -870,6 +869,7 @@ curW=defaultWorkout();showW(curW);
 renderGoalsUI();
 wireExInfo();
 injectEv();
+injectPrayer();
 syncUI();
 scheduleReminders();
 renderRem();
