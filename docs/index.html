@@ -184,31 +184,6 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 .gl-habit input{border:none;border-bottom:1px solid var(--lt);background:transparent;min-width:140px;font-size:13.5px;outline:none;color:var(--b5);font-weight:600;padding:2px;font-family:'Barlow',sans-serif;}
 .gl-habit input:focus{border-color:var(--b5);}
 .gl-habit .arr{color:var(--b5);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin:0 4px;}
-/* ---- Print export (Operating Plan sheet) ---- */
-#printSheet{display:none;font-family:Georgia,'Times New Roman',serif;color:#22231f;background:#fff;}
-.pp-kicker{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7b2d3b;margin:0 0 8px;}
-.pp-h1{font-size:30px;font-weight:500;margin:0;letter-spacing:-.01em;}
-.pp-sub{font-style:italic;color:#5c5d56;font-size:13px;margin:6px 0 0;padding-bottom:14px;border-bottom:2px solid #22231f;}
-.pp-sec{margin-top:20px;}
-.pp-sh{font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#22231f;margin-bottom:8px;}
-.pp-sh b{color:#7b2d3b;margin-right:8px;font-weight:600;}
-.pp-decade{font-size:22px;font-style:italic;margin:2px 0 4px;}
-.pp-decade b{font-style:normal;border-bottom:2px solid #22231f;padding:0 12px;}
-.pp-row{display:flex;gap:10px;border-bottom:1px solid #d6d7ce;padding:4px 0;font-size:13px;min-height:22px;}
-.pp-row b{font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:500;color:#7b2d3b;width:4.6ch;flex:none;}
-.pp-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;}
-.pp-q b{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#7b2d3b;display:block;margin-bottom:2px;}
-.pp-q div{border-bottom:1px solid #d6d7ce;min-height:34px;font-size:13px;padding:2px 0 4px;}
-.pp-goal{display:flex;gap:12px;border-bottom:1px solid #d6d7ce;padding:5px 0;font-size:13.5px;min-height:24px;}
-.pp-goal b{font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:#7b2d3b;width:104px;flex:none;padding-top:2px;}
-.pp-habit{font-size:15px;line-height:1.9;}
-.pp-habit b{border-bottom:1px solid #7b2d3b;padding:0 6px;font-weight:500;}
-.pp-colophon{margin-top:28px;padding-top:10px;border-top:1px solid #d6d7ce;font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#a9aaa1;}
-@media print{
-body{background:#fff !important;padding:0 !important;display:block !important;color:#22231f;}
-body>*:not(#printSheet){display:none !important;}
-#printSheet{display:block !important;padding:18px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-}
 /* ---- Belief evidence cards ---- */
 .ev-alt{font-size:11.5px;font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:6px 16px;line-height:1.5;}
 :root[data-theme="dark"] .ev-alt{color:#cbc5f5;}
@@ -512,7 +487,6 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div><div class="el">Landmark start date</div><input id="gl_startdate" placeholder="the day I begin"></div>
 </div>
 <button class="sbtn" style="background:var(--b5)" onclick="saveGoals()"><span class="spin" id="glSpin" style="display:none"></span><span id="glTxt">Save Plan to Notion</span></button>
-<button class="sbtn" style="background:#333" onclick="printPlan()">⎙ Print / Save as PDF</button>
 <div style="height:10px"></div>
 </div>
 <div class="lft"><div class="prow"><span class="pl">The Plan</span><span class="pc" id="glCnt" style="color:var(--b5)">0/9 goals</span></div><div class="pb"><div class="pf" id="glFill" style="width:0%;background:var(--b5)"></div></div><div class="pp" id="glPct">Fill it in · revisit weekly</div></div>
@@ -525,7 +499,6 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div class="sess-body ani" id="sessBody"></div>
 <div class="sess-nav"><button class="sess-back" id="sessBack" onclick="prevSl()">Back</button><button class="sess-next" id="sessNext" onclick="nextSl()">Continue</button></div>
 </div>
-<div id="printSheet"></div>
 <div id="toast"></div>
 <script>
 var NOTION_OS='3240ac6c9de1815abad8fcad66654830';
@@ -562,7 +535,13 @@ function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.cl
 function setSv(sid,tid,saving,lbl){var sp=document.getElementById(sid),tx=document.getElementById(tid);if(sp)sp.style.display=saving?'inline-block':'none';if(tx&&lbl)tx.textContent=lbl;}
 /* ---- Notion sync via your backend proxy (see docs/backend) ---- */
 function notionCfg(){return {url:(localStorage.getItem('wb_notion_url')||'').replace(/\/+$/,''),secret:localStorage.getItem('wb_notion_secret')||''};}
-async function callBackend(payload,spId,txId,ok,def){var cfg=notionCfg();if(!cfg.url){toast('Set up Notion Sync first (⚙)');openSettings();return;}setSv(spId,txId,true);setSt('load','Syncing...');try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify(payload)});var data=await res.json().catch(function(){return {};});if(!res.ok||(data&&data.error))throw new Error((data&&data.error)||('HTTP '+res.status));setSt('ok','Synced');setSv(spId,txId,false,ok);toast('Saved to Notion');setTimeout(function(){setSv(spId,txId,false,def);},2000);}catch(err){setSt('err','Error');setSv(spId,txId,false,'Retry');toast('Error: '+err.message,7000);setTimeout(function(){setSv(spId,txId,false,def);},3500);}}
+async function postBackend(cfg,payload){try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify(payload)});var data=await res.json().catch(function(){return {};});if(!res.ok||(data&&data.error))return {err:(data&&data.error)||('HTTP '+res.status)};return {ok:true};}catch(e){return {err:e.message};}}
+async function callBackend(payload,spId,txId,ok,def){var cfg=notionCfg();if(!cfg.url){toast('Set up Notion Sync first (⚙)');openSettings();return;}setSv(spId,txId,true);setSt('load','Syncing...');var r=await postBackend(cfg,payload);
+// Older deployed workers don't know logEntry — fall back to creating a page
+// under the Well-Being OS parent so saves still land in Notion.
+if(r.err&&/Unknown action/i.test(r.err)&&payload.action==='logEntry'){var title=payload.name||(payload.date+' · '+payload.category);var md='## '+title+'\n\n'+(payload.completed!=null?'**Completion:** '+payload.completed+'/'+payload.total+'\n\n':'')+(payload.markdown||'')+(payload.notes?'\n\n### Notes\n'+payload.notes:'');r=await postBackend(cfg,{action:'createPage',parentId:NOTION_OS,title:title,markdown:md});}
+if(r.err){setSt('err','Error');setSv(spId,txId,false,'Retry');toast('Error: '+r.err,7000);setTimeout(function(){setSv(spId,txId,false,def);},3500);return;}
+setSt('ok','Synced');setSv(spId,txId,false,ok);toast('Saved to Notion');setTimeout(function(){setSv(spId,txId,false,def);},2000);}
 function createPage(parentId,title,markdown,spId,txId,ok,def){return callBackend({action:'createPage',parentId:parentId,title:title,markdown:markdown},spId,txId,ok,def);}
 function appendBlocks(pageId,markdown,spId,txId,ok,def){return callBackend({action:'appendBlocks',pageId:pageId,markdown:markdown},spId,txId,ok,def);}
 function logEntry(category,date,name,opts,spId,txId,ok,def){var p={action:'logEntry',databaseId:NOTION_DB,date:date,category:category,name:name};opts=opts||{};if(opts.completed!=null)p.completed=opts.completed;if(opts.total!=null)p.total=opts.total;if(opts.completion!=null)p.completion=opts.completion;if(opts.notes)p.notes=opts.notes;if(opts.markdown)p.markdown=opts.markdown;return callBackend(p,spId,txId,ok,def);}
@@ -748,29 +727,6 @@ if(glv('gl_habit')||glv('gl_anchorto'))md+='## The Habit\nI\'ll start **'+(glv('
 if(glv('gl_revday')||glv('gl_startdate'))md+='## The Anchor\n- Weekly review: '+(glv('gl_revday')||'—')+'\n- Landmark start: '+(glv('gl_startdate')||'—');
 if(!md){toast('Write something first');return;}
 await logEntry('Goals',date,date+' · Operating Plan',{completed:n,total:9,completion:n/9,markdown:md},'glSpin','glTxt','Saved','Save Plan to Notion');}
-function printPlan(){var y0=new Date().getFullYear();var blank='&nbsp;';
-var h='<p class="pp-kicker">Plan your life like a business</p><h1 class="pp-h1">The Operating Plan</h1><p class="pp-sub">The life you want won\'t happen by accident. It happens by design.</p>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>01</b>The Decade</div><div class="pp-decade">It\'s the <b>'+(esc(glv('gl_decade'))||'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')+'</b> decade.</div></div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>02</b>The Years</div><div class="pp-cols">';
-for(var i=0;i<10;i++){var y=y0+i;h+='<div class="pp-row"><b>'+y+'</b><span>'+(esc(glv('gl_y'+y))||blank)+'</span></div>';}
-h+='</div></div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>03</b>The Quarters · '+y0+'</div><div class="pp-cols">';
-[['1','Jan–Mar'],['2','Apr–Jun'],['3','Jul–Sep'],['4','Oct–Dec']].forEach(function(q){h+='<div class="pp-q"><b>Q'+q[0]+' · '+q[1]+'</b><div>'+(esc(glv('gl_q'+q[0]))||blank)+'</div></div>';});
-h+='</div></div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>04</b>The Goals</div>';
-for(var j=1;j<=9;j++){h+='<div class="pp-goal"><b>'+(esc(glv('gl_cat'+j))||blank)+'</b><span>'+(esc(glv('gl_goal'+j))||blank)+'</span></div>';}
-h+='</div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>05</b>The Trade-offs</div><div class="pp-cols"><div><div class="pp-sh" style="letter-spacing:.12em">What I\'ll give up</div>';
-[1,2,3].forEach(function(k){h+='<div class="pp-row"><span>'+(esc(glv('gl_give'+k))||blank)+'</span></div>';});
-h+='</div><div><div class="pp-sh" style="letter-spacing:.12em">What I\'ll say no to</div>';
-[1,2,3].forEach(function(k){h+='<div class="pp-row"><span>'+(esc(glv('gl_no'+k))||blank)+'</span></div>';});
-h+='</div></div></div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>06</b>The Habit</div><div class="pp-habit">I\'ll start <b>'+(esc(glv('gl_habit'))||'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')+'</b> → anchored to <b>'+(esc(glv('gl_anchorto'))||'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')+'</b>.</div></div>';
-h+='<div class="pp-sec"><div class="pp-sh"><b>07</b>The Anchor</div><div class="pp-cols"><div class="pp-row"><b style="width:auto">Review</b><span>'+(esc(glv('gl_revday'))||blank)+'</span></div><div class="pp-row"><b style="width:auto">Start</b><span>'+(esc(glv('gl_startdate'))||blank)+'</span></div></div></div>';
-h+='<p class="pp-colophon">After Emma Grede · Well-Being OS · '+todayKey()+' · Revisit weekly</p>';
-document.getElementById('printSheet').innerHTML=h;
-try{window.print();}catch(e){}
-setTimeout(function(){if(!window.matchMedia('print').matches)toast('If no print dialog appeared, open the app in Safari (not the installed icon) and tap Print there.',6000);},800);}
 
 /* ============================================================
    EXERCISE GUIDE — muscle heat-map + cues + variations
