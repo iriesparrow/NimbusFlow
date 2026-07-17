@@ -184,6 +184,22 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 .gl-habit input{border:none;border-bottom:1px solid var(--lt);background:transparent;min-width:140px;font-size:13.5px;outline:none;color:var(--b5);font-weight:600;padding:2px;font-family:'Barlow',sans-serif;}
 .gl-habit input:focus{border-color:var(--b5);}
 .gl-habit .arr{color:var(--b5);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin:0 4px;}
+/* ---- Wins / Achievements ---- */
+.win-today{margin:10px 16px 4px;padding:12px 14px;border-radius:8px;background:linear-gradient(135deg,#FEF5E7,#FDF0DC);border-left:3px solid var(--su);}
+:root[data-theme="dark"] .win-today{background:linear-gradient(135deg,#33270f,#2a2010);}
+.win-today .wt-l{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--su);margin-bottom:4px;}
+.win-today .wt-t{font-size:15px;font-weight:600;line-height:1.45;color:var(--blk);}
+.win-today .wt-s{font-size:11px;font-style:italic;color:var(--gr);margin-top:5px;}
+.win{display:flex;align-items:baseline;gap:8px;padding:7px 16px;border-bottom:.5px solid var(--lt);}
+.win-d{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--su);width:62px;flex:none;}
+.win-t{font-size:13px;color:var(--blk);flex:1;line-height:1.4;}
+.win-c{font-family:'Barlow Condensed',sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+.win-x{border:none;background:none;color:var(--lt);font-size:14px;cursor:pointer;padding:0 2px;line-height:1;}
+.win-x:hover{color:var(--tr);}
+.win-add{padding:8px 16px 4px;display:grid;grid-template-columns:1fr;gap:6px;}
+.win-add .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.win-add input,.win-add select{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:4px 0;outline:none;width:100%;}
+.win-add input:focus,.win-add select:focus{border-color:var(--su);}
 /* ---- Belief evidence cards ---- */
 .ev-alt{font-size:11.5px;font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:6px 16px;line-height:1.5;}
 :root[data-theme="dark"] .ev-alt{color:#cbc5f5;}
@@ -234,7 +250,7 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 </head>
 <body>
 <div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="themeBtn" onclick="toggleTheme()" aria-label="Theme">🌙</button><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔</button><button class="bell" id="gearBtn" onclick="openSettings()" aria-label="Notion Sync">⚙</button><div class="sync s-idle" id="sync">Offline</div></div></div>
-<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button><button class="mbtn" onclick="setMode('goals')">Goals</button></div>
+<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button><button class="mbtn" onclick="setMode('goals')">Goals</button><button class="mbtn" onclick="setMode('wins')">Wins</button></div>
 <div class="dnav" id="dnav">
 <button class="dbtn on" onclick="setDay(0)" id="d0">Mon<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
 <button class="dbtn" onclick="setDay(1)" id="d1">Tue<div class="dotrow"><div class="dot" style="background:#C8321A"></div></div></button>
@@ -483,6 +499,28 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 </div>
 <div class="lft"><div class="prow"><span class="pl">The Plan</span><span class="pc" id="glCnt" style="color:var(--b5)">0/9 goals</span></div><div class="pb"><div class="pf" id="glFill" style="width:0%;background:var(--b5)"></div></div><div class="pp" id="glPct">Fill it in · revisit weekly</div></div>
 </div>
+<div class="card" id="winsCard" style="width:390px">
+<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">The evidence file</div><div class="ct" style="color:var(--su)">Achieve<wbr>ments</div><div class="cs">Enshrined proof · read when doubt speaks</div><div class="mr"><div class="ml">Ch 12 method, pointed at yourself</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)" id="winCount">0 wins</div></div></div></div>
+<div class="lbd">
+<div class="gl-note">You did these. They are not opinions — they are records. When a limiting belief surfaces, this page is the counter-evidence.</div>
+<div class="win-today" id="winToday"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Add evidence</span><span class="ss">plainly, like a fact</span></div>
+<div class="win-add">
+<input id="win_text" placeholder="What did you do / build / become?">
+<div class="row2"><input id="win_month" type="month" aria-label="When"><select id="win_cat"><option>Business</option><option>Clients</option><option>Finances</option><option>Recognition</option><option>Relationships</option><option>Growth</option><option>Life</option><option>Craft</option></select></div>
+<button class="sbtn" style="background:var(--su);margin:4px 0 2px" onclick="addWin()">+ Add to the file</button>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Milestones</span><span class="ss">dated</span></div>
+<div id="winDated"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Standing evidence</span><span class="ss">who you've become</span></div>
+<div id="winStanding"></div>
+<button class="sbtn" style="background:var(--su)" onclick="saveWins()"><span class="spin" id="wnSpin" style="display:none"></span><span id="wnTxt">Save Evidence File to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">The Evidence File</span><span class="pc" id="winFoot" style="color:var(--su)">—</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">One rotates through Today's Reflection daily</div></div>
+</div>
 <div id="exOverlay" class="ov" onclick="closeEx(event)">
 <div class="sheet" onclick="event.stopPropagation()"><div class="rs-grab"></div><div id="exBody"></div><button class="rs-close" onclick="closeEx()">Close</button></div>
 </div>
@@ -513,7 +551,7 @@ function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d
 function scrollToNow(){var el=document.getElementById('nowRow');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});}
 function togDay(r){r.classList.toggle('dn');updDP();saveChecks();}
 function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.row');var done=document.getElementById('dBody').querySelectorAll('.row.dn').length,tot=rows.length;var p=tot?Math.round(done/tot*100):0;document.getElementById('dCnt').textContent=done+'/'+tot;document.getElementById('dFill').style.width=p+'%';document.getElementById('dPct').textContent=p+'% complete';}
-function setMode(m){var modes=['day','routine','goals'];document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',modes[i]===m);});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';var g=document.getElementById('goalsCard');if(g){g.style.display=m==='goals'?'flex':'none';g.classList.toggle('vis',m==='goals');}if(m!=='routine')stopBv();if(m==='routine')setR(curR);}
+function setMode(m){var modes=['day','routine','goals','wins'];document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',modes[i]===m);});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';var g=document.getElementById('goalsCard');if(g){g.style.display=m==='goals'?'flex':'none';g.classList.toggle('vis',m==='goals');}var w=document.getElementById('winsCard');if(w){w.style.display=m==='wins'?'flex':'none';w.classList.toggle('vis',m==='wins');}if(m!=='routine')stopBv();if(m==='routine')setR(curR);}
 function setDay(i){curDay=i;for(var j=0;j<7;j++){document.getElementById('d'+j).classList.toggle('on',j===i);}renderDay(i);}
 var RC={practice:'#5B4FE8',supps:'#D4820A',skin:'#2E9E6B',train:'#C8321A',beliefs:'#5B4FE8'};
 function setR(r){curR=r;if(r!=='practice')stopBv();['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
@@ -555,9 +593,10 @@ async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var
    ============================================================ */
 function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
-function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
+function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;if(el.id&&el.id.indexOf('win_')===0)return null;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
 function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
 document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();if(el.id&&el.id.indexOf('gl_')===0)updGL();});
+
 function checksKey(){return 'wb_checks_'+todayKey();}
 function rowKey(r){var card=r.closest('.card');var ctx=card?card.id:'x';if(ctx==='dayCard')ctx+='_'+curDay;var rn=r.querySelector('.rn');var t=rn?(rn.childNodes[0]?rn.childNodes[0].textContent:rn.textContent):r.textContent;return ctx+'|'+t.trim();}
 function saveChecks(){var done=[];document.querySelectorAll('.row.dn').forEach(function(r){done.push(rowKey(r));});localStorage.setItem(checksKey(),JSON.stringify(done));}
@@ -660,7 +699,7 @@ function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:
 {t:'metta',ey:'Five Wishes · 5 of 5',title:'All of humanity',who:'The whole planet',wishes:'May we all be happy<br>May we all be healthy and strong<br>May we all be safe, on the inside and out<br>May we all awaken to our highest potential<br>May we all live with ease',note:'Shift to "we".'},
 {t:'say',ey:'Close the metta',quote:'"Thank you. Thank you. Thank you."'},
 {t:'grat',ey:'3 Gratitudes',title:'I am grateful for…'},
-{t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'}
+{t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'+(function(){var tw=todaysWin();return tw?'<br><br>Today\'s evidence: "'+esc(tw.t)+'"':'';})()}
 ];
 // Scientific Prayer: one full read-aloud screen per step, inserted before gratitudes.
 var pr=PRAYER.map(function(p,i){return {t:'pray',ey:'Scientific Prayer · '+(i+1)+' of 7',title:p.n,quote:p.q,small:PRAYER_SMALL[i]||null};});
@@ -691,7 +730,8 @@ if(yr)h+='<div class="sess-bodytxt"><b>'+y+':</b> '+esc(yr)+'</div>';
 if(qq)h+='<div class="sess-bodytxt"><b>Q'+q+':</b> '+esc(qq)+'</div>';
 if(goals.length){h+='<div class="sess-wishes" style="font-style:normal;text-align:left;font-size:13.5px;line-height:1.8;margin-top:12px">'+goals.map(function(g){return '• '+(g.c?'<b>'+esc(g.c)+'</b> — ':'')+esc(g.g);}).join('<br>')+'</div>';}
 if(glv('gl_habit'))h+='<div class="sess-small">Habit: '+esc(glv('gl_habit'))+' → '+esc(glv('gl_anchorto')||'…')+'</div>';
-h+='<div class="sess-small">Did this week move the plan? What shifts next week?</div>';
+var wn=loadWins();if(wn.length)h+='<div class="sess-small">Evidence file: '+wn.length+' wins on record — and counting.</div>';
+h+='<div class="sess-small">Did this week move the plan? What shifts next week? What win goes in the file?</div>';
 return h;}
 function renderSl(){slCleanup();var s=SL[slIdx];var b=document.getElementById('sessBody');b.innerHTML=slHtml(s);b.classList.remove('ani');void b.offsetWidth;b.classList.add('ani');document.getElementById('sessFill').style.width=Math.round((slIdx+1)/SL.length*100)+'%';document.getElementById('sessStep').textContent=(slIdx+1)+' / '+SL.length;document.getElementById('sessBack').style.visibility=slIdx?'visible':'hidden';document.getElementById('sessNext').textContent=(slIdx===SL.length-1)?'Finish & Log ✓':'Continue';
 if(s.t==='breath'){bvPrefix='s';setBv(s.mode);setTimeout(function(){if(SL[slIdx]===s&&document.getElementById('sbvc'))startBv();},900);}else{bvPrefix='';}
@@ -703,6 +743,51 @@ function sgIn(el,i){var t=document.getElementById('g'+i);if(t)t.value=el.value;v
 function nextSl(){if(slIdx>=SL.length-1){finishSess();return;}slIdx++;renderSl();}
 function prevSl(){if(slIdx<1)return;slIdx--;renderSl();}
 function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step 4','Scientific Prayer','3 Gratitudes'];document.querySelectorAll('#c-practice .row').forEach(function(r){var rn=r.querySelector('.rn');if(!rn)return;var t=(rn.childNodes[0]?rn.childNodes[0].textContent:'').trim();if(marks.some(function(m){return t.indexOf(m)===0;}))r.classList.add('dn');});saveChecks();updPR();closeSess();toast('Practice logged ✓ — save to Notion when ready',4500);}
+
+/* ============================================================
+   WINS — the achievements evidence file
+   ============================================================ */
+var WINS_SEED=[
+{d:'2025',t:'Doubled the business',c:'Business'},
+{d:'2025-06',t:'Pre-paid and signed a full-year lease on my own office space',c:'Business'},
+{d:'2026-03',t:'Doubled my staff',c:'Business'},
+{d:'2026-07',t:'Working with a repeat client',c:'Clients'},
+{d:'2026-07',t:'Started developing a material library',c:'Craft'},
+{d:'',t:'Being promoted by TALD, Programa, The Local Project, and Architectural Digest',c:'Recognition'},
+{d:'',t:'Twice as efficient as I used to be',c:'Growth'},
+{d:'',t:'I can look at my business and plan for expansion because of its improvement',c:'Business'},
+{d:'',t:'Thinking about who to hire next so I can scale',c:'Business'},
+{d:'',t:'On track for my most successful year yet',c:'Business'},
+{d:'',t:'Improved my client communications',c:'Clients'},
+{d:'',t:'I can better serve my clients',c:'Clients'},
+{d:'',t:'I can look at the numbers of my business and not be afraid',c:'Finances'},
+{d:'',t:'Soon able to access business credit',c:'Finances'},
+{d:'',t:'A diversified income',c:'Finances'},
+{d:'',t:'Better work/life compartmentalization',c:'Life'},
+{d:'',t:'I can start to help people I care about',c:'Life'},
+{d:'',t:'Done a better job at maintaining myself',c:'Life'},
+{d:'',t:'A wider social and professional network',c:'Relationships'},
+{d:'',t:'Better familial relationships',c:'Relationships'},
+{d:'',t:'Better boundaries — clear about what I will and won\'t do',c:'Growth'},
+{d:'',t:'I trust myself more',c:'Growth'}];
+var WIN_COLORS={Business:'#C8321A',Clients:'#1A6EC8',Finances:'#D4820A',Recognition:'#8B3EC8',Relationships:'#2E9E6B',Growth:'#5B4FE8',Life:'#993556',Craft:'#557'};
+function loadWins(){try{var w=JSON.parse(localStorage.getItem('wb_wins'));if(Array.isArray(w))return w;}catch(e){}if(!localStorage.getItem('wb_wins_seeded')){localStorage.setItem('wb_wins',JSON.stringify(WINS_SEED));localStorage.setItem('wb_wins_seeded','1');return WINS_SEED.slice();}return [];}
+function storeWins(w){localStorage.setItem('wb_wins',JSON.stringify(w));}
+function winDateLabel(d){if(!d)return '';if(d.length===4)return d;var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(d.slice(5,7),10)-1];return mo+' '+d.slice(0,4);}
+function todaysWin(){var w=loadWins();if(!w.length)return null;return w[dayOfYear()%w.length];}
+function renderWins(){var w=loadWins();var dated=w.map(function(x,i){x._i=i;return x;}).filter(function(x){return x.d;}).sort(function(a,b){return b.d.localeCompare(a.d);});var standing=w.map(function(x,i){x._i=i;return x;}).filter(function(x){return !x.d;});
+function row(x){var col=WIN_COLORS[x.c]||'#888';return '<div class="win"><span class="win-d">'+(winDateLabel(x.d)||'·')+'</span><span class="win-t">'+esc(x.t)+'</span><span class="win-c" style="color:'+col+'">'+esc(x.c||'')+'</span><button class="win-x" onclick="delWin('+x._i+')" aria-label="Remove">×</button></div>';}
+var wd=document.getElementById('winDated');if(wd)wd.innerHTML=dated.map(row).join('')||'<div class="gl-note">No dated milestones yet.</div>';
+var ws=document.getElementById('winStanding');if(ws)ws.innerHTML=standing.map(row).join('')||'<div class="gl-note">Nothing here yet.</div>';
+var tw=todaysWin();var t=document.getElementById('winToday');if(t)t.innerHTML=tw?'<div class="wt-l">Today\'s reflection</div><div class="wt-t">'+esc(tw.t)+'</div><div class="wt-s">'+(winDateLabel(tw.d)?winDateLabel(tw.d)+' · ':'')+'Sit with this one. It already happened — it\'s evidence, not opinion.</div>':'<div class="wt-l">Today\'s reflection</div><div class="wt-t">Add your first piece of evidence below.</div>';
+var cEl=document.getElementById('winCount');if(cEl)cEl.textContent=w.length+' wins';
+var fEl=document.getElementById('winFoot');if(fEl)fEl.textContent=w.length+' pieces of evidence';}
+function addWin(){var t=(document.getElementById('win_text')||{value:''}).value.trim();if(!t){toast('Write the win first');return;}var d=(document.getElementById('win_month')||{value:''}).value||'';var c=(document.getElementById('win_cat')||{value:'Growth'}).value;var w=loadWins();w.push({d:d,t:t,c:c});storeWins(w);document.getElementById('win_text').value='';renderWins();toast('Added to the evidence file ✓');}
+function delWin(i){var w=loadWins();if(i<0||i>=w.length)return;w.splice(i,1);storeWins(w);renderWins();toast('Removed');}
+async function saveWins(){var w=loadWins();if(!w.length){toast('The file is empty');return;}var date=new Date().toISOString().split('T')[0];var dated=w.filter(function(x){return x.d;}).sort(function(a,b){return b.d.localeCompare(a.d);});var standing=w.filter(function(x){return !x.d;});
+var md='';if(dated.length)md+='### Milestones\n'+dated.map(function(x){return '- **'+winDateLabel(x.d)+'** — '+x.t+(x.c?' _('+x.c+')_':'');}).join('\n')+'\n\n';
+if(standing.length)md+='### Standing evidence\n'+standing.map(function(x){return '- '+x.t+(x.c?' _('+x.c+')_':'');}).join('\n');
+await logEntry('Wins',date,date+' · Evidence File',{completed:w.length,markdown:md},'wnSpin','wnTxt','Saved','Save Evidence File to Notion');}
 
 /* ============================================================
    GOALS — The Operating Plan (after Emma Grede)
@@ -867,6 +952,7 @@ setDay(today);
 ['c-supps','c-skin','c-train','c-beliefs'].forEach(function(id){var c=document.getElementById(id);if(c){c.style.display='none';c.classList.remove('vis');}});
 curW=defaultWorkout();showW(curW);
 renderGoalsUI();
+renderWins();
 wireExInfo();
 injectEv();
 injectPrayer();
