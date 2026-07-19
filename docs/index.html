@@ -184,6 +184,21 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 .gl-habit input{border:none;border-bottom:1px solid var(--lt);background:transparent;min-width:140px;font-size:13.5px;outline:none;color:var(--b5);font-weight:600;padding:2px;font-family:'Barlow',sans-serif;}
 .gl-habit input:focus{border-color:var(--b5);}
 .gl-habit .arr{color:var(--b5);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin:0 4px;}
+/* ---- Editable supplement stack ---- */
+.sp-add{padding:8px 16px 4px;display:grid;gap:6px;}
+.sp-add .r2{display:grid;grid-template-columns:1fr 110px;gap:8px;}
+.sp-add .r3{display:grid;grid-template-columns:86px 1fr 1fr;gap:8px;}
+.sp-add input,.sp-add select{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:4px 0;outline:none;width:100%;}
+.sp-add input:focus,.sp-add select:focus{border-color:var(--su);}
+.sp-row{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:.5px solid var(--lt);cursor:pointer;}
+.sp-row:hover{background:var(--ltr);}
+.sp-row.editing{background:#FEF5E7;}
+:root[data-theme="dark"] .sp-row.editing{background:#33270f;}
+.sp-main{flex:1;min-width:0;}
+.sp-main b{font-size:13px;color:var(--blk);font-weight:600;display:block;line-height:1.3;}
+.sp-meta{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gr);margin-top:1px;}
+.sp-meta .fd{color:var(--su);}
+.sp-dose{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:var(--blk);white-space:nowrap;}
 /* ---- Wins / Achievements ---- */
 .win-today{margin:10px 16px 4px;padding:12px 14px;border-radius:8px;background:linear-gradient(135deg,#FEF5E7,#FDF0DC);border-left:3px solid var(--su);}
 :root[data-theme="dark"] .win-today{background:linear-gradient(135deg,#33270f,#2a2010);}
@@ -341,24 +356,21 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div class="lft"><div class="prow"><span class="pl">Session Progress</span><span class="pc" id="prCnt">0/0</span></div><div class="pb"><div class="pf" id="prFill" style="width:0%;background:var(--pr)"></div></div><div class="pp" id="prPct">0% complete</div></div>
 </div>
 <div class="card" id="c-supps">
-<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">Daily · 4 timing windows</div><div class="ct" style="color:var(--su)">Supplements</div><div class="cs">12 products · tap doses to edit</div><div class="mr"><div class="ml">Edit inline · Save syncs Notion</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)">12 items</div></div></div></div>
+<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">Daily · 4 timing windows</div><div class="ct" style="color:var(--su)">Supplements</div><div class="cs">Your live stack · tap a row to edit</div><div class="mr"><div class="ml">What · dose · time · with food</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)" id="spChip">12 items</div></div></div></div>
 <div class="lbd">
-<div class="sh"><span class="stg" style="background:var(--su)">6:00 am</span><span class="ss">empty stomach</span></div><div class="thn"></div>
-<table class="ext"><tr><td class="exn">AG1 (Athletic Greens)</td><td class="exv"><input value="1 scoop" data-s="AG1"></td></tr><tr><td class="exn">Tru Niagen (NR)</td><td class="exv"><input value="900 mg" data-s="Niagen"></td></tr><tr><td class="exn">L-Theanine</td><td class="exv"><input value="200 mg" data-s="LTheanine"></td></tr><tr><td class="exn" style="color:var(--su);font-weight:600">Enclomiphene (Sun only)</td><td class="exv"><input value="50 mg" data-s="Enclo"></td></tr></table>
+<div class="sh"><span class="stg" style="background:var(--su)" id="spFormLabel">Add to stack</span><span class="ss">what · how much · when · with food?</span></div>
+<div class="sp-add">
+<div class="r2"><input id="sp_name" placeholder="Supplement name"><input id="sp_dose" placeholder="Dose (e.g. 500 mg)"></div>
+<div class="r3"><input id="sp_time" type="time" value="06:00" aria-label="Time of day"><select id="sp_food" aria-label="With food?"><option>Empty stomach</option><option>With food</option><option>With food (needs fat)</option><option>30–60 min before food</option><option>With or after food</option><option>Anytime</option></select><select id="sp_days" aria-label="Which days"><option>Daily</option><option>Mon–Fri</option><option>Sat + Sun</option><option>Sun only</option><option>Mon/Wed/Fri</option><option>As needed</option></select></div>
+<button class="sbtn" style="background:var(--su);margin:4px 0 2px" id="spBtn" onclick="spSubmit()">+ Add to Stack</button>
+</div>
 <div class="thk"></div>
-<div class="sh"><span class="stg" style="background:var(--su)">8:00 am</span><span class="ss">with breakfast (needs fat)</span></div><div class="thn"></div>
-<table class="ext"><tr><td class="exn">D3 + K2 (5,000 IU / 100mcg)</td><td class="exv"><input value="1 softgel" data-s="D3K2"></td></tr><tr><td class="exn">CoQ10</td><td class="exv"><input value="200 mg" data-s="CoQ10"></td></tr><tr><td class="exn">Omega-3 Krill Oil</td><td class="exv"><input value="1,000 mg" data-s="Krill"></td></tr><tr><td class="exn">One A Day Men's</td><td class="exv"><input value="1 tablet" data-s="OneADay"></td></tr></table>
-<div class="thk"></div>
-<div class="sh"><span class="stg" style="background:var(--su)">12:30 + 1:00 pm</span><span class="ss">before + with lunch</span></div><div class="thn"></div>
-<table class="ext"><tr><td class="exn">ColonBroom (30-60 min before)</td><td class="exv"><input value="1 serving" data-s="ColonBroom"></td></tr><tr><td class="exn">Liposomal Vitamin C</td><td class="exv"><input value="1,000 mg" data-s="VitC"></td></tr><tr><td class="exn">B12</td><td class="exv"><input value="1,000 mcg" data-s="B12"></td></tr></table>
-<div class="thk"></div>
-<div class="sh"><span class="stg" style="background:var(--su)">8:00 pm</span><span class="ss">Mon-Fri only</span></div><div class="thn"></div>
-<table class="ext"><tr><td class="exn">Ashwagandha (rests Sat+Sun)</td><td class="exv"><input value="1,000 mg" data-s="Ashwa"></td></tr></table>
-<div class="tip">Tap any dose to edit. Save appends an update record to your Notion Well-Being OS page.</div>
+<div id="spList"></div>
+<div class="tip">Tap any row to edit it · × removes it. Save writes the whole stack to Notion.</div>
 <button class="sbtn" style="background:var(--su)" onclick="saveSupps()"><span class="spin" id="suSpin" style="display:none"></span><span id="suTxt">Save Dose Updates to Notion</span></button>
 <div style="height:10px"></div>
 </div>
-<div class="lft"><div class="prow"><span class="pl">Supplement Stack</span><span class="pc" style="color:var(--su)">12 items</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">Edit doses above · tap Save to sync</div></div>
+<div class="lft"><div class="prow"><span class="pl">Supplement Stack</span><span class="pc" style="color:var(--su)" id="spFoot">12 items</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">Tap a row to edit · Save syncs to Notion</div></div>
 </div>
 <div class="card" id="c-skin">
 <div class="lhd" style="border-bottom-color:var(--sk)"><div class="ey">AM every day · PM varies by night</div><div class="ct" style="color:var(--sk)">Skincare</div><div class="cs">10 products · AM + PM protocols</div><div class="mr"><div class="ml">Check off steps</div><div class="bgs"><div class="bg f" style="background:var(--sk);border-color:var(--sk)">10 products</div></div></div></div>
@@ -582,7 +594,10 @@ function saveSettings(){var u=document.getElementById('setUrl').value.trim().rep
 async function testBackend(){saveSettings();var cfg=notionCfg();if(!cfg.url){toast('Enter a backend URL');return;}var n=document.getElementById('setNote');n.textContent='Testing...';try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify({action:'ping'})});var data=await res.json().catch(function(){return {};});if(res.ok&&data&&data.ok){n.innerHTML='✅ Connected — backend reachable and secret accepted.';toast('Backend OK');}else{n.innerHTML='⚠️ Reached backend but got: '+((data&&data.error)||('HTTP '+res.status));}}catch(err){n.innerHTML='❌ Could not reach backend: '+err.message;}}
 async function saveDay(){var d=DAYS[curDay];var date=document.getElementById('logDate').value||new Date().toISOString().split('T')[0];var notes=(document.getElementById('dNotes')||{value:''}).value||'';var rows=document.getElementById('dBody').querySelectorAll('.row');var done=[],todo=[];rows.forEach(function(r){var txt=r.querySelector('.rn');if(!txt)return;var label=txt.childNodes[0].textContent.trim();(r.classList.contains('dn')?done:todo).push(label);});var pct=done.length+todo.length>0?Math.round(done.length/(done.length+todo.length)*100):0;var total=done.length+todo.length,completion=total?done.length/total:0;var md='### Completed\n'+done.map(function(x){return '- '+x;}).join('\n')+'\n\n### Not completed\n'+todo.map(function(x){return '- '+x;}).join('\n');await logEntry('Day',date,date+' · '+d.n,{completed:done.length,total:total,completion:completion,notes:notes,markdown:md},'dSpin','dTxt','Saved','Save to Notion');}
 async function savePractice(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var g1=document.getElementById('g1').value,g2=document.getElementById('g2').value,g3=document.getElementById('g3').value;var ev=document.getElementById('eNotes').value;var date=new Date().toISOString().split('T')[0];var completion=tot?done/tot:0;var surf=getBSurf();var md='### 3 Gratitudes\n1. '+(g1||'-')+'\n2. '+(g2||'-')+'\n3. '+(g3||'-')+'\n\n### Limiting beliefs surfaced today\n'+(surf.length?surf.sort().map(function(i){return '- '+BELIEFS_FULL[i];}).join('\n'):'- None')+(ev?'\n\n### Evening Reflection\n'+ev:'');await logEntry('Practice',date,date+' · Practice',{completed:done,total:tot,completion:completion,notes:ev,markdown:md},'prSpin','prTxt','Saved','Save Session to Notion');}
-async function saveSupps(){var inputs=document.querySelectorAll('[data-s]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-s')+': '+inp.value);});var date=new Date().toISOString().split('T')[0];var md='### Doses\n'+lines.join('\n');await logEntry('Supplements',date,date+' · Supplements',{markdown:md},'suSpin','suTxt','Saved','Save Dose Updates to Notion');}
+async function saveSupps(){var s=loadSupps();if(!s.length){toast('Stack is empty');return;}var date=new Date().toISOString().split('T')[0];
+var sorted=s.slice().sort(function(a,b){return (a.time||'99').localeCompare(b.time||'99');});
+var md='',lastT=null;sorted.forEach(function(x){if(x.time!==lastT){lastT=x.time;md+='\n### '+fmtHM(x.time)+'\n';}md+='- **'+x.n+'** — '+(x.dose||'—')+' · '+x.food+' · '+x.days+'\n';});
+await logEntry('Supplements',date,date+' · Supplement Stack',{completed:s.length,markdown:md.trim()},'suSpin','suTxt','Saved','Save Dose Updates to Notion');}
 async function saveWorkout(){var wname={p1:'Push 1',l1:'Pull 1',legs1:'Legs 1',p2:'Push 2',pull2:'Pull 2',legs2:'Legs 2'};var inputs=document.querySelectorAll('#w-'+curW+' [data-e]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-e').replace(/_/g,' ')+': '+inp.value);});var notes=document.getElementById('wNotes').value;var date=new Date().toISOString().split('T')[0];var md='### Weights\n'+lines.join('\n')+(notes?'\n\n### Notes\n'+notes:'');await logEntry('Workout',date,date+' · '+wname[curW],{notes:notes,markdown:md},'trSpin','trTxt','Saved','Save Workout to Notion');}
 async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var labels=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed for money','Money requires constant monitoring','Ambition requires sacrificing life'];var sections='',count=0;['b1','b2','b3','b4','b5'].forEach(function(b,i){var alt=document.getElementById(b+'a'),orig=document.getElementById(b+'o'),rep=document.getElementById(b+'r');if(!alt)return;if(alt.value||orig.value||rep.value){count++;sections+='\n\n### Belief '+(i+1)+' - '+labels[i];if(alt.value)sections+='\n\n**Alternative explanations:**\n'+alt.value;if(orig.value)sections+='\n\n**Origin:**\n'+orig.value;if(rep.value)sections+='\n\n**New belief:**\n> '+rep.value;}});if(!sections){toast('Write something first');return;}document.getElementById('blCnt').textContent=count+'/5 beliefs';document.getElementById('blFill').style.width=(count/5*100)+'%';document.getElementById('blPct').textContent=count+' of 5 beliefs written';var md=sections;await logEntry('Beliefs',date,date+' · Beliefs',{completed:count,total:5,completion:count/5,markdown:md},'blSpin','blTxt','Saved','Save Belief Work to Notion');}
 
@@ -593,7 +608,7 @@ async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var
    ============================================================ */
 function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
-function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;if(el.id&&el.id.indexOf('win_')===0)return null;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
+function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;if(el.id&&(el.id.indexOf('win_')===0||el.id.indexOf('sp_')===0))return null;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
 function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
 document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();if(el.id&&el.id.indexOf('gl_')===0)updGL();});
 
@@ -743,6 +758,43 @@ function sgIn(el,i){var t=document.getElementById('g'+i);if(t)t.value=el.value;v
 function nextSl(){if(slIdx>=SL.length-1){finishSess();return;}slIdx++;renderSl();}
 function prevSl(){if(slIdx<1)return;slIdx--;renderSl();}
 function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step 4','Scientific Prayer','3 Gratitudes'];document.querySelectorAll('#c-practice .row').forEach(function(r){var rn=r.querySelector('.rn');if(!rn)return;var t=(rn.childNodes[0]?rn.childNodes[0].textContent:'').trim();if(marks.some(function(m){return t.indexOf(m)===0;}))r.classList.add('dn');});saveChecks();updPR();closeSess();toast('Practice logged ✓ — save to Notion when ready',4500);}
+
+/* ============================================================
+   SUPPLEMENT STACK — editable: what, dose, time, food, days
+   ============================================================ */
+var SUPP_SEED=[
+{k:'AG1',n:'AG1 (Athletic Greens)',dose:'1 scoop',time:'06:00',food:'Empty stomach',days:'Daily'},
+{k:'Niagen',n:'Tru Niagen (NR)',dose:'900 mg',time:'06:00',food:'Empty stomach',days:'Daily'},
+{k:'LTheanine',n:'L-Theanine',dose:'200 mg',time:'06:00',food:'Empty stomach',days:'As needed'},
+{k:'Enclo',n:'Enclomiphene Citrate',dose:'50 mg',time:'06:00',food:'Empty stomach',days:'Sun only'},
+{k:'D3K2',n:'D3 + K2 (5,000 IU / 100 mcg)',dose:'1 softgel',time:'08:00',food:'With food (needs fat)',days:'Daily'},
+{k:'CoQ10',n:'CoQ10',dose:'200 mg',time:'08:00',food:'With food (needs fat)',days:'Daily'},
+{k:'Krill',n:'Omega-3 Krill Oil',dose:'1,000 mg',time:'08:00',food:'With food (needs fat)',days:'Daily'},
+{k:'OneADay',n:"One A Day Men's",dose:'1 tablet',time:'08:00',food:'With food',days:'Daily'},
+{k:'ColonBroom',n:'ColonBroom',dose:'1 serving',time:'12:30',food:'30–60 min before food',days:'Daily'},
+{k:'VitC',n:'Liposomal Vitamin C',dose:'1,000 mg',time:'13:00',food:'With food',days:'Daily'},
+{k:'B12',n:'B12',dose:'1,000 mcg',time:'13:00',food:'With food',days:'Daily'},
+{k:'Ashwa',n:'Ashwagandha',dose:'1,000 mg',time:'20:00',food:'With or after food',days:'Mon–Fri'}];
+var spEditIdx=-1;
+function loadSupps(){try{var s=JSON.parse(localStorage.getItem('wb_supps'));if(Array.isArray(s))return s;}catch(e){}
+if(!localStorage.getItem('wb_supps_seeded')){var f=loadFields();var seed=SUPP_SEED.map(function(x){var o={n:x.n,dose:(f[x.k]||x.dose),time:x.time,food:x.food,days:x.days};return o;});localStorage.setItem('wb_supps',JSON.stringify(seed));localStorage.setItem('wb_supps_seeded','1');return seed;}
+return [];}
+function storeSupps(s){localStorage.setItem('wb_supps',JSON.stringify(s));}
+function fmtHM(t){if(!t)return '';var h=parseInt(t.slice(0,2),10),m=t.slice(3,5),ap=h>=12?'pm':'am',h12=h%12;if(h12===0)h12=12;return h12+':'+m+' '+ap;}
+function renderSupps(){var s=loadSupps().map(function(x,i){x._i=i;return x;}).sort(function(a,b){return (a.time||'99').localeCompare(b.time||'99');});
+var html='',lastT=null;
+s.forEach(function(x){if(x.time!==lastT){lastT=x.time;html+='<div class="sh"><span class="stg" style="background:var(--su)">'+fmtHM(x.time)+'</span></div>';}
+html+='<div class="sp-row'+(x._i===spEditIdx?' editing':'')+'" onclick="spEdit('+x._i+')"><div class="sp-main"><b>'+esc(x.n)+'</b><div class="sp-meta"><span class="fd">'+esc(x.food)+'</span> · '+esc(x.days)+'</div></div><span class="sp-dose">'+esc(x.dose||'—')+'</span><button class="win-x" onclick="event.stopPropagation();spDel('+x._i+')" aria-label="Remove">×</button></div>';});
+var el=document.getElementById('spList');if(el)el.innerHTML=html||'<div class="gl-note">Stack is empty — add your first supplement above.</div>';
+var n=loadSupps().length;var c=document.getElementById('spChip');if(c)c.textContent=n+' items';var ft=document.getElementById('spFoot');if(ft)ft.textContent=n+' items';}
+function spv(id){var el=document.getElementById(id);return el?el.value:'';}
+function spSubmit(){var n=spv('sp_name').trim();if(!n){toast('Name the supplement first');return;}
+var item={n:n,dose:spv('sp_dose').trim(),time:spv('sp_time')||'06:00',food:spv('sp_food'),days:spv('sp_days')};
+var s=loadSupps();if(spEditIdx>=0&&spEditIdx<s.length){s[spEditIdx]=item;toast('Updated ✓');}else{s.push(item);toast('Added to stack ✓');}
+storeSupps(s);spResetForm();renderSupps();}
+function spEdit(i){var s=loadSupps();var x=s[i];if(!x)return;spEditIdx=i;document.getElementById('sp_name').value=x.n;document.getElementById('sp_dose').value=x.dose||'';document.getElementById('sp_time').value=x.time||'06:00';document.getElementById('sp_food').value=x.food||'With food';document.getElementById('sp_days').value=x.days||'Daily';document.getElementById('spBtn').textContent='Update '+x.n;document.getElementById('spFormLabel').textContent='Editing';renderSupps();}
+function spResetForm(){spEditIdx=-1;['sp_name','sp_dose'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});var t=document.getElementById('sp_time');if(t)t.value='06:00';document.getElementById('spBtn').textContent='+ Add to Stack';document.getElementById('spFormLabel').textContent='Add to stack';}
+function spDel(i){var s=loadSupps();if(i<0||i>=s.length)return;var name=s[i].n;s.splice(i,1);storeSupps(s);if(spEditIdx===i)spResetForm();else if(spEditIdx>i)spEditIdx--;renderSupps();toast('Removed '+name);}
 
 /* ============================================================
    WINS — the achievements evidence file
@@ -953,6 +1005,7 @@ setDay(today);
 curW=defaultWorkout();showW(curW);
 renderGoalsUI();
 renderWins();
+renderSupps();
 wireExInfo();
 injectEv();
 injectPrayer();
