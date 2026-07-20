@@ -2,14 +2,20 @@
    - Caches the app shell so it loads offline / fast
    - Handles notification clicks (focus the app)
    Bump CACHE when you change files so phones pull the new version. */
-const CACHE = 'wellbeing-os-v15';
+const CACHE = 'wellbeing-os-v16';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './greenroom/',
+  './greenroom/index.html',
+  './greenroom/manifest.webmanifest',
+  './greenroom/icons/icon-192.png',
+  './greenroom/icons/icon-512.png',
+  './greenroom/icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (e) => {
@@ -29,8 +35,11 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   // Network-first for navigations so updates show up; cache fallback offline.
+  // Path-aware so the Green Room surface falls back to its own shell.
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).catch(() => caches.match('./index.html')));
+    const shell = new URL(req.url).pathname.includes('/greenroom')
+      ? './greenroom/index.html' : './index.html';
+    e.respondWith(fetch(req).catch(() => caches.match(shell)));
     return;
   }
   e.respondWith(caches.match(req).then((hit) => hit || fetch(req)));

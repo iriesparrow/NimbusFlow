@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Green Room</title>
+<meta name="theme-color" content="#1C1A19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Green Room">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#1C1A19; --panel:#262321; --panel2:#2C2926; --line:#3A3733;
+  --ink:#EDE7DD; --mut:#9A9288; --faint:#6B655C; --sage:#8FAF8B; --sage-dim:#5C7A5A;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,Menlo,'SF Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.55;
+  display:flex;justify-content:center;padding:calc(14px + env(safe-area-inset-top)) 14px 60px;}
+.wrap{width:100%;max-width:420px;}
+
+/* ---- masthead ---- */
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);margin-bottom:10px;}
+h1{font-size:34px;font-weight:500;letter-spacing:-.01em;line-height:1.05;}
+.sub{font-style:italic;color:var(--mut);font-size:14.5px;margin-top:8px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.backlink{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);text-decoration:none;padding:14px 0;min-height:44px;}
+.backlink:active{color:var(--mut);}
+
+/* ---- sections ---- */
+section{margin-top:26px;}
+.sh{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
+.sh .idx{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--sage);}
+.sh .t{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;}
+.note{font-style:italic;color:var(--mut);font-size:13px;margin-bottom:12px;max-width:60ch;}
+
+/* ---- beats editor ---- */
+.beat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;}
+.beat label{display:block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);}
+.beat .hint{font-size:12px;font-style:italic;color:var(--faint);margin:3px 0 8px;}
+.beat textarea{width:100%;min-height:72px;background:transparent;border:none;outline:none;resize:vertical;
+  color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;}
+.beat textarea::placeholder{color:var(--faint);font-style:italic;}
+.beat:focus-within{border-color:var(--sage-dim);}
+
+/* ---- buttons ---- */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:10px;
+  border:none;border-radius:10px;cursor:pointer;font-family:var(--mono);font-size:12.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;transition:opacity .15s;}
+.btn:active{opacity:.75;}
+.btn.primary{background:var(--sage);color:#15130f;}
+.btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line);}
+.btn.danger{background:transparent;color:#a06a5a;border:1px solid var(--line);}
+.saved{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  text-align:center;margin-top:10px;min-height:14px;}
+
+/* ---- overlays (rehearse / drill) ---- */
+.stage{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 90% at 50% 0%,#232019 0%,#161413 70%);
+  display:none;flex-direction:column;}
+.stage.show{display:flex;}
+.stage-top{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;}
+.stage-x{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;min-width:44px;min-height:44px;}
+.stage-bar{flex:1;height:2px;background:rgba(237,231,221,.12);border-radius:2px;overflow:hidden;}
+.stage-fill{height:100%;background:var(--sage);width:0;transition:width .3s;}
+.clock{font-family:var(--mono);font-size:12px;color:var(--sage);min-width:86px;text-align:right;}
+.stage-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 26px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;text-align:center;}
+.stage-ey{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--sage);margin-bottom:14px;}
+.stage-txt{font-size:21px;line-height:1.7;font-style:italic;color:#F2EDE3;white-space:pre-wrap;}
+.stage-txt.long{font-size:16.5px;text-align:left;}
+.stage-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:18px;}
+.stage-nav{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom));}
+.stage-nav .btn{margin-top:0;}
+.stage-nav .back{width:96px;flex:none;}
+
+.colophon{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);line-height:1.9;}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="backlink" href="../">&larr; Well-Being OS</a>
+  <p class="kicker">Before the room hears it</p>
+  <h1>Green Room</h1>
+  <p class="sub">The story of why you build is told badly by accident and well by rehearsal. Write the beats. Say them out loud. Time it.</p>
+
+  <section>
+    <div class="sh"><span class="idx">01</span><span class="t">The Beats</span></div>
+    <p class="note">Six beats make a founder story. Write plainly &mdash; you're drafting speech, not copy. Everything stays on this device.</p>
+    <div id="beats"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">02</span><span class="t">Rehearse</span></div>
+    <p class="note">One beat per screen, teleprompter-style, with the clock running. Aim to speak each beat, not read it.</p>
+    <button class="btn primary" onclick="startRun()">&#9654; Run the story</button>
+    <button class="btn ghost" onclick="startDrill()">? Question drill &mdash; unscripted answers</button>
+    <div class="saved" id="takeLine"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">03</span><span class="t">Housekeeping</span></div>
+    <button class="btn danger" onclick="wipe()">Erase everything on this device</button>
+  </section>
+
+  <p class="colophon">Nothing you write here leaves this device &middot; localStorage only &middot; no accounts &middot; no analytics</p>
+</main>
+
+<div class="stage" id="stage">
+  <div class="stage-top">
+    <button class="stage-x" onclick="closeStage()">&#10005;</button>
+    <div class="stage-bar"><div class="stage-fill" id="stageFill"></div></div>
+    <div class="clock" id="clock">0:00</div>
+  </div>
+  <div class="stage-body" id="stageBody"></div>
+  <div class="stage-nav">
+    <button class="btn ghost back" id="stageBack" onclick="prevCard()">Back</button>
+    <button class="btn primary" id="stageNext" onclick="nextCard()">Next</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* Green Room — founder-story rehearsal.
+   All user content lives ONLY under this one localStorage key.
+   This surface must never touch Well-Being OS state (wb* keys). */
+var KEY='lifeos.narrative.v1';
+
+var BEATS=[
+ {k:'hook', t:'The Hook',   h:'One line. The change you make — not your job title.',           p:'The single sentence you could open any room with…'},
+ {k:'origin',t:'The Origin', h:'The moment this became inevitable. A scene, not a summary.',    p:'Where it actually started…'},
+ {k:'turn', t:'The Turn',   h:'The risk, the leap, or the hard call that made it real.',       p:'The decision that cost something…'},
+ {k:'craft',t:'The Craft',  h:'What you do differently — the thing imitators get wrong.',      p:'How the work is actually different…'},
+ {k:'proof',t:'The Proof',  h:'Evidence, plainly. Numbers, names, moments that landed.',       p:'How you know it’s working…'},
+ {k:'vision',t:'The Vision', h:'Where this goes. Big enough to matter, near enough to believe.',p:'What the next chapter is…'}
+];
+
+var QUESTIONS=[
+ 'Why does this company exist?',
+ 'What almost made you quit — and why didn’t you?',
+ 'What do people misunderstand about your work at first?',
+ 'What’s the hardest no you’ve had to say?',
+ 'What did the first year teach you that you couldn’t have learned any other way?',
+ 'Who is this not for?',
+ 'What would you tell yourself on day one?',
+ 'What does success look like beyond the numbers?',
+ 'What’s the win you’re proudest of — and the one nobody saw?',
+ 'Where is this in five years?',
+ 'What breaks first if you grow too fast?',
+ 'What part of the story do you usually leave out?'
+];
+
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&typeof d==='object')return d;}catch(e){}return {v:1,beats:{},takes:0};}
+function store(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---- editor ---- */
+function renderBeats(){
+  var d=load(),html='';
+  BEATS.forEach(function(b){
+    html+='<div class="beat"><label for="b-'+b.k+'">'+b.t+'</label><div class="hint">'+b.h+'</div>'+
+      '<textarea id="b-'+b.k+'" placeholder="'+b.p+'"></textarea></div>';
+  });
+  document.getElementById('beats').innerHTML=html;
+  BEATS.forEach(function(b){
+    var el=document.getElementById('b-'+b.k);
+    el.value=(d.beats&&d.beats[b.k])||'';
+    el.addEventListener('input',save);
+  });
+  takeLine();
+}
+var saveT=null;
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    var d=load();d.beats={};
+    BEATS.forEach(function(b){d.beats[b.k]=document.getElementById('b-'+b.k).value;});
+    store(d);
+    var s=document.querySelector('.saved');
+  },250);
+}
+function takeLine(){
+  var d=load();
+  document.getElementById('takeLine').textContent=d.takes?('Takes so far: '+d.takes):'';
+}
+function wipe(){
+  if(!confirm('Erase every beat and take count from this device?'))return;
+  localStorage.removeItem(KEY);
+  renderBeats();
+}
+
+/* ---- stage engine (rehearse + drill share it) ---- */
+var cards=[],cardIdx=0,mode='',t0=0,clockT=null,takeDone=false;
+function fmtClock(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function tick(){document.getElementById('clock').textContent=fmtClock(Date.now()-t0);}
+function openStage(){
+  document.getElementById('stage').classList.add('show');
+  document.body.style.overflow='hidden';
+  t0=Date.now();clockT=setInterval(tick,500);tick();
+}
+function closeStage(){
+  document.getElementById('stage').classList.remove('show');
+  document.body.style.overflow='';
+  clearInterval(clockT);
+  takeLine();
+}
+function renderCard(){
+  var c=cards[cardIdx],b=document.getElementById('stageBody');
+  var cls=(c.txt&&c.txt.length>260)?' long':'';
+  b.innerHTML='<div class="stage-ey">'+esc(c.ey)+'</div>'+
+    '<div class="stage-txt'+cls+'">'+esc(c.txt)+'</div>'+
+    (c.hint?'<div class="stage-hint">'+esc(c.hint)+'</div>':'');
+  document.getElementById('stageFill').style.width=Math.round((cardIdx+1)/cards.length*100)+'%';
+  document.getElementById('stageBack').style.visibility=cardIdx?'visible':'hidden';
+  document.getElementById('stageNext').textContent=(cardIdx===cards.length-1)?(mode==='run'?'End take':'Done'):'Next';
+}
+function nextCard(){
+  if(cardIdx>=cards.length-1){
+    if(mode==='run'&&!takeDone){takeDone=true;var d=load();d.takes=(d.takes||0)+1;store(d);}
+    closeStage();return;
+  }
+  cardIdx++;renderCard();
+}
+function prevCard(){if(cardIdx>0){cardIdx--;renderCard();}}
+
+/* ---- rehearse ---- */
+function startRun(){
+  var d=load();
+  cards=BEATS.filter(function(b){return d.beats&&d.beats[b.k]&&d.beats[b.k].trim();})
+    .map(function(b){return {ey:b.t,txt:d.beats[b.k].trim(),hint:'Say it — don’t read it'};});
+  if(!cards.length){alert('Write at least one beat first.');return;}
+  cards.push({ey:'Curtain',txt:'That’s the story. Once more, faster, warmer.',hint:'Ending the take logs it'});
+  mode='run';cardIdx=0;takeDone=false;openStage();renderCard();
+}
+
+/* ---- drill ---- */
+function startDrill(){
+  var q=QUESTIONS.slice();
+  for(var i=q.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=q[i];q[i]=q[j];q[j]=tmp;}
+  cards=q.slice(0,6).map(function(x,i){return {ey:'Question '+(i+1)+' of 6',txt:x,hint:'Answer out loud — 60 seconds, no notes'};});
+  mode='drill';cardIdx=0;openStage();renderCard();
+}
+
+renderBeats();
+</script>
+</body>
+</html>
