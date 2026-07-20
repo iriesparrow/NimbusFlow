@@ -106,6 +106,8 @@ section{margin-top:26px;}
 
   <section>
     <div class="sh"><span class="idx">03</span><span class="t">Housekeeping</span></div>
+    <button class="btn ghost" onclick="exportGR()">&darr; Export this device's story (.json)</button>
+    <label class="btn ghost" style="cursor:pointer">&uarr; Import a story file<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
     <button class="btn danger" onclick="wipe()">Erase everything on this device</button>
   </section>
 
@@ -193,6 +195,27 @@ function wipe(){
   if(!confirm('Erase every beat and take count from this device?'))return;
   localStorage.removeItem(KEY);
   renderBeats();
+}
+/* Export/import covers ONLY this surface's key — used when the site moves hosts. */
+function exportGR(){
+  var blob=new Blob([JSON.stringify({'lifeos.narrative.v1':localStorage.getItem(KEY)||''},null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='greenroom-story.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);
+}
+function importGR(input){
+  var f=input.files&&input.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var o=JSON.parse(rd.result);
+      if(typeof o[KEY]!=='string'||!o[KEY])throw new Error('not a story file');
+      JSON.parse(o[KEY]); // must itself be valid
+      localStorage.setItem(KEY,o[KEY]);
+      renderBeats();
+    }catch(e){alert('That file isn’t a Green Room story export.');}
+  };
+  rd.readAsText(f);input.value='';
 }
 
 /* ---- stage engine (rehearse + drill share it) ---- */

@@ -18,13 +18,11 @@ The integration can only touch pages you explicitly share.
 1. Open your **Well-Being OS** page in Notion → top-right **•••** → **Connections / Add connections** → choose `Well-Being OS`.
 2. Do the same for your **Limiting Beliefs** page.
 
-> The app already targets these page IDs:
-> - Well-Being OS: `3240ac6c9de1815abad8fcad66654830`
-> - Limiting Beliefs: `3240ac6c9de1810db4b1d6ecc814f85d`
->
-> If those aren't your pages anymore, open the correct page in Notion, copy its
-> URL, take the 32-character id at the end, and update `NOTION_OS` /
-> `NOTION_BELIEFS` at the top of `docs/index.html`.
+> The app reads its target page/database IDs from your device's personal file
+> (imported once via ⚙ → Import; the keys are `notionOS`, `notionBeliefs`,
+> `notionDB` inside `wb_personal`). No IDs are committed to this repo. To point
+> at different pages, open the page in Notion, copy the 32-character id from
+> the end of its URL, and update your personal file before importing.
 
 ## Step 3 — Deploy the Worker
 

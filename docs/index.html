@@ -276,7 +276,7 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <button class="dbtn" onclick="setDay(6)" id="d6">Sun<div class="dotrow"><div class="dot" style="background:#D4820A"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
 </div>
 <div class="card vis" id="dayCard">
-<div class="lhd"><div class="ey" id="dEy">Day 1 of 7</div><div class="ct" id="dTt">Monday</div><div class="cs" id="dSb">Push 1 · Shave · Tretinoin PM</div><div class="mr"><div class="ml">Log &amp; track</div><div class="bgs" id="dBg"></div></div></div>
+<div class="lhd"><div class="ey" id="dEy">Day 1 of 7</div><div class="ct" id="dTt">Monday</div><div class="cs" id="dSb">Push 1 · Shave · Retinoid PM</div><div class="mr"><div class="ml">Log &amp; track</div><div class="bgs" id="dBg"></div></div></div>
 <div class="drow"><div class="dlbl">Log date</div><input type="date" id="logDate"></div>
 <div class="lbd" id="dBody"></div>
 <button class="sbtn" style="background:var(--p)" onclick="saveDay()"><span class="spin" id="dSpin" style="display:none"></span><span id="dTxt">Save to Notion</span></button>
@@ -294,7 +294,7 @@ input[type=date]:focus{border-bottom-color:var(--p);}
 <div class="lhd" style="border-bottom-color:var(--pr)"><div class="ey">Every day · 5:00 am · Ch 8-9</div><div class="ct" style="color:var(--pr)">Metaphysical<br>Practice</div><div class="cs">Meditation · Prayer · Reflection</div><div class="mr"><div class="ml">20-40 min · Beginner</div><div class="bgs"><div class="bg f" style="background:var(--pr);border-color:var(--pr)">Daily</div></div></div></div>
 <div class="lbd">
 <button class="sbtn" style="background:linear-gradient(135deg,#5B4FE8,#8B3EC8);margin-top:10px;padding:13px" onclick="openSess()">✦ Begin Guided Session · 20–40 min</button>
-<div class="anchor">I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming.</div>
+<div class="anchor" id="anchorTxt"></div>
 <div class="bvwrap">
 <div class="bvmodes"><button class="bvm" id="bvm-calm" onclick="setBv('calm')">4-7 Breath</button><button class="bvm" id="bvm-gap" onclick="setBv('gap')">The Gap</button><button class="bvm" id="bvm-heart" onclick="setBv('heart')">Heart</button></div>
 <div class="bvstage" onclick="toggleBv()"><div class="bvring"></div><div class="bvc" id="bvc"></div></div>
@@ -317,7 +317,7 @@ For each person, visualize them clearly and offer:
 <div class="q">1. May you be happy<br>2. May you be healthy and strong<br>3. May you be safe, on the inside and out<br>4. May you awaken to your highest potential<br>5. May you live with ease<br><br>Conclude each person: "I love you, I love you, I love you."</div>
 <h5>Send the wishes to, in order</h5>
 <b>1 · Loved ones</b> — <span id="rotLoved"></span><br><span style="color:var(--gr)">Deceased (†): visualize them in their highest, most luminous state.</span><br>
-<b>2 · Yourself</b> — <i>"Havard, may you be happy…"</i><br>
+<b>2 · Yourself</b> — <i>"[Your name], may you be happy…"</i><br>
 <b>3 · A stranger</b> and <b>4 · Someone difficult</b> — today's rotation:
 <div class="rot"><span class="rotl">Stranger today</span><span class="rotv" id="rotStranger"></span></div>
 <div class="rot"><span class="rotl">Difficult person today</span><span class="rotv" id="rotDifficult"></span></div>
@@ -325,9 +325,9 @@ For each person, visualize them clearly and offer:
 <h5>Part C — Close with gratitude</h5>
 <div class="q">"Thank you. Thank you. Thank you."</div>
 <h5>Edit your rotation lists</h5>
-<div class="el" style="margin-top:4px">Loved ones (comma-separated)</div><input class="ef" id="mettaLoved" value="Daddy (Havard Cooper) †, Mummy (Alice Cooper), Grandpa †, Grandaddy †, Alyssa, Nathan, Havanna">
-<div class="el" style="margin-top:8px">Strangers (rotates daily)</div><input class="ef" id="mettaStrangers" value="Door person at the building, Trader Joe's clerk, Front desk at the office">
-<div class="el" style="margin-top:8px">Difficult people (rotates daily)</div><input class="ef" id="mettaDifficult" value="Liam, Nick, Mori, Brian">
+<div class="el" style="margin-top:4px">Loved ones (comma-separated)</div><input class="ef" id="mettaLoved" placeholder="Names, comma-separated († for those passed)">
+<div class="el" style="margin-top:8px">Strangers (rotates daily)</div><input class="ef" id="mettaStrangers" placeholder="People you pass daily, comma-separated">
+<div class="el" style="margin-top:8px">Difficult people (rotates daily)</div><input class="ef" id="mettaDifficult" placeholder="Names, comma-separated">
 </div>
 <div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div><div class="rv gv" style="background:var(--pl);color:var(--pr)" onclick="event.stopPropagation();togEx('gd-prayer')">guide ▾</div></div>
 <div class="gd" id="gd-prayer"></div>
@@ -383,11 +383,11 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">4. ATOBARRIER365 Cream<span class="sub">Ceramides + niacinamide</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
 <div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">5. Elta MD UV Clear Tinted SPF 46<span class="sub">Always last — non-negotiable</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
 <div class="thk"></div>
-<div class="sh"><span class="stg" style="background:var(--sk)">PM Tret</span><span class="ss">Mon + Thu</span></div><div class="thn"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Rx</span><span class="ss">Mon + Thu</span></div><div class="thn"></div>
 <div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser (double) to Mist to HA</div><div class="rv" style="background:#EAF7F1;color:var(--sk)">1-3</div></div>
-<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Anua Azelaic Acid 10%<span class="sub">Wait 5 min before tretinoin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
-<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Tretinoin 0.025%<span class="sub">Pea-size · dry skin · avoid eye/lip corners</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
-<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">ATOBARRIER365 Cream<span class="sub">Wait 20-30 min after tretinoin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 6</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Anua Azelaic Acid 10%<span class="sub">Wait 5 min before retinoid</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Rx Retinoid 0.025%<span class="sub">Pea-size · dry skin · avoid eye/lip corners</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">ATOBARRIER365 Cream<span class="sub">Wait 20-30 min after retinoid</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 6</div></div>
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--sk)">PM Exfol</span><span class="ss">Wed + Sat</span></div><div class="thn"></div>
 <div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to BHA or Glycolic (alternate weekly)<span class="sub">Wait 5-10 min · one exfoliant only</span></div></div>
@@ -395,7 +395,7 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div class="thk"></div>
 <div class="sh"><span class="stg" style="background:var(--sk)">PM Rest</span><span class="ss">Tue + Fri + Sun</span></div><div class="thn"></div>
 <div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to Mist to HA to ATOBARRIER365 Cream<span class="sub">No actives — barrier repair only</span></div></div>
-<div class="tip">Never use exfoliants on tretinoin nights. Never use both BHA and glycolic on the same night.</div>
+<div class="tip">Never use exfoliants on retinoid nights. Never use both BHA and glycolic on the same night.</div>
 <div style="height:10px"></div>
 </div>
 <div class="lft"><div class="prow"><span class="pl">Skincare Checklist</span><span class="pc" id="skCnt">0/0</span></div><div class="pb"><div class="pf" id="skFill" style="width:0%;background:var(--sk)"></div></div><div class="pp" id="skPct">0% complete</div></div>
@@ -427,7 +427,7 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 <div class="bc" style="background:#FEF5E7;border-color:var(--b2);margin-top:5px" onclick="tb('b2')"><div class="bnum" style="color:var(--b2)">Belief 2</div><div class="btxt">Money is difficult to keep</div><div class="barr" id="ba-b2">Rowling · Blakely · Lauren · DeJoria · Parton · Perry · Ortega</div></div>
 <div id="bw-b2" style="display:none"><div class="er"><div class="el" style="color:var(--b2)">Alternative explanations / Is it true?</div><textarea class="ef" id="b2a" placeholder="Think of J.K. Rowling, Sara Blakely, Ralph Lauren, DeJoria..."></textarea></div><div class="er"><div class="el" style="color:var(--b2)">Where did this come from?</div><textarea class="ef" id="b2o"></textarea></div><div class="er"><div class="el" style="color:var(--b2)">New replacement belief</div><input class="ef" id="b2r" placeholder="Money stays and grows because I..."></div></div>
 <div class="bc" style="background:#EAF7F1;border-color:var(--b3);margin-top:5px" onclick="tb('b3')"><div class="bnum" style="color:var(--b3)">Belief 3</div><div class="btxt">Time must be sacrificed for money</div><div class="barr" id="ba-b3">Kiyosaki · Buffett · Naval · Ferriss · Sting · Read · Jordan</div></div>
-<div id="bw-b3" style="display:none"><div class="er"><div class="el" style="color:var(--b3)">What assets earn without your time?</div><textarea class="ef" id="b3a" placeholder="Bahamas Airbnb · architectural IP · what else?"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">Where did this come from?</div><textarea class="ef" id="b3o"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">New replacement belief</div><input class="ef" id="b3r" placeholder="My assets work so my time is..."></div></div>
+<div id="bw-b3" style="display:none"><div class="er"><div class="el" style="color:var(--b3)">What assets earn without your time?</div><textarea class="ef" id="b3a" placeholder="Rental income · licensing · what else?"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">Where did this come from?</div><textarea class="ef" id="b3o"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">New replacement belief</div><input class="ef" id="b3r" placeholder="My assets work so my time is..."></div></div>
 <div class="bc" style="background:#EAF2FD;border-color:var(--b4);margin-top:5px" onclick="tb('b4')"><div class="bnum" style="color:var(--b4)">Belief 4</div><div class="btxt">Money requires constant monitoring</div><div class="barr" id="ba-b4">Bogle · Sethi · Housel · Munger · Scheiber · Groner · Lynch</div></div>
 <div id="bw-b4" style="display:none"><div class="er"><div class="el" style="color:var(--b4)">What would you automate if you trusted the system?</div><textarea class="ef" id="b4a" placeholder="Think of Bogle, Sethi, Housel, Munger..."></textarea></div><div class="er"><div class="el" style="color:var(--b4)">Where did this come from?</div><textarea class="ef" id="b4o"></textarea></div><div class="er"><div class="el" style="color:var(--b4)">New replacement belief</div><input class="ef" id="b4r" placeholder="My financial system runs well without..."></div></div>
 <div class="bc" style="background:#F4EDFB;border-color:var(--b5);margin-top:5px" onclick="tb('b5')"><div class="bnum" style="color:var(--b5)">Belief 5</div><div class="btxt">Ambition requires sacrificing life</div><div class="barr" id="ba-b5">Branson · Rihanna · Li Ka-shing · Huffington · Chouinard · Dalio · LeBron</div></div>
@@ -544,19 +544,22 @@ Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and
 </div>
 <div id="toast"></div>
 <script>
-var NOTION_OS='3240ac6c9de1815abad8fcad66654830';
-var NOTION_BELIEFS='3240ac6c9de1810db4b1d6ecc814f85d';
-var NOTION_DB='e9196ff663064e54acd6f7d73bb78c5d';
+var NOTION_OS='',NOTION_BELIEFS='',NOTION_DB='';
+function loadPersonal(){try{var o=JSON.parse(localStorage.getItem('wb_personal'));if(o&&typeof o==='object')return o;}catch(e){}return {};}
+function applyPersonal(){var pd=loadPersonal();NOTION_OS=pd.notionOS||'';NOTION_BELIEFS=pd.notionBeliefs||'';NOTION_DB=pd.notionDB||'';
+var a=document.getElementById('anchorTxt');if(a)a.textContent=pd.anchorText||'Your Daily Anchor lives on this device, never in the code. Import your personal file in \u2699 to restore it \u2014 or begin writing your own.';
+var f=loadFields(),ch=false;['mettaLoved','mettaStrangers','mettaDifficult'].forEach(function(k){if(!f[k]&&pd[k]){f[k]=pd[k];ch=true;}});if(ch)localStorage.setItem('wb_fields',JSON.stringify(f));}
+function anchorText(){var pd=loadPersonal();return pd.anchorText?('"'+pd.anchorText+'"'):'"I am building the life I intend. I keep my word to myself. Good things are already in motion."';}
 var VAPID_PUBLIC='BF4o9EdC0Pj0k5KscwlHs9iDAQGyiB9Hl7oMj0otmDoIwsmiLLU12AyR5aMX7nOy49Ho4yzZVvUzuMxxNKisuU0';
 var curDay=0,curR='practice',curW='p1';
 var DAYS=[
-{n:'Monday',ey:'Day 1 of 7 — Training Day',sb:'Push 1 · Shave · Tretinoin PM',bg:[{t:'Push 1',c:'#C8321A'},{t:'Shave',c:'#1A6EC8'},{t:'Tret PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full 4-step + Scientific Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb fully before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > Elta MD SPF'},{t:'tr',l:'7:00am — Push 1',s:'Bench · OHP · Incline · Cable Fly · Tricep · Lateral Raise'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With oatmeal + nuts + hemp'},{t:'su',l:'12:30pm — ColonBroom',s:'30-60 min before lunch'},{t:'su',l:'1:00pm — Vitamin C + B12',s:'With lunch'},{t:'su',l:'8:00pm — Ashwagandha',s:'With or after dinner'},{t:'sk',l:'8:00pm — PM Skincare (Tretinoin night)',s:'Cleanser > Mist > HA > Azelaic Acid > Tretinoin > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:'Limiting belief check + what did you release?'}]},
+{n:'Monday',ey:'Day 1 of 7 — Training Day',sb:'Push 1 · Shave · Retinoid PM',bg:[{t:'Push 1',c:'#C8321A'},{t:'Shave',c:'#1A6EC8'},{t:'Rx PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full 4-step + Scientific Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb fully before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > Elta MD SPF'},{t:'tr',l:'7:00am — Push 1',s:'Bench · OHP · Incline · Cable Fly · Tricep · Lateral Raise'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With oatmeal + nuts + hemp'},{t:'su',l:'12:30pm — ColonBroom',s:'30-60 min before lunch'},{t:'su',l:'1:00pm — Vitamin C + B12',s:'With lunch'},{t:'su',l:'8:00pm — Ashwagandha',s:'With or after dinner'},{t:'sk',l:'8:00pm — PM Skincare (Retinoid night)',s:'Cleanser > Mist > HA > Azelaic Acid > Rx Retinoid > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:'Limiting belief check + what did you release?'}]},
 {n:'Tuesday',ey:'Day 2 of 7 — Training Day',sb:'Pull 1 · Rest PM',bg:[{t:'Pull 1',c:'#C8321A'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Pull 1',s:'Pulldown · Face Pulls · Lat Pull · Hammer · Bayesian · Row x2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
 {n:'Wednesday',ey:'Day 3 of 7 — Rest Day',sb:'Shave · Exfoliant PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Best night for Ch 12 deactivation work'}]},
-{n:'Thursday',ey:'Day 4 of 7 — Training Day',sb:'Legs 1 · Tretinoin PM',bg:[{t:'Legs 1',c:'#2E9E6B'},{t:'Tret PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Legs 1',s:'Elliptical · Leg Press · Goblet Squat · Leg Ext · Glute Kickback · Calf · Reverse Lunge'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Tretinoin night)',s:'Cleanser > Mist > HA > Azelaic Acid > Tretinoin > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
+{n:'Thursday',ey:'Day 4 of 7 — Training Day',sb:'Legs 1 · Retinoid PM',bg:[{t:'Legs 1',c:'#2E9E6B'},{t:'Rx PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Legs 1',s:'Elliptical · Leg Press · Goblet Squat · Leg Ext · Glute Kickback · Calf · Reverse Lunge'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Retinoid night)',s:'Cleanser > Mist > HA > Azelaic Acid > Rx Retinoid > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
 {n:'Friday',ey:'Day 5 of 7 — Rest Day',sb:'Shave · Rest PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Rest PM',c:'#888'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:'Last dose this week'},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Good night for Ch 12 work'}]},
 {n:'Saturday',ey:'Day 6 of 7 — Training Day',sb:'Rotating Workout · Exfoliant PM',bg:[{t:'Rotating',c:'#C8321A'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'No Ashwagandha today'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Rotating Workout',s:'Week A: Push 2 · Week B: Pull 2 · Week C: Legs 2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Weekly Review',s:'Consistency · intentions · what shifts next week'}]},
-{n:'Sunday',ey:'Day 7 of 7 — Full Rest',sb:'Enclomiphene Day · Rest PM',bg:[{t:'Enclo',c:'#D4820A'},{t:'Full Rest',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full rest day — run a longer session'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine + Enclomiphene 50mg',s:'Weekly enclomiphene dose · empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast · No Ashwagandha'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Full rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream · Complete weekly reset'},{t:'pr',l:'8:30pm — Weekly Review + Belief Work',s:'Best night for Ch 12 research and writing'}]}
+{n:'Sunday',ey:'Day 7 of 7 — Full Rest',sb:'Weekly Rx Day · Rest PM',bg:[{t:'Rx',c:'#D4820A'},{t:'Full Rest',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full rest day — run a longer session'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine + Weekly Rx',s:'Weekly Rx dose · empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast · No Ashwagandha'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Full rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream · Complete weekly reset'},{t:'pr',l:'8:30pm — Weekly Review + Belief Work',s:'Best night for Ch 12 research and writing'}]}
 ];
 var TC={pr:'#5B4FE8',su:'#D4820A',sk:'#2E9E6B',tr:'#C8321A',sh:'#1A6EC8'};
 var TL={pr:'practice',su:'supps',sk:'skincare',tr:'gym',sh:'shave'};
@@ -693,14 +696,14 @@ var PRAYER=[
 {n:'I Declare',q:'I Declare—Now, in this state of surrender, knowing, oneness, readiness, forgiveness, and Universal Love, I come into direct connection with the pure, creative intelligence of the Universe.<br><br>I declare that ______________________.<br>I give thanks, and so it is.<br><br>I declare that ______________________.<br>I give thanks, and so it is.'},
 {n:'I Thank',q:'I Thank—I now give thanks for the manifestation of these intentions. I fully accept their absolute reality in my life now.'},
 {n:'I Devote',q:'I Devote—I now devote myself to mastering the power of Universal Love, and I commit to using it in all circumstances, especially challenges. I now turn all my intentions over to the Universe for manifestation and know I am always being supplied with exactly what I need. I move forward in a spirit of joy, enthusiasm, excitement, expectancy, peace, and love. I dedicate myself to be of maximum service to all, to live in a manner that exemplifies love, and to always be responsive to Universal guidance.<br><br>I let go and let the Universe bring these co-creations—or creations even better—into reality now. This magnificent power created the galaxies, the moon, sun, stars, our beautiful planet, the sky, the mountains, the oceans, and everything in it. This is a power which knows no difficulty, for which nothing is hard. To this power, I submit these intentions with a firm knowing they shall all be made so.<br><br>I now let go—and go forth with 100% belief, 100% faith, 100% trust, and 100% knowing.<br><br>Thank you. Thank you. Thank you. And so it is.'}];
-var PRAYER_SMALL={4:'(Repeat until you have submitted all your requests.) · Your standing declaration: "I trust the abundance already in motion. I receive with ease and calm. The money follows the work I\'ve already done."'};
+var PRAYER_SMALL={4:'(Repeat until you have submitted all your requests.)'};function declareSmall(){var pd=loadPersonal();return PRAYER_SMALL[4]+(pd.declareText?' · Your standing declaration: "'+pd.declareText+'"':'');}
 var W5='May you be happy<br>May you be healthy and strong<br>May you be safe, on the inside and out<br>May you awaken to your highest potential<br>May you live with ease';
-var ANCHOR_TXT='"I have built the foundation. The systems work. The biggest project of my career is running well. My spirit is calmer than it has ever been. I am at the end of a difficult period — not the middle of one. My father is sending abundance. Good things are already in motion. I trust what is coming."';
+
 var SL=[],slIdx=0,scanTimer=null,scanIdx=0;
 function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:''}).value;var lovedShort=loved.split(',').map(function(s){return s.trim();}).filter(Boolean).join(' · ');var out=[
 {t:'text',ey:'Metaphysical Practice',title:'Begin',body:'Find your spot. Sit tall — spine erect, feet flat on the floor. Phone on Do Not Disturb. If the body asks, take 1–2 minutes of light stretching first.',small:'20–40 min · same place, same time'},
 {t:'say',ey:'Set your intention — say aloud',quote:'"I now consciously connect to Universal Intelligence. I am open and receptive to guidance from the universe."',small:'Then let it go entirely, and begin.'},
-{t:'say',ey:'Daily Anchor — say aloud',quote:ANCHOR_TXT},
+{t:'say',ey:'Daily Anchor — say aloud',quote:anchorText()},
 {t:'breath',mode:'calm',ey:'Step 1 · Breath Focus'},
 {t:'text',ey:'Step 1 · continued',title:'Natural breath',body:'Release all control. Observe the breath exactly as it is — the air passing over your upper lip, slightly warmer on the way out. When the mind wanders, note it without judgment and gently return to the next inhale.',small:'Noticing the wandering IS the practice.'},
 {t:'scan',ey:'Step 2 · Inner Body Scan'},
@@ -709,7 +712,7 @@ function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:
 {t:'breath',mode:'heart',ey:'Step 4 · Heart Breathing'},
 {t:'say',ey:'Say aloud',quote:'"I now open my heart fully to all living things. I love all of life."'},
 {t:'metta',ey:'Five Wishes · 1 of 5',title:'Your loved ones',who:lovedShort||'Your loved ones',note:'Deceased (†): see them in their highest, most luminous state. One at a time.'},
-{t:'metta',ey:'Five Wishes · 2 of 5',title:'Yourself',who:'"Havard, may you be happy…"',note:'Offer yourself the same tenderness.'},
+{t:'metta',ey:'Five Wishes · 2 of 5',title:'Yourself',who:(loadPersonal().firstName?'"'+loadPersonal().firstName+', may you be happy…"':'"May you be happy…"'),note:'Offer yourself the same tenderness.'},
 {t:'metta',ey:'Five Wishes · 3 of 5',title:'A stranger',who:rotPick('mettaStrangers'),note:'See them clearly. They want what you want.'},
 {t:'metta',ey:'Five Wishes · 4 of 5',title:'Someone difficult',who:rotPick('mettaDifficult'),note:'Rise above the memory. A sovereign soul doing their best.'},
 {t:'metta',ey:'Five Wishes · 5 of 5',title:'All of humanity',who:'The whole planet',wishes:'May we all be happy<br>May we all be healthy and strong<br>May we all be safe, on the inside and out<br>May we all awaken to our highest potential<br>May we all live with ease',note:'Shift to "we".'},
@@ -718,7 +721,7 @@ function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:
 {t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'+(function(){var tw=todaysWin();return tw?'<br><br>Today\'s evidence: "'+esc(tw.t)+'"':'';})()}
 ];
 // Scientific Prayer: one full read-aloud screen per step, inserted before gratitudes.
-var pr=PRAYER.map(function(p,i){return {t:'pray',ey:'Scientific Prayer · '+(i+1)+' of 7',title:p.n,quote:p.q,small:PRAYER_SMALL[i]||null};});
+var pr=PRAYER.map(function(p,i){return {t:'pray',ey:'Scientific Prayer · '+(i+1)+' of 7',title:p.n,quote:p.q,small:(i===4?declareSmall():null)};});
 Array.prototype.splice.apply(out,[out.length-2,0].concat(pr));
 // Weekend sessions (Sat/Sun) close with a review of the Operating Plan.
 if(realTodayIdx()>=5)out.splice(out.length-1,0,{t:'plan'});
@@ -763,19 +766,7 @@ function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step
 /* ============================================================
    SUPPLEMENT STACK — editable: what, dose, time, food, days
    ============================================================ */
-var SUPP_SEED=[
-{k:'AG1',n:'AG1 (Athletic Greens)',dose:'1 scoop',time:'06:00',food:'Empty stomach',days:'Daily'},
-{k:'Niagen',n:'Tru Niagen (NR)',dose:'900 mg',time:'06:00',food:'Empty stomach',days:'Daily'},
-{k:'LTheanine',n:'L-Theanine',dose:'200 mg',time:'06:00',food:'Empty stomach',days:'As needed'},
-{k:'Enclo',n:'Enclomiphene Citrate',dose:'50 mg',time:'06:00',food:'Empty stomach',days:'Sun only'},
-{k:'D3K2',n:'D3 + K2 (5,000 IU / 100 mcg)',dose:'1 softgel',time:'08:00',food:'With food (needs fat)',days:'Daily'},
-{k:'CoQ10',n:'CoQ10',dose:'200 mg',time:'08:00',food:'With food (needs fat)',days:'Daily'},
-{k:'Krill',n:'Omega-3 Krill Oil',dose:'1,000 mg',time:'08:00',food:'With food (needs fat)',days:'Daily'},
-{k:'OneADay',n:"One A Day Men's",dose:'1 tablet',time:'08:00',food:'With food',days:'Daily'},
-{k:'ColonBroom',n:'ColonBroom',dose:'1 serving',time:'12:30',food:'30–60 min before food',days:'Daily'},
-{k:'VitC',n:'Liposomal Vitamin C',dose:'1,000 mg',time:'13:00',food:'With food',days:'Daily'},
-{k:'B12',n:'B12',dose:'1,000 mcg',time:'13:00',food:'With food',days:'Daily'},
-{k:'Ashwa',n:'Ashwagandha',dose:'1,000 mg',time:'20:00',food:'With or after food',days:'Mon–Fri'}];
+var SUPP_SEED=[]; // personal stack is imported at runtime, never committed
 var spEditIdx=-1;
 function loadSupps(){try{var s=JSON.parse(localStorage.getItem('wb_supps'));if(Array.isArray(s))return s;}catch(e){}
 if(!localStorage.getItem('wb_supps_seeded')){var f=loadFields();var seed=SUPP_SEED.map(function(x){var o={n:x.n,dose:(f[x.k]||x.dose),time:x.time,food:x.food,days:x.days};return o;});localStorage.setItem('wb_supps',JSON.stringify(seed));localStorage.setItem('wb_supps_seeded','1');return seed;}
@@ -800,29 +791,7 @@ function spDel(i){var s=loadSupps();if(i<0||i>=s.length)return;var name=s[i].n;s
 /* ============================================================
    WINS — the achievements evidence file
    ============================================================ */
-var WINS_SEED=[
-{d:'2025',t:'Doubled the business',c:'Business'},
-{d:'2025-06',t:'Pre-paid and signed a full-year lease on my own office space',c:'Business'},
-{d:'2026-03',t:'Doubled my staff',c:'Business'},
-{d:'2026-07',t:'Working with a repeat client',c:'Clients'},
-{d:'2026-07',t:'Started developing a material library',c:'Craft'},
-{d:'',t:'Being promoted by TALD, Programa, The Local Project, and Architectural Digest',c:'Recognition'},
-{d:'',t:'Twice as efficient as I used to be',c:'Growth'},
-{d:'',t:'I can look at my business and plan for expansion because of its improvement',c:'Business'},
-{d:'',t:'Thinking about who to hire next so I can scale',c:'Business'},
-{d:'',t:'On track for my most successful year yet',c:'Business'},
-{d:'',t:'Improved my client communications',c:'Clients'},
-{d:'',t:'I can better serve my clients',c:'Clients'},
-{d:'',t:'I can look at the numbers of my business and not be afraid',c:'Finances'},
-{d:'',t:'Soon able to access business credit',c:'Finances'},
-{d:'',t:'A diversified income',c:'Finances'},
-{d:'',t:'Better work/life compartmentalization',c:'Life'},
-{d:'',t:'I can start to help people I care about',c:'Life'},
-{d:'',t:'Done a better job at maintaining myself',c:'Life'},
-{d:'',t:'A wider social and professional network',c:'Relationships'},
-{d:'',t:'Better familial relationships',c:'Relationships'},
-{d:'',t:'Better boundaries — clear about what I will and won\'t do',c:'Growth'},
-{d:'',t:'I trust myself more',c:'Growth'}];
+var WINS_SEED=[]; // personal wins are imported at runtime, never committed
 var WIN_COLORS={Business:'#C8321A',Clients:'#1A6EC8',Finances:'#D4820A',Recognition:'#8B3EC8',Relationships:'#2E9E6B',Growth:'#5B4FE8',Life:'#993556',Craft:'#557'};
 function loadWins(){try{var w=JSON.parse(localStorage.getItem('wb_wins'));if(Array.isArray(w))return w;}catch(e){}if(!localStorage.getItem('wb_wins_seeded')){localStorage.setItem('wb_wins',JSON.stringify(WINS_SEED));localStorage.setItem('wb_wins_seeded','1');return WINS_SEED.slice();}return [];}
 function storeWins(w){localStorage.setItem('wb_wins',JSON.stringify(w));}
@@ -986,7 +955,7 @@ b5:{alt:'The people with the most sustained ambition and largest outcomes also h
 {n:'LeBron James',tag:'sleeps 10–12h · $1B+ active',s:'Reportedly spends about $1.5M a year on his body and treats 10–12 hours of sleep as non-negotiable. Two decades at the top, a family he\'s visibly present for, a school he founded — and he became a billionaire while still playing.',k:'Recovery, family, and longevity weren\'t what he traded away for ambition — they were the mechanism of it.'}]}};
 function injectEv(){['b1','b2','b3','b4','b5'].forEach(function(b){var host=document.getElementById('bw-'+b);if(!host||document.getElementById('ev-'+b))return;var d=EVID[b];if(!d)return;var html='<div id="ev-'+b+'"><div class="ev-alt"><b>Alternative explanation:</b> '+d.alt+'</div>';d.people.forEach(function(p,i){var id=b+'p'+i;html+='<div class="evp"><div class="evp-h" onclick="togEvp(\''+id+'\')"><span>'+p.n+'</span><small>'+p.tag+' ▾</small></div><div class="evp-d" id="evp-'+id+'">'+p.s+'<span class="kl">Key lesson: '+p.k+'</span>'+(p.q?'<span class="qq">'+p.q+'</span>':'')+'</div></div>';});html+='</div>';host.insertAdjacentHTML('afterbegin',html);});}
 function togEvp(id){var el=document.getElementById('evp-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
-function injectPrayer(){var el=document.getElementById('gd-prayer');if(!el||el.children.length)return;el.innerHTML='<i>Perform immediately after meditation, while vibration is elevated. Read each step aloud in full.</i>'+PRAYER.map(function(p,i){return '<h5>'+(i+1)+' · '+p.n+'</h5><div class="q">'+p.q+'</div>'+(i===4?'<div style="font-size:11px;color:var(--gr);margin:2px 0 4px">'+PRAYER_SMALL[4]+'</div>':'');}).join('');}
+function injectPrayer(){var el=document.getElementById('gd-prayer');if(!el||el.children.length)return;el.innerHTML='<i>Perform immediately after meditation, while vibration is elevated. Read each step aloud in full.</i>'+PRAYER.map(function(p,i){return '<h5>'+(i+1)+' · '+p.n+'</h5><div class="q">'+p.q+'</div>'+(i===4?'<div style="font-size:11px;color:var(--gr);margin:2px 0 4px">'+declareSmall()+'</div>':'');}).join('');}
 
 /* ---- Theme, workout rotation, backup ---- */
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
@@ -998,6 +967,7 @@ function importBackup(input){var f=input.files&&input.files[0];if(!f)return;var 
 
 /* ---- init ---- */
 setTheme(localStorage.getItem('wb_theme')||'light');
+applyPersonal();
 setBv('calm');
 var dow=new Date().getDay(),dayMap={1:0,2:1,3:2,4:3,5:4,6:5,0:6};
 var today=dayMap[dow]!==undefined?dayMap[dow]:0;
