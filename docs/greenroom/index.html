@@ -79,6 +79,26 @@ section{margin-top:26px;}
 .stage-nav .btn{margin-top:0;}
 .stage-nav .back{width:96px;flex:none;}
 
+/* ---- coach ---- */
+.coach-log{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+.cb{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;}
+.cb.u{align-self:flex-end;background:var(--sage-dim);color:#F2EDE3;border-bottom-right-radius:4px;}
+.cb.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px;font-style:italic;}
+.cb.err{align-self:flex-start;background:transparent;border:1px dashed #7a5548;color:#b08a7a;font-family:var(--mono);font-size:11.5px;font-style:normal;}
+.coach-in{width:100%;min-height:64px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:var(--serif);font-size:15px;line-height:1.55;padding:11px 13px;resize:vertical;outline:none;}
+.coach-in::placeholder{color:var(--faint);font-style:italic;}
+.coach-in:focus{border-color:var(--sage-dim);}
+.speakrow{display:flex;align-items:center;gap:10px;min-height:44px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--mut);cursor:pointer;margin-top:2px;}
+.speakrow input{width:18px;height:18px;accent-color:var(--sage);}
+.cfg summary{min-height:44px;display:flex;align-items:center;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);cursor:pointer;list-style:none;}
+.cfg summary::before{content:'\25B8\00A0';}
+.cfg[open] summary::before{content:'\25BE\00A0';}
+.cfg-in{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);
+  font-family:var(--mono);font-size:12.5px;padding:12px 2px;outline:none;}
+.cfg-in:focus{border-color:var(--sage-dim);}
 .colophon{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);
   font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);line-height:1.9;}
 </style>
@@ -105,7 +125,23 @@ section{margin-top:26px;}
   </section>
 
   <section>
-    <div class="sh"><span class="idx">03</span><span class="t">Housekeeping</span></div>
+    <div class="sh"><span class="idx">03</span><span class="t">The Coach</span></div>
+    <p class="note">A sparring partner who reads your beats and asks the questions a journalist would. One question at a time. Replies can be spoken aloud &mdash; answer by voice with the mic key on your keyboard. Exchanges leave this device only through your own backend.</p>
+    <div class="coach-log" id="coachLog"></div>
+    <textarea class="coach-in" id="coachTxt" placeholder="Talk it through&hellip;"></textarea>
+    <button class="btn primary" id="coachBtn" onclick="coachSend()">Ask the coach</button>
+    <label class="speakrow"><input type="checkbox" id="coachSpeak" onchange="coachSpeakToggle()"> Speak replies aloud</label>
+    <button class="btn ghost" onclick="coachClear()">Clear the conversation</button>
+    <details class="cfg">
+      <summary>Backend connection (one-time)</summary>
+      <input class="cfg-in" id="coachUrl" placeholder="https://your-worker.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <input class="cfg-in" id="coachSecret" placeholder="shared secret" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button class="btn ghost" onclick="coachSaveCfg()">Save connection</button>
+    </details>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">04</span><span class="t">Housekeeping</span></div>
     <button class="btn ghost" onclick="exportGR()">&darr; Export this device's story (.json)</button>
     <label class="btn ghost" style="cursor:pointer">&uarr; Import a story file<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
     <button class="btn danger" onclick="wipe()">Erase everything on this device</button>
@@ -270,7 +306,71 @@ function startDrill(){
   mode='drill';cardIdx=0;openStage();renderCard();
 }
 
+/* ---- coach (talks to your own backend; nothing else) ---- */
+function coachRender(){
+  var d=load(),log=document.getElementById('coachLog');
+  log.innerHTML=(d.coach||[]).map(function(m){
+    var cls=m.r==='a'?'a':(m.r==='e'?'err':'u');
+    return '<div class="cb '+cls+'">'+esc(m.t)+'</div>';
+  }).join('');
+  log.scrollTop=log.scrollHeight;
+  var sp=document.getElementById('coachSpeak');if(sp)sp.checked=!!d.speak;
+  var cfg=d.backend||{};
+  var u=document.getElementById('coachUrl');if(u&&!u.value)u.value=cfg.url||'';
+  var s=document.getElementById('coachSecret');if(s&&!s.value)s.value=cfg.secret||'';
+}
+function coachSaveCfg(){
+  var d=load();d.backend={
+    url:(document.getElementById('coachUrl').value||'').trim().replace(/\/+$/,''),
+    secret:(document.getElementById('coachSecret').value||'').trim()
+  };store(d);
+  var btn=document.getElementById('coachBtn');btn.textContent='Ask the coach';
+}
+function coachSpeakToggle(){var d=load();d.speak=document.getElementById('coachSpeak').checked;store(d);}
+function coachClear(){var d=load();d.coach=[];store(d);coachRender();}
+function speak(t){
+  if(!('speechSynthesis' in window))return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.rate=0.97;speechSynthesis.speak(u);}catch(e){}
+}
+async function coachSend(){
+  var box=document.getElementById('coachTxt'),txt=(box.value||'').trim();
+  if(!txt)return;
+  var d=load();
+  if(!d.backend||!d.backend.url){
+    document.querySelector('.cfg').open=true;
+    d.coach=(d.coach||[]).concat([{r:'e',t:'Connect your backend first (one-time, below).'}]);
+    store(d);coachRender();return;
+  }
+  d.coach=(d.coach||[]).concat([{r:'u',t:txt}]).slice(-40);
+  store(d);box.value='';coachRender();
+  var btn=document.getElementById('coachBtn');btn.disabled=true;btn.textContent='Thinking…';
+  try{
+    var res=await fetch(d.backend.url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WB-Token':d.backend.secret||''},
+      body:JSON.stringify({
+        action:'coach',
+        messages:d.coach.filter(function(m){return m.r!=='e';}).map(function(m){return {role:m.r==='a'?'assistant':'user',content:m.t};}),
+        beats:d.beats||{}
+      })
+    });
+    var data=await res.json().catch(function(){return {};});
+    d=load();
+    if(!res.ok||data.error||!data.reply){
+      d.coach=(d.coach||[]).concat([{r:'e',t:(data.error||('HTTP '+res.status))}]);
+    }else{
+      d.coach=(d.coach||[]).concat([{r:'a',t:data.reply}]).slice(-40);
+      if(d.speak)speak(data.reply);
+    }
+    store(d);coachRender();
+  }catch(e){
+    d=load();d.coach=(d.coach||[]).concat([{r:'e',t:e.message}]);store(d);coachRender();
+  }
+  btn.disabled=false;btn.textContent='Ask the coach';
+}
+
 renderBeats();
+coachRender();
 </script>
 </body>
 </html>

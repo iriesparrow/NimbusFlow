@@ -128,6 +128,30 @@ Dashboard route:
 - The worker signs a VAPID JWT and encrypts each payload (aes128gcm) before posting
   to Apple/Google's push endpoint; the service worker shows the notification.
 
+---
+
+# Green Room coach (optional)
+
+The Green Room surface has a conversational story coach. It talks to this same
+worker (`action: "coach"`), which proxies to the Claude API — your API key
+lives only in Cloudflare, never in the browser.
+
+1. Get an Anthropic API key at <https://console.anthropic.com> (Settings → API keys).
+2. Worker → **Settings → Variables and Secrets** → add `ANTHROPIC_API_KEY`
+   (Encrypt) → **Deploy**. Optional: `COACH_MODEL` to override the default
+   (`claude-opus-4-8`) — e.g. `claude-sonnet-5` for lower cost.
+3. In Green Room → **The Coach → Backend connection** → paste the same worker
+   URL + `APP_SECRET` → Save.
+
+Costs: replies are capped at ~400 tokens with a short conversation window —
+typically a cent or two per exchange on the default model.
+
+Privacy: each coach exchange sends your recent messages **and your draft story
+beats** to your worker, which forwards them to Anthropic's API. Nothing is
+stored server-side by the worker.
+
+---
+
 ### Notes & limits
 - iOS delivers Web Push only to apps **installed to the Home Screen** (iOS 16.4+).
 - Apple may throttle/delay background pushes somewhat; exact-to-the-second delivery

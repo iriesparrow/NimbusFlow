@@ -62,6 +62,38 @@ export default {
       catch (err) { return json({ error: String(err && err.message || err) }, 502, cors); }
     }
 
+    // Green Room coach: proxies a coaching conversation to the Claude API.
+    // Requires the ANTHROPIC_API_KEY secret; the key never reaches the client.
+    if (action === 'coach') {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: 'Coach not configured: set the ANTHROPIC_API_KEY secret on the worker.' }, 503, cors);
+      const msgs = Array.isArray(body.messages) ? body.messages.slice(-24)
+        .map((m) => ({ role: m && m.role === 'assistant' ? 'assistant' : 'user', content: trunc(String((m && m.content) || ''), 4000) }))
+        .filter((m) => m.content) : [];
+      if (!msgs.length || msgs[0].role !== 'user') return json({ error: 'coach needs messages starting with a user turn' }, 400, cors);
+      const beats = body.beats && typeof body.beats === 'object' ? body.beats : {};
+      const beatTxt = Object.keys(beats).filter((k) => beats[k] && String(beats[k]).trim())
+        .map((k) => k.toUpperCase() + ': ' + trunc(String(beats[k]), 1500)).join('\n\n');
+      const system = 'You are a seasoned executive and founder-story coach in a private rehearsal room. '
+        + 'Style: warm, direct, concise. Briefly mirror what you heard, then push deeper with exactly ONE probing question or ONE concrete suggestion per reply — never more than one question. '
+        + 'Keep replies under 110 words of plain spoken language; they may be read aloud by a voice, so no markdown, lists, or headers. '
+        + 'Never invent facts about the founder — work only from what they tell you and their draft story beats. If a beat is weak or generic, say which one and why.'
+        + (beatTxt ? '\n\nTheir current draft beats:\n' + beatTxt : '\n\nThey have not written any beats yet — help them find the story first.');
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ model: env.COACH_MODEL || 'claude-opus-4-8', max_tokens: 400, system, messages: msgs }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return json({ error: 'Coach API ' + res.status + ': ' + ((data.error && data.error.message) || 'unavailable') }, 502, cors);
+      if (data.stop_reason === 'refusal') return json({ ok: true, reply: 'I can’t coach on that one. Bring it back to your story — try a different angle.' }, 200, cors);
+      const reply = (data.content || []).filter((c) => c.type === 'text').map((c) => c.text).join(' ').trim();
+      return json({ ok: true, reply: reply || '…' }, 200, cors);
+    }
+
     if (!env.NOTION_TOKEN) return json({ error: 'Server missing NOTION_TOKEN' }, 500, cors);
 
     try {
