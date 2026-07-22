@@ -3,6 +3,9 @@
 name = "wellbeing-notion"
 main = "worker.js"
 compatibility_date = "2024-11-01"
+# Preserve dashboard-configured plain-text vars (e.g. ALLOW_ORIGIN, COACH_MODEL)
+# across CI deploys; secrets are always preserved.
+keep_vars = true
 
 # Do NOT put secrets here. Set them with:
 #   wrangler secret put NOTION_TOKEN

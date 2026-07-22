@@ -1,0 +1,8 @@
+{
+  "name": "wellbeing-notion-worker",
+  "private": true,
+  "description": "Cloudflare Worker backend for the Well-Being OS + Green Room PWA",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  }
+}
