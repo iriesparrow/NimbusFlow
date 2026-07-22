@@ -3,6 +3,7 @@
   "private": true,
   "description": "Cloudflare Worker backend for the Well-Being OS + Green Room PWA",
   "scripts": {
+    "build": "echo 'no build step — worker deploys as-is'",
     "deploy": "wrangler deploy"
   }
 }
