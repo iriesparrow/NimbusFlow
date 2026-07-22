@@ -38,7 +38,9 @@ export default {
     };
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
-    if (request.method !== 'POST') return json({ error: 'Use POST' }, 405, cors);
+    // The version marker makes deploys verifiable: open the worker URL in a
+    // browser — seeing this version number confirms which code is live.
+    if (request.method !== 'POST') return json({ error: 'Use POST', version: 'v2-coach-logs-push' }, 405, cors);
 
     // Shared-secret gate — fail CLOSED. If the secret isn't configured on the
     // server, refuse everything (otherwise an open-CORS worker with a valid
