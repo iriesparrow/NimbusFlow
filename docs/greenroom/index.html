@@ -133,6 +133,10 @@ section{margin-top:26px;}
     <label class="speakrow"><input type="checkbox" id="coachSpeak" onchange="coachSpeakToggle()"> Speak replies aloud</label>
     <button class="btn ghost" onclick="coachClear()">Clear the conversation</button>
     <details class="cfg">
+      <summary>Notes for the coach (private &middot; read with every question)</summary>
+      <textarea class="coach-in" id="coachCtx" oninput="coachSaveCtx()" placeholder="Paste who you are beneath the story &mdash; a positioning survey, your tensions, what you're avoiding, what you want to get better at. The coach reads this every time, so it can push where it matters. Stays on this device." style="min-height:130px;margin-top:8px"></textarea>
+    </details>
+    <details class="cfg">
       <summary>Backend connection (one-time)</summary>
       <input class="cfg-in" id="coachUrl" placeholder="https://your-worker.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
       <input class="cfg-in" id="coachSecret" placeholder="shared secret" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -318,7 +322,9 @@ function coachRender(){
   var cfg=d.backend||{};
   var u=document.getElementById('coachUrl');if(u&&!u.value)u.value=cfg.url||'';
   var s=document.getElementById('coachSecret');if(s&&!s.value)s.value=cfg.secret||'';
+  var ctx=document.getElementById('coachCtx');if(ctx&&!ctx.value)ctx.value=d.context||'';
 }
+function coachSaveCtx(){var d=load();d.context=(document.getElementById('coachCtx').value||'');store(d);}
 function coachSaveCfg(){
   var d=load();d.backend={
     url:(document.getElementById('coachUrl').value||'').trim().replace(/\/+$/,''),
@@ -351,7 +357,8 @@ async function coachSend(){
       body:JSON.stringify({
         action:'coach',
         messages:d.coach.filter(function(m){return m.r!=='e';}).map(function(m){return {role:m.r==='a'?'assistant':'user',content:m.t};}),
-        beats:d.beats||{}
+        beats:d.beats||{},
+        context:d.context||''
       })
     });
     var data=await res.json().catch(function(){return {};});

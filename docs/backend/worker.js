@@ -75,11 +75,14 @@ export default {
       const beats = body.beats && typeof body.beats === 'object' ? body.beats : {};
       const beatTxt = Object.keys(beats).filter((k) => beats[k] && String(beats[k]).trim())
         .map((k) => k.toUpperCase() + ': ' + trunc(String(beats[k]), 1500)).join('\n\n');
+      const context = trunc(String(body.context || '').trim(), 8000);
       const system = 'You are a seasoned executive and founder-story coach in a private rehearsal room. '
         + 'Style: warm, direct, concise. Briefly mirror what you heard, then push deeper with exactly ONE probing question or ONE concrete suggestion per reply — never more than one question. '
         + 'Keep replies under 110 words of plain spoken language; they may be read aloud by a voice, so no markdown, lists, or headers. '
-        + 'Never invent facts about the founder — work only from what they tell you and their draft story beats. If a beat is weak or generic, say which one and why.'
-        + (beatTxt ? '\n\nTheir current draft beats:\n' + beatTxt : '\n\nThey have not written any beats yet — help them find the story first.');
+        + 'Never invent facts about the founder — work only from what they tell you, their draft story beats, and any background notes below. If a beat is weak or generic, say which one and why. '
+        + 'When they have shared background notes, be attentive to the tensions, fears, and edges they name (e.g. discomfort with visibility, money, self-promotion) and gently press exactly there — that is usually where the real story is stuck.'
+        + (beatTxt ? '\n\nTheir current draft beats:\n' + beatTxt : '\n\nThey have not written any beats yet — help them find the story first.')
+        + (context ? '\n\nBackground notes the founder wrote about themselves (private; use to ground and sharpen your questions, never quote back verbatim):\n' + context : '');
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
