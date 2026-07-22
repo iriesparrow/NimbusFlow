@@ -99,20 +99,20 @@ key on the worker:
 > (`VAPID_PUBLIC`) and the worker's `VAPID_PRIVATE_JWK` must be a matching pair.
 
 ### 2. Create a KV namespace to store subscriptions
-Dashboard route:
 1. Cloudflare → **Storage & Databases → KV** → **Create namespace** → name it `wellbeing-subs`.
-2. Back in your worker → **Settings → Bindings → Add → KV namespace**:
-   - Variable name: **`SUBS`** (exactly)
-   - KV namespace: `wellbeing-subs`
-3. **Deploy**.
+2. Copy its **namespace ID**.
+3. Put the ID into **both** `wrangler.toml` files (root and `docs/backend/`) under
+   the `[[kv_namespaces]]` block with `binding = "SUBS"`, and commit.
 
-(CLI route: `wrangler kv:namespace create SUBS`, paste the id into `wrangler.toml`, `wrangler deploy`.)
+> ⚠️ With Git auto-deploy, the KV binding and cron trigger **must** live in
+> `wrangler.toml` — a binding/trigger added only in the Cloudflare dashboard is
+> wiped on the next push, because `wrangler deploy` treats the config file as the
+> source of truth for bindings and triggers. (`keep_vars = true` preserves
+> plain-text vars and secrets, but **not** KV bindings or cron triggers.)
 
-### 3. Add the cron trigger (the scheduler)
-1. Worker → **Settings → Triggers → Cron Triggers → Add Cron Trigger**
-2. Schedule: **`*/5 * * * *`** (every 5 minutes) → Save.
-
-(CLI route: uncomment the `[triggers]` block in `wrangler.toml`, `wrangler deploy`.)
+### 3. Cron trigger (the scheduler)
+Already declared in `wrangler.toml` as `crons = ["*/5 * * * *"]` (every 5 min).
+It deploys automatically with the KV binding above — nothing to click.
 
 ### 4. Turn it on in the app
 1. Open the installed app → **🔔** → **Enable Reminders** (this also subscribes you to push).

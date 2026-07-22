@@ -6,3 +6,10 @@ name = "wellbeing-notion"
 main = "docs/backend/worker.js"
 compatibility_date = "2024-11-01"
 keep_vars = true
+
+[[kv_namespaces]]
+binding = "SUBS"
+id = "dfc0b7beaa0b4767afbda151645ada99"
+
+[triggers]
+crons = ["*/5 * * * *"]

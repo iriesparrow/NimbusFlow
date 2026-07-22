@@ -7,6 +7,17 @@ compatibility_date = "2024-11-01"
 # across CI deploys; secrets are always preserved.
 keep_vars = true
 
+# --- Background push (Web Push) ---
+# KV namespace storing push subscriptions (a namespace ID is a resource
+# identifier, not a secret). Declared here so Git auto-deploy keeps the binding.
+[[kv_namespaces]]
+binding = "SUBS"
+id = "dfc0b7beaa0b4767afbda151645ada99"
+
+# Cron: every 5 minutes, send any reminders due in each subscriber's local window.
+[triggers]
+crons = ["*/5 * * * *"]
+
 # Do NOT put secrets here. Set them with:
 #   wrangler secret put NOTION_TOKEN
 #   wrangler secret put APP_SECRET
