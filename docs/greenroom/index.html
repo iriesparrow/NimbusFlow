@@ -79,6 +79,25 @@ section{margin-top:26px;}
 .stage-nav .btn{margin-top:0;}
 .stage-nav .back{width:96px;flex:none;}
 
+/* ---- The Canon ---- */
+.canon-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.canon-tab{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;padding:0 14px;min-height:44px;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer;white-space:nowrap;}
+.canon-tab.on{background:var(--sage);border-color:var(--sage);color:#15130f;}
+.piece{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px;background:var(--panel);}
+.piece.line{border-left:3px solid var(--sage-dim);}
+.piece-top{display:flex;align-items:flex-start;gap:10px;}
+.piece-check{display:flex;align-items:flex-start;justify-content:center;padding-top:6px;min-width:44px;min-height:44px;margin:-4px 0 0 -6px;cursor:pointer;}
+.piece-check input{width:20px;height:20px;accent-color:var(--sage);}
+.piece-main{flex:1;cursor:pointer;min-width:0;}
+.piece-title{font-size:15px;font-weight:500;color:var(--ink);line-height:1.35;}
+.piece-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:3px;}
+.piece-body{font-size:14px;line-height:1.6;color:var(--mut);margin-top:7px;cursor:pointer;white-space:pre-wrap;}
+.piece.line .piece-body{font-style:italic;color:var(--ink);font-size:15.5px;}
+.piece-edit{border:1px solid var(--sage-dim);border-radius:10px;padding:12px;margin:6px 0 10px;background:var(--panel2);}
+.pe-row{display:flex;gap:6px;flex-wrap:wrap;}
+.ver-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink);}
+.ver-l{flex:1;min-width:0;}
+.ver-b{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;min-height:44px;padding:0 14px;font-family:var(--mono);font-size:11px;cursor:pointer;}
 /* ---- coach ---- */
 .coach-log{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
 .cb{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;}
@@ -117,7 +136,24 @@ section{margin-top:26px;}
   </section>
 
   <section>
-    <div class="sh"><span class="idx">02</span><span class="t">Rehearse</span></div>
+    <div class="sh"><span class="idx">02</span><span class="t">The Canon</span></div>
+    <p class="note">Your living source-text &mdash; the manifesto and record you draw from. Keep <b>lines</b> (your quotable truths) and <b>passages</b> (stories, positions) filed under a lens, then check any of them and compose a record for a specific use. Everything stays on this device.</p>
+    <div class="canon-tabs" id="canonTabs"></div>
+    <div id="canonList"></div>
+    <div id="canonEditor"></div>
+    <button class="btn ghost" onclick="canonAddOpen()">+ Add a piece</button>
+    <div id="canonCompose"></div>
+    <details class="cfg">
+      <summary>Versions &amp; backup</summary>
+      <button class="btn ghost" onclick="canonSaveVersion()">Save a version (snapshot)</button>
+      <div id="canonVersions"></div>
+      <button class="btn ghost" onclick="exportGR()" style="margin-top:8px">Export everything (.json)</button>
+      <label class="btn ghost" style="cursor:pointer">Import story / canon seed<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
+    </details>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">03</span><span class="t">Rehearse</span></div>
     <p class="note">One beat per screen, teleprompter-style, with the clock running. Aim to speak each beat, not read it.</p>
     <button class="btn primary" onclick="startRun()">&#9654; Run the story</button>
     <button class="btn ghost" onclick="startDrill()">? Question drill &mdash; unscripted answers</button>
@@ -125,7 +161,7 @@ section{margin-top:26px;}
   </section>
 
   <section>
-    <div class="sh"><span class="idx">03</span><span class="t">The Coach</span></div>
+    <div class="sh"><span class="idx">04</span><span class="t">The Coach</span></div>
     <p class="note">A sparring partner who reads your beats and asks the questions a journalist would. One question at a time. Replies can be spoken aloud &mdash; answer by voice with the mic key on your keyboard. Exchanges leave this device only through your own backend.</p>
     <div class="coach-log" id="coachLog"></div>
     <textarea class="coach-in" id="coachTxt" placeholder="Talk it through&hellip;"></textarea>
@@ -145,7 +181,7 @@ section{margin-top:26px;}
   </section>
 
   <section>
-    <div class="sh"><span class="idx">04</span><span class="t">Housekeeping</span></div>
+    <div class="sh"><span class="idx">05</span><span class="t">Housekeeping</span></div>
     <button class="btn ghost" onclick="exportGR()">&darr; Export this device's story (.json)</button>
     <label class="btn ghost" style="cursor:pointer">&uarr; Import a story file<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
     <button class="btn danger" onclick="wipe()">Erase everything on this device</button>
@@ -249,11 +285,53 @@ function importGR(input){
   rd.onload=function(){
     try{
       var o=JSON.parse(rd.result);
-      if(typeof o[KEY]!=='string'||!o[KEY])throw new Error('not a story file');
-      JSON.parse(o[KEY]); // must itself be valid
-      localStorage.setItem(KEY,o[KEY]);
-      renderBeats();
-    }catch(e){alert('That file isn’t a Green Room story export.');}
+      // Full story export — replaces this device's Green Room state.
+      if(typeof o[KEY]==='string'&&o[KEY]){
+        JSON.parse(o[KEY]); // must itself be valid
+        localStorage.setItem(KEY,o[KEY]);
+        canonSel={};canonDraft=null;canonEdit=null;canonRecord=null;
+        renderBeats();renderCanon();
+        toast('Story imported');
+        return;
+      }
+      // Additive seed — adds canon pieces (and fills empty beats) without wiping anything.
+      if(Array.isArray(o.canonSeed)||o.beatsSeed){
+        var d=load();
+        if(!d.canon||typeof d.canon!=='object')d.canon={pieces:[],versions:[]};
+        if(!Array.isArray(d.canon.pieces))d.canon.pieces=[];
+        if(!Array.isArray(d.canon.versions))d.canon.versions=[];
+        var seen={};
+        d.canon.pieces.forEach(function(p){seen[(p.body||'').trim()]=true;});
+        var added=0;
+        (o.canonSeed||[]).forEach(function(s){
+          if(!s||!s.body)return;
+          var body=String(s.body).trim();
+          if(!body||seen[body])return;
+          seen[body]=true;
+          d.canon.pieces.push({
+            id:uid(),
+            kind:s.kind==='line'?'line':'passage',
+            lens:['who','about','why','next'].indexOf(s.lens)>=0?s.lens:'who',
+            themes:Array.isArray(s.themes)?s.themes.map(String):[],
+            title:s.title?String(s.title):'',
+            body:body,
+            pinned:!!s.pinned
+          });
+          added++;
+        });
+        if(o.beatsSeed&&typeof o.beatsSeed==='object'){
+          if(!d.beats)d.beats={};
+          BEATS.forEach(function(b){
+            if((!d.beats[b.k]||!d.beats[b.k].trim())&&o.beatsSeed[b.k])d.beats[b.k]=String(o.beatsSeed[b.k]);
+          });
+        }
+        store(d);
+        renderBeats();renderCanon();
+        toast(added+' piece'+(added===1?'':'s')+' added');
+        return;
+      }
+      throw new Error('unrecognized');
+    }catch(e){alert('That file isn’t a Green Room story export or canon seed.');}
   };
   rd.readAsText(f);input.value='';
 }
@@ -350,6 +428,8 @@ async function coachSend(){
   d.coach=(d.coach||[]).concat([{r:'u',t:txt}]).slice(-40);
   store(d);box.value='';coachRender();
   var btn=document.getElementById('coachBtn');btn.disabled=true;btn.textContent='Thinking…';
+  var dig=canonDigest(),ctxOut=(d.context||'');
+  if(dig)ctxOut=(ctxOut?ctxOut+'\n\n':'')+dig;
   try{
     var res=await fetch(d.backend.url,{
       method:'POST',
@@ -358,7 +438,7 @@ async function coachSend(){
         action:'coach',
         messages:d.coach.filter(function(m){return m.r!=='e';}).map(function(m){return {role:m.r==='a'?'assistant':'user',content:m.t};}),
         beats:d.beats||{},
-        context:d.context||''
+        context:ctxOut
       })
     });
     var data=await res.json().catch(function(){return {};});
@@ -376,8 +456,242 @@ async function coachSend(){
   btn.disabled=false;btn.textContent='Ask the coach';
 }
 
+/* ---- The Canon (manifesto + record you draw pieces from) ---- */
+var CANON_LENSES=[['who','Who I am'],['about','What I’m about'],['why','Why I do it'],['next','What’s next']];
+var CANON_TABS=[['all','All'],['who','Who I am'],['about','What I’m about'],['why','Why I do it'],['next','What’s next'],['manifesto','Manifesto']];
+var canonTab='all', canonSel={}, canonDraft=null, canonEdit=null, canonRecord=null, canonRecName='';
+
+function uid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function grDate(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function canonData(){
+  var d=load();
+  if(!d.canon||typeof d.canon!=='object')d.canon={pieces:[],versions:[]};
+  if(!Array.isArray(d.canon.pieces))d.canon.pieces=[];
+  if(!Array.isArray(d.canon.versions))d.canon.versions=[];
+  return d.canon;
+}
+function canonSave(c){var d=load();d.canon=c;store(d);}
+function lensLabel(l){for(var i=0;i<CANON_LENSES.length;i++)if(CANON_LENSES[i][0]===l)return CANON_LENSES[i][1];return '';}
+function toast(msg){
+  var t=document.createElement('div');t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--sage);color:#15130f;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border-radius:22px;z-index:300;';
+  document.body.appendChild(t);setTimeout(function(){t.remove();},1500);
+}
+
+function renderCanon(){renderCanonTabs();renderCanonList();renderCanonCompose();renderCanonVersions();}
+
+function renderCanonTabs(){
+  var c=canonData();
+  document.getElementById('canonTabs').innerHTML=CANON_TABS.map(function(t){
+    var n;
+    if(t[0]==='all')n=c.pieces.length;
+    else if(t[0]==='manifesto')n=c.pieces.filter(function(p){return p.kind==='line';}).length;
+    else n=c.pieces.filter(function(p){return p.lens===t[0];}).length;
+    return '<button class="canon-tab'+(canonTab===t[0]?' on':'')+'" onclick="canonSetTab(\''+t[0]+'\')">'+esc(t[1])+(n?' '+n:'')+'</button>';
+  }).join('');
+}
+function canonSetTab(t){canonTab=t;renderCanon();}
+
+function canonFiltered(){
+  var c=canonData(),list=c.pieces.slice();
+  if(canonTab==='manifesto')list=list.filter(function(p){return p.kind==='line';});
+  else if(canonTab!=='all')list=list.filter(function(p){return p.lens===canonTab;});
+  list.sort(function(a,b){return (b.pinned?1:0)-(a.pinned?1:0);});
+  return list;
+}
+function renderCanonList(){
+  var list=canonFiltered(),el=document.getElementById('canonList');
+  if(!list.length){
+    el.innerHTML='<p class="note" style="opacity:.7">Nothing here yet. Add a <b>line</b> (a truth you want to be able to say) or a <b>passage</b> (a story or position) &mdash; or import a seed under Versions &amp; backup.</p>';
+    return;
+  }
+  el.innerHTML=list.map(function(p){
+    var meta=[p.kind==='line'?'Line':'Passage',lensLabel(p.lens)].concat(p.themes||[]).filter(Boolean).join(' · ');
+    var checked=canonSel[p.id]?' checked':'';
+    return '<div class="piece'+(p.kind==='line'?' line':'')+'">'+
+      '<div class="piece-top">'+
+        '<label class="piece-check"><input type="checkbox"'+checked+' onchange="canonToggleSel(\''+p.id+'\')"></label>'+
+        '<div class="piece-main" onclick="canonEditOpen(\''+p.id+'\')">'+
+          (p.title?'<div class="piece-title">'+(p.pinned?'★ ':'')+esc(p.title)+'</div>':(p.pinned?'<div class="piece-title">★</div>':''))+
+          '<div class="piece-meta">'+esc(meta)+'</div>'+
+          (p.body?'<div class="piece-body">'+esc(p.body)+'</div>':'')+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function canonToggleSel(id){if(canonSel[id])delete canonSel[id];else canonSel[id]=true;renderCanonCompose();}
+function canonClearSel(){canonSel={};canonRecord=null;renderCanon();}
+
+function renderCanonCompose(){
+  var ids=Object.keys(canonSel),el=document.getElementById('canonCompose');
+  if(canonRecord){
+    el.innerHTML='<div class="piece-edit"><div class="piece-meta" style="margin-bottom:6px">'+esc(canonRecord.name)+'</div>'+
+      '<textarea class="coach-in" id="canonRecText" style="min-height:180px">'+esc(canonRecord.text)+'</textarea>'+
+      '<div class="pe-row" style="margin-top:8px">'+
+        '<button class="btn primary" style="flex:1" onclick="canonCopyRecord()">Copy</button>'+
+        '<button class="btn ghost" style="flex:1" onclick="canonExportRecord()">Save .txt</button>'+
+      '</div>'+
+      '<button class="btn ghost" onclick="canonClearSel()">Done</button>'+
+    '</div>';
+    return;
+  }
+  if(!ids.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="margin-top:4px">'+
+    '<div class="piece-meta" style="margin-bottom:6px">'+ids.length+' selected &mdash; assemble into a record</div>'+
+    '<input class="cfg-in" id="canonRecName" placeholder="Name this record — e.g. Investor intro, About page, Podcast bio" value="'+esc(canonRecName)+'" oninput="canonRecName=this.value" style="margin-bottom:8px">'+
+    '<button class="btn primary" onclick="canonCompose()">Assemble record</button>'+
+    '<button class="btn ghost" onclick="canonClearSel()">Clear selection</button>'+
+  '</div>';
+}
+function canonCompose(){
+  var c=canonData();
+  var picked=c.pieces.filter(function(p){return canonSel[p.id];});
+  if(!picked.length)return;
+  var name=(canonRecName||'').trim()||'Record';
+  var out=picked.map(function(p){
+    if(p.kind==='line')return '“'+p.body.trim()+'”';
+    return (p.title?p.title.trim()+'\n':'')+p.body.trim();
+  }).join('\n\n');
+  canonRecord={name:name,text:out};
+  renderCanonCompose();
+}
+function canonCopyRecord(){
+  var ta=document.getElementById('canonRecText');if(!ta)return;var t=ta.value;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('Copied');},function(){fallbackCopy(ta);});}
+  else fallbackCopy(ta);
+}
+function fallbackCopy(ta){ta.focus();ta.select();try{document.execCommand('copy');toast('Copied');}catch(e){toast('Select & copy');}}
+function canonExportRecord(){
+  var ta=document.getElementById('canonRecText');if(!ta)return;
+  var nm=(canonRecord&&canonRecord.name||'record').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()||'record';
+  var blob=new Blob([ta.value],{type:'text/plain'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=nm+'.txt';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);
+}
+
+/* ---- add / edit a piece ---- */
+function canonAddOpen(){
+  canonDraft={id:null,kind:'line',lens:(canonTab!=='all'&&canonTab!=='manifesto')?canonTab:'who',themes:[],title:'',body:'',pinned:false};
+  canonEdit='new';renderCanonEditor();
+  document.getElementById('canonEditor').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function canonEditOpen(id){
+  var c=canonData(),p=c.pieces.filter(function(x){return x.id===id;})[0];
+  if(!p)return;
+  canonDraft={id:p.id,kind:p.kind,lens:p.lens,themes:(p.themes||[]).slice(),title:p.title||'',body:p.body||'',pinned:!!p.pinned};
+  canonEdit=id;renderCanonEditor();
+  document.getElementById('canonEditor').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function canonSyncDraft(){
+  if(!canonDraft)return;
+  var t=document.getElementById('ceTitle'),b=document.getElementById('ceBody'),th=document.getElementById('ceThemes'),pn=document.getElementById('cePin');
+  if(b)canonDraft.body=b.value;
+  if(t)canonDraft.title=t.value;
+  if(th)canonDraft.themes=th.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  if(pn)canonDraft.pinned=pn.checked;
+}
+function canonEK(k){canonSyncDraft();canonDraft.kind=k;renderCanonEditor();}
+function canonEL(l){canonSyncDraft();canonDraft.lens=l;renderCanonEditor();}
+function renderCanonEditor(){
+  var p=canonDraft,el=document.getElementById('canonEditor');
+  if(!p){el.innerHTML='';return;}
+  var kindRow=[['line','Line'],['passage','Passage']].map(function(k){
+    return '<button class="btn '+(p.kind===k[0]?'primary':'ghost')+'" style="flex:1;margin-top:0" onclick="canonEK(\''+k[0]+'\')">'+k[1]+'</button>';
+  }).join('');
+  var lensRow=CANON_LENSES.map(function(l){
+    return '<button class="canon-tab'+(p.lens===l[0]?' on':'')+'" onclick="canonEL(\''+l[0]+'\')">'+esc(l[1])+'</button>';
+  }).join('');
+  el.innerHTML='<div class="piece-edit">'+
+    '<div class="pe-row" style="margin-bottom:8px">'+kindRow+'</div>'+
+    '<div class="canon-tabs" style="margin-bottom:8px">'+lensRow+'</div>'+
+    (p.kind==='passage'?'<input class="cfg-in" id="ceTitle" placeholder="Title — how you refer to this passage" value="'+esc(p.title||'')+'" style="margin-bottom:6px">':'')+
+    '<textarea class="coach-in" id="ceBody" placeholder="'+(p.kind==='line'?'The line, exactly as you’d say it.':'The passage — a story, a position, a paragraph of belief.')+'" style="min-height:120px">'+esc(p.body||'')+'</textarea>'+
+    '<input class="cfg-in" id="ceThemes" placeholder="Themes (comma-separated) — optional" value="'+esc((p.themes||[]).join(', '))+'" style="margin-top:6px">'+
+    '<label class="speakrow"><input type="checkbox" id="cePin"'+(p.pinned?' checked':'')+'> Pin to top</label>'+
+    '<div class="pe-row" style="margin-top:8px">'+
+      '<button class="btn primary" style="flex:1;margin-top:0" onclick="canonEditSave()">Save piece</button>'+
+      '<button class="btn ghost" style="flex:1;margin-top:0" onclick="canonEditCancel()">Cancel</button>'+
+    '</div>'+
+    (p.id?'<button class="btn danger" onclick="canonEditDelete()">Delete this piece</button>':'')+
+  '</div>';
+}
+function canonEditSave(){
+  canonSyncDraft();
+  if(!canonDraft.body.trim()){alert('Write the line or passage first.');return;}
+  var c=canonData();
+  var rec={id:canonDraft.id||uid(),kind:canonDraft.kind,lens:canonDraft.lens,themes:canonDraft.themes,title:canonDraft.title.trim(),body:canonDraft.body.trim(),pinned:canonDraft.pinned};
+  if(canonDraft.id){
+    for(var i=0;i<c.pieces.length;i++)if(c.pieces[i].id===canonDraft.id){c.pieces[i]=rec;break;}
+  }else{c.pieces.unshift(rec);}
+  canonSave(c);canonDraft=null;canonEdit=null;
+  renderCanon();
+}
+function canonEditCancel(){canonDraft=null;canonEdit=null;document.getElementById('canonEditor').innerHTML='';}
+function canonEditDelete(){
+  if(!canonDraft||!canonDraft.id)return;
+  if(!confirm('Delete this piece?'))return;
+  var c=canonData();c.pieces=c.pieces.filter(function(p){return p.id!==canonDraft.id;});
+  delete canonSel[canonDraft.id];
+  canonSave(c);canonDraft=null;canonEdit=null;
+  renderCanon();
+}
+
+/* ---- versions (snapshot beats + canon; roll back) ---- */
+function canonSaveVersion(){
+  var label=prompt('Name this version (e.g. “Pre-raise draft”, “v2 after the podcast”):','');
+  if(label===null)return;
+  var d=load(),c=canonData();
+  c.versions.unshift({id:uid(),label:(label||'').trim()||('Snapshot '+grDate()),date:grDate(),
+    beats:JSON.parse(JSON.stringify(d.beats||{})),pieces:JSON.parse(JSON.stringify(c.pieces))});
+  canonSave(c);renderCanonVersions();toast('Version saved');
+}
+function renderCanonVersions(){
+  var c=canonData(),el=document.getElementById('canonVersions');if(!el)return;
+  if(!c.versions.length){el.innerHTML='<p class="note" style="opacity:.7;margin:8px 0 0">No versions yet. A version snapshots your beats + canon so you can watch the story evolve &mdash; and roll back.</p>';return;}
+  el.innerHTML=c.versions.map(function(v){
+    return '<div class="ver-row"><div class="ver-l"><div>'+esc(v.label)+'</div><div class="piece-meta">'+esc(v.date)+' · '+(v.pieces?v.pieces.length:0)+' pieces</div></div>'+
+      '<button class="ver-b" onclick="canonRestore(\''+v.id+'\')">Restore</button>'+
+      '<button class="ver-b" onclick="canonDelVer(\''+v.id+'\')">✕</button></div>';
+  }).join('');
+}
+function canonRestore(id){
+  var c=canonData(),v=c.versions.filter(function(x){return x.id===id;})[0];if(!v)return;
+  if(!confirm('Restore “'+v.label+'”? This replaces your current beats and canon pieces. Your saved versions are kept.'))return;
+  var d=load();
+  d.beats=JSON.parse(JSON.stringify(v.beats||{}));
+  if(!d.canon)d.canon={pieces:[],versions:c.versions};
+  d.canon.pieces=JSON.parse(JSON.stringify(v.pieces||[]));
+  store(d);
+  canonSel={};canonDraft=null;canonEdit=null;canonRecord=null;
+  renderBeats();renderCanon();toast('Restored');
+}
+function canonDelVer(id){
+  var c=canonData();c.versions=c.versions.filter(function(v){return v.id!==id;});
+  canonSave(c);renderCanonVersions();
+}
+
+/* ---- canon digest handed to the coach with each question ---- */
+function canonDigest(){
+  var c=canonData();if(!c.pieces.length)return '';
+  var byLens={};
+  c.pieces.forEach(function(p){(byLens[p.lens]||(byLens[p.lens]=[])).push(p);});
+  var out=['— THE CANON (the founder’s own source-text; quote and build on these, never contradict them) —'];
+  CANON_LENSES.forEach(function(l){
+    var arr=byLens[l[0]]||[];if(!arr.length)return;
+    out.push('\n['+l[1]+']');
+    arr.forEach(function(p){
+      if(p.kind==='line')out.push('• “'+p.body.trim()+'”');
+      else out.push('• '+(p.title?p.title.trim()+': ':'')+p.body.trim().slice(0,400));
+    });
+  });
+  return out.join('\n');
+}
+
 renderBeats();
 coachRender();
+renderCanon();
 </script>
 </body>
 </html>
