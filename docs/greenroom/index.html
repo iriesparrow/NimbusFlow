@@ -156,7 +156,8 @@ section{margin-top:26px;}
     <div class="sh"><span class="idx">03</span><span class="t">Rehearse</span></div>
     <p class="note">One beat per screen, teleprompter-style, with the clock running. Aim to speak each beat, not read it.</p>
     <button class="btn primary" onclick="startRun()">&#9654; Run the story</button>
-    <button class="btn ghost" onclick="startDrill()">? Question drill &mdash; unscripted answers</button>
+    <button class="btn ghost" onclick="startDrill()">? Question drill &mdash; the story (Part 1)</button>
+    <button class="btn ghost" onclick="startDrillP2()">? Question drill &mdash; the system &amp; the self (Part 2)</button>
     <div class="saved" id="takeLine"></div>
   </section>
 
@@ -232,6 +233,23 @@ var QUESTIONS=[
  'Where is this in five years?',
  'What breaks first if you grow too fast?',
  'What part of the story do you usually leave out?'
+];
+
+/* Part 2 — the system you built, then the reckoning with yourself.
+   Runs in order (two movements) — the arc is the point. */
+var QUESTIONS_P2=[
+ {m:'The System',q:'What used to slow you down before you had a system — and what did you build to end it?'},
+ {m:'The System',q:'Walk through how the work actually runs now. What does each person on the project see?'},
+ {m:'The System',q:'What does it cost when a project drifts? Tell the moment it went wrong.'},
+ {m:'The System',q:'Once the system freed you from chasing the truth, what did you do with that energy instead?'},
+ {m:'The System',q:'What does everyone get wrong about staying in control?'},
+ {m:'The Reckoning',q:'Being visible doesn’t come naturally to you. So why do it at all — what’s worth the discomfort?'},
+ {m:'The Reckoning',q:'Where’s the line between showing up as yourself and performing a version of yourself?'},
+ {m:'The Reckoning',q:'What’s your real relationship with money — and what does it cost the work when you flinch at being paid for it?'},
+ {m:'The Reckoning',q:'Forget hedging: what are you actually certain of? Say what you’d defend if the room disagreed.'},
+ {m:'The Reckoning',q:'What does transparency cost you — and what do you keep private?'},
+ {m:'The Reckoning',q:'If you’re your own biggest obstacle, what’s the opportunity on the other side of you?'},
+ {m:'The Reckoning',q:'Five years out — who do you have to become for this to keep working? Not the company. You.'}
 ];
 
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&typeof d==='object')return d;}catch(e){}return {v:1,beats:{},takes:0};}
@@ -385,6 +403,16 @@ function startDrill(){
   var q=QUESTIONS.slice();
   for(var i=q.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=q[i];q[i]=q[j];q[j]=tmp;}
   cards=q.slice(0,6).map(function(x,i){return {ey:'Question '+(i+1)+' of 6',txt:x,hint:'Answer out loud — 60 seconds, no notes'};});
+  mode='drill';cardIdx=0;openStage();renderCard();
+}
+/* Part 2 runs its twelve in order, labelled by movement. */
+function startDrillP2(){
+  var counts={},n={};
+  QUESTIONS_P2.forEach(function(x){counts[x.m]=(counts[x.m]||0)+1;});
+  cards=QUESTIONS_P2.map(function(x){
+    n[x.m]=(n[x.m]||0)+1;
+    return {ey:x.m+' — '+n[x.m]+' of '+counts[x.m],txt:x.q,hint:'Answer out loud — no notes'};
+  });
   mode='drill';cardIdx=0;openStage();renderCard();
 }
 
