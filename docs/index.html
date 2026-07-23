@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Well-Being OS</title>
+<meta name="theme-color" content="#5B4FE8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Well-Being">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--p:#5B4FE8;--pl:#EEEDFD;--pm:#A9A4F0;--blk:#0a0a0a;--wht:#fafafa;--gr:#777;--lt:#e5e5e5;--ltr:#f3f3f3;--pr:#5B4FE8;--su:#D4820A;--sk:#2E9E6B;--tr:#C8321A;--sh:#1A6EC8;--b1:#C8321A;--b2:#D4820A;--b3:#2E9E6B;--b4:#1A6EC8;--b5:#8B3EC8;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+body{background:#111;font-family:'Barlow',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:10px 0 50px;color:var(--blk);}
+.topbar{width:390px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;}
+.app-ttl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#555;}
+.tbr{display:flex;align-items:center;gap:6px;}
+.bell{background:#1a1a1a;border:none;color:#cfcfcf;font-size:13px;padding:4px 8px;border-radius:8px;cursor:pointer;line-height:1;}
+.bell.on{background:#1a1650;color:#A9A4F0;}
+.sync{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;transition:all .3s;}
+.s-idle{background:#222;color:#555;}.s-load{background:#1a1650;color:#A9A4F0;}.s-ok{background:#0a2e1e;color:#2E9E6B;}.s-err{background:#2e0a0a;color:#C8321A;}
+.mnav{width:390px;display:flex;gap:3px;margin-bottom:8px;background:#1a1a1a;border-radius:10px;padding:3px;}
+.mbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 2px;border:none;border-radius:7px;background:transparent;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.mbtn.on{background:var(--wht);color:var(--blk);}
+.dnav{width:390px;display:flex;gap:4px;margin-bottom:8px;}
+.dbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:7px 2px;border:1.5px solid #333;border-radius:8px;background:#111;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.dbtn.on{border-color:var(--wht);background:var(--wht);color:var(--blk);}
+.dotrow{display:flex;justify-content:center;gap:2px;margin-top:2px;}
+.dot{width:4px;height:4px;border-radius:50%;}
+.card{width:390px;background:var(--wht);border-radius:4px;overflow:hidden;display:none;flex-direction:column;}
+.card.vis{display:flex;}
+.lhd{padding:12px 16px 8px;border-bottom:8px solid var(--blk);}
+.ey{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gr);margin-bottom:2px;}
+.ct{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;letter-spacing:-.01em;line-height:.93;text-transform:uppercase;}
+.cs{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gr);margin-top:3px;}
+.mr{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+.ml{font-size:11px;color:var(--gr);font-weight:500;}
+.bgs{display:flex;gap:3px;flex-wrap:wrap;}
+.bg{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;border:1.5px solid;}
+.bg.f{color:white;}
+.lbd{overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:530px;padding-bottom:8px;}
+.lbd::-webkit-scrollbar{width:2px;}
+.lbd::-webkit-scrollbar-thumb{background:var(--lt);}
+.thk{height:3px;background:var(--blk);margin:6px 0;}
+.thn{height:.5px;background:var(--lt);margin:0 16px;}
+.sh{display:flex;align-items:center;gap:8px;padding:8px 16px 3px;}
+.stg{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:white;padding:2px 8px;border-radius:2px;}
+.ss{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gr);letter-spacing:.04em;}
+.row{display:flex;align-items:flex-start;gap:10px;padding:7px 16px;cursor:pointer;border-bottom:.5px solid var(--lt);transition:background .1s;}
+.row:last-child{border-bottom:none;}
+.row:hover{background:var(--ltr);}
+.chk{width:14px;height:14px;border:1.5px solid var(--lt);border-radius:2px;flex-shrink:0;margin-top:2px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.row.dn .chk{background:var(--p);border-color:var(--p);}
+.row.dn .chk::after{content:'';width:7px;height:4px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg) translateY(-1px);display:block;}
+.row.dn .rn{text-decoration:line-through;color:var(--gr);}
+.rn{font-size:13px;font-weight:500;color:var(--blk);line-height:1.35;flex:1;}
+.rn .sub{display:block;font-size:11px;font-weight:400;color:var(--gr);margin-top:1px;}
+.rv{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:3px;white-space:nowrap;}
+.ef{width:100%;border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:3px 0;outline:none;transition:border-color .15s;}
+.ef:focus{border-bottom-color:var(--p);}
+textarea.ef{resize:none;min-height:55px;line-height:1.5;border:1px solid var(--lt);border-radius:4px;padding:6px 8px;margin-top:2px;}
+textarea.ef:focus{border-color:var(--p);}
+.er{padding:5px 16px;border-bottom:.5px solid var(--lt);}
+.er:last-child{border-bottom:none;}
+.el{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gr);margin-bottom:2px;}
+.sbtn{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 16px 2px;padding:9px;border-radius:6px;color:white;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:none;transition:opacity .2s;}
+.sbtn:hover{opacity:.85;}.sbtn:active{opacity:.7;}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.lft{border-top:3px solid var(--blk);padding:7px 16px;}
+.prow{display:flex;justify-content:space-between;margin-bottom:4px;}
+.pl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blk);}
+.pc{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--blk);}
+.pb{width:100%;height:5px;background:var(--ltr);border-radius:3px;overflow:hidden;margin-bottom:3px;}
+.pf{height:100%;border-radius:3px;transition:width .3s;}
+.pp{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--gr);text-align:right;}
+#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);max-width:340px;width:max-content;background:#0a0a0a;color:white;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;line-height:1.35;text-align:center;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;}
+#toast.show{opacity:1;}
+.tip{background:var(--pl);border-left:3px solid var(--pm);border-radius:0 4px 4px 0;padding:7px 12px;margin:5px 16px;font-size:12px;font-style:italic;color:#2a2060;line-height:1.45;}
+.anchor{margin:10px 16px 0;padding:10px 12px;border-radius:4px;border-left:3px solid var(--pm);background:var(--pl);font-size:12px;font-style:italic;color:#2a2060;line-height:1.55;}
+.drow{padding:6px 16px;border-bottom:.5px solid var(--lt);display:flex;align-items:center;gap:10px;}
+.dlbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);flex-shrink:0;}
+input[type=date]{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:12px;color:var(--blk);padding:2px 0;outline:none;flex:1;}
+input[type=date]:focus{border-bottom-color:var(--p);}
+.snav{width:390px;display:flex;gap:3px;margin-bottom:8px;padding:3px;background:#1a1a1a;border-radius:10px;}
+.snbtn{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:6px 2px;border:none;border-radius:7px;background:transparent;color:#555;cursor:pointer;transition:all .2s;text-align:center;}
+.snbtn.on{color:white;}
+.ext{width:100%;border-collapse:collapse;font-size:12px;}
+.ext td{padding:5px 16px;border-bottom:.5px solid var(--lt);}
+.ext tr:last-child td{border-bottom:none;}
+.exn{font-weight:500;color:var(--blk);}
+.exv{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--gr);text-align:right;}
+.ext input{border:none;border-bottom:1px solid var(--lt);background:transparent;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--blk);text-align:right;outline:none;width:68px;padding:1px 0;}
+.ext input:focus{border-bottom-color:var(--p);}
+.wbtns{padding:8px 16px 4px;display:flex;gap:5px;flex-wrap:wrap;}
+.wbtn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1.5px solid var(--tr);cursor:pointer;transition:all .2s;}
+.wbtn.on{background:var(--tr);color:white;}.wbtn.off{background:transparent;color:var(--tr);}
+.bc{margin:5px 16px 0;border-radius:6px;padding:9px 12px;cursor:pointer;border:1.5px solid;transition:opacity .15s;}
+.bc:hover{opacity:.85;}
+.bnum{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.btxt{font-size:13px;font-weight:600;line-height:1.3;color:var(--blk);}
+.barr{font-size:10px;color:var(--gr);margin-top:2px;}
+/* ---- Reminders sheet ---- */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:1000;}
+.ov.show{display:flex;}
+.sheet{width:390px;max-width:100%;background:var(--wht);border-radius:16px 16px 0 0;padding:8px 0 28px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.rs-grab{width:38px;height:4px;background:var(--lt);border-radius:3px;margin:6px auto 8px;}
+.rs-hd{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:-.01em;padding:0 16px;}
+.rs-sub{font-size:12px;color:var(--gr);padding:2px 16px 4px;}
+.rs-note{font-size:11px;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);margin:6px 16px;padding:7px 10px;border-radius:0 4px 4px 0;line-height:1.45;}
+.rs-lh{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gr);padding:10px 16px 2px;}
+.rs-item{display:flex;justify-content:space-between;gap:10px;padding:6px 16px;border-bottom:.5px solid var(--lt);font-size:12px;align-items:center;}
+.rs-item:last-child{border-bottom:none;}
+.rs-time{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--p);white-space:nowrap;}
+.rs-close{display:block;margin:10px 16px 0;width:calc(100% - 32px);padding:9px;border:1.5px solid var(--lt);background:transparent;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gr);cursor:pointer;}
+/* ---- Current-task highlight ---- */
+.row.now{background:var(--pl);box-shadow:inset 3px 0 0 var(--p);}
+.row.now .rn{font-weight:600;}
+/* ---- Dark mode ---- */
+:root[data-theme="dark"]{--wht:#1c1c1e;--blk:#f1f1f2;--lt:#343436;--ltr:#262628;--gr:#9a9a9e;--pl:#241f3a;}
+:root[data-theme="dark"] .anchor,:root[data-theme="dark"] .tip{color:#cbc5f5;}
+:root[data-theme="dark"] .mbtn.on{background:var(--p);color:#fff;}
+:root[data-theme="dark"] .dbtn.on{background:var(--p);color:#fff;border-color:var(--p);}
+:root[data-theme="dark"] .btxt{color:#161616;}
+:root[data-theme="dark"] .barr{color:#6a6a6a;}
+/* ---- Breath visualizer ---- */
+.bvwrap{padding:10px 16px 2px;}
+.bvmodes{display:flex;gap:5px;margin-bottom:6px;}
+.bvm{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 8px;border-radius:20px;border:1.5px solid var(--lt);background:transparent;color:var(--gr);cursor:pointer;transition:all .2s;}
+.bvstage{position:relative;height:184px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.bvring{position:absolute;width:164px;height:164px;border-radius:50%;border:1.5px dashed var(--lt);}
+.bvc{width:164px;height:164px;border-radius:50%;transform:scale(.42);will-change:transform;}
+.bvlabel{text-align:center;padding:0 0 2px;}
+.bvphase{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;}
+.bvcount{font-size:11px;color:var(--gr);margin-top:1px;min-height:14px;}
+.bvhint{font-size:11px;color:var(--gr);text-align:center;font-style:italic;padding-bottom:6px;}
+/* ---- Guides (expandable) ---- */
+.gv{cursor:pointer;}
+.gd{display:none;margin:4px 16px 8px;border:1px solid var(--lt);border-radius:6px;padding:10px 12px;font-size:12px;line-height:1.55;color:var(--blk);}
+.gd h5{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin:9px 0 3px;color:var(--pr);}
+.gd h5:first-child{margin-top:0;}
+.gd .q{font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:5px 0;}
+:root[data-theme="dark"] .gd .q{color:#cbc5f5;}
+.rot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 0;padding:6px 9px;border:1px solid var(--lt);border-radius:6px;}
+.rotl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);white-space:nowrap;}
+.rotv{font-weight:600;font-size:13px;color:var(--pr);text-align:right;}
+/* ---- Exercise guide sheet ---- */
+.exlink{cursor:pointer;}
+.exlink::after{content:' ⓘ';font-size:10px;color:var(--tr);opacity:.8;}
+.ex-map{display:flex;justify-content:center;padding:8px 16px 0;}
+.ex-map svg{width:236px;height:auto;}
+.ex-leg{display:flex;gap:14px;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);padding:2px 0 4px;}
+.ex-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
+.ex-sec{padding:6px 16px 2px;}
+.ex-sec h6{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tr);margin-bottom:3px;}
+.ex-sec ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.6;color:var(--blk);}
+.ex-var{margin:4px 16px;padding:7px 10px;border:1px solid var(--lt);border-radius:6px;cursor:pointer;transition:all .15s;}
+.ex-var.on{border-color:var(--tr);background:#FEF0ED;}
+:root[data-theme="dark"] .ex-var.on{background:#38150f;}
+.ex-var b{font-size:12.5px;color:var(--blk);}
+.ex-var span{display:block;font-size:11.5px;color:var(--gr);line-height:1.45;}
+/* ---- Goals / Operating Plan ---- */
+.gl-note{font-size:12px;color:var(--gr);padding:2px 16px 6px;line-height:1.5;font-style:italic;}
+.gl-decade{font-size:20px;padding:6px 16px 12px;font-style:italic;color:var(--blk);display:flex;align-items:baseline;gap:10px;}
+.gl-decade input{flex:1;min-width:100px;border:none;border-bottom:2px solid var(--blk);font-size:26px;font-weight:800;text-align:center;background:transparent;color:var(--b5);outline:none;font-style:normal;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.02em;}
+.gl-decade input:focus{border-color:var(--b5);}
+.gl-yr{display:flex;align-items:baseline;gap:10px;padding:4px 16px;border-bottom:.5px solid var(--lt);}
+.gl-yr b{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:var(--b5);width:4.2ch;flex:none;}
+.gl-yr input{border:none;background:transparent;font-size:13px;width:100%;outline:none;color:var(--blk);font-family:'Barlow',sans-serif;}
+.gl-q{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 16px 6px;}
+.gl-goal{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:4px 16px;border-bottom:.5px solid var(--lt);align-items:center;}
+.gl-goal input{border:none;background:transparent;outline:none;font-family:'Barlow',sans-serif;color:var(--blk);width:100%;}
+.gl-goal .cat{font-family:'Barlow Condensed',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--b5);font-weight:700;}
+.gl-goal .what{font-size:13.5px;}
+.gl-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 16px 6px;}
+.gl-split input{width:100%;border:none;border-bottom:1px solid var(--lt);background:transparent;font-size:12.5px;padding:4px 0;outline:none;color:var(--blk);font-family:'Barlow',sans-serif;}
+.gl-split input:focus{border-color:var(--b5);}
+.gl-habit{font-size:14px;line-height:2.1;padding:4px 16px 8px;color:var(--blk);}
+.gl-habit input{border:none;border-bottom:1px solid var(--lt);background:transparent;min-width:140px;font-size:13.5px;outline:none;color:var(--b5);font-weight:600;padding:2px;font-family:'Barlow',sans-serif;}
+.gl-habit input:focus{border-color:var(--b5);}
+.gl-habit .arr{color:var(--b5);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin:0 4px;}
+/* ---- Editable supplement stack ---- */
+.sp-add{padding:8px 16px 4px;display:grid;gap:6px;}
+.sp-add .r2{display:grid;grid-template-columns:1fr 110px;gap:8px;}
+.sp-add .r3{display:grid;grid-template-columns:86px 1fr 1fr;gap:8px;}
+.sp-add input,.sp-add select{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:4px 0;outline:none;width:100%;}
+.sp-add input:focus,.sp-add select:focus{border-color:var(--su);}
+.sp-row{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:.5px solid var(--lt);cursor:pointer;}
+.sp-row:hover{background:var(--ltr);}
+.sp-row.editing{background:#FEF5E7;}
+:root[data-theme="dark"] .sp-row.editing{background:#33270f;}
+.sp-main{flex:1;min-width:0;}
+.sp-main b{font-size:13px;color:var(--blk);font-weight:600;display:block;line-height:1.3;}
+.sp-meta{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gr);margin-top:1px;}
+.sp-meta .fd{color:var(--su);}
+.sp-dose{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:var(--blk);white-space:nowrap;}
+/* ---- Wins / Achievements ---- */
+.win-today{margin:10px 16px 4px;padding:12px 14px;border-radius:8px;background:linear-gradient(135deg,#FEF5E7,#FDF0DC);border-left:3px solid var(--su);}
+:root[data-theme="dark"] .win-today{background:linear-gradient(135deg,#33270f,#2a2010);}
+.win-today .wt-l{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--su);margin-bottom:4px;}
+.win-today .wt-t{font-size:15px;font-weight:600;line-height:1.45;color:var(--blk);}
+.win-today .wt-s{font-size:11px;font-style:italic;color:var(--gr);margin-top:5px;}
+.win{display:flex;align-items:baseline;gap:8px;padding:7px 16px;border-bottom:.5px solid var(--lt);}
+.win-d{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--su);width:62px;flex:none;}
+.win-t{font-size:13px;color:var(--blk);flex:1;line-height:1.4;}
+.win-c{font-family:'Barlow Condensed',sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+.win-x{border:none;background:none;color:var(--lt);font-size:14px;cursor:pointer;padding:0 2px;line-height:1;}
+.win-x:hover{color:var(--tr);}
+.win-add{padding:8px 16px 4px;display:grid;grid-template-columns:1fr;gap:6px;}
+.win-add .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.win-add input,.win-add select{border:none;border-bottom:1.5px solid var(--lt);background:transparent;font-family:'Barlow',sans-serif;font-size:13px;color:var(--blk);padding:4px 0;outline:none;width:100%;}
+.win-add input:focus,.win-add select:focus{border-color:var(--su);}
+/* ---- Belief evidence cards ---- */
+.ev-alt{font-size:11.5px;font-style:italic;color:#2a2060;background:var(--pl);border-left:3px solid var(--pm);padding:6px 9px;border-radius:0 4px 4px 0;margin:6px 16px;line-height:1.5;}
+:root[data-theme="dark"] .ev-alt{color:#cbc5f5;}
+.evp{margin:4px 16px;border:1px solid var(--lt);border-radius:6px;overflow:hidden;}
+.evp-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;font-weight:600;font-size:12.5px;color:var(--blk);}
+.evp-h small{color:var(--gr);font-weight:500;font-size:10.5px;text-align:right;white-space:nowrap;}
+.evp-d{display:none;padding:0 10px 9px;font-size:12px;line-height:1.6;color:var(--blk);}
+.evp-d .kl{display:block;margin-top:5px;font-weight:600;color:var(--p);}
+.evp-d .qq{display:block;margin-top:4px;font-style:italic;color:var(--gr);}
+/* ---- Guided session (full-screen) ---- */
+#sess{position:fixed;inset:0;z-index:2000;display:none;flex-direction:column;background:radial-gradient(120% 90% at 50% 0%,#1b1538 0%,#0d0b1e 70%);color:#f1eefc;}
+#sess.show{display:flex;}
+.sess-top{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;}
+.sess-x{background:none;border:none;color:#8c86b8;font-size:17px;cursor:pointer;padding:4px;line-height:1;}
+.sess-bar{flex:1;height:3px;background:rgba(255,255,255,.13);border-radius:2px;overflow:hidden;}
+.sess-fill{height:100%;background:var(--pm);width:0;transition:width .35s;}
+.sess-step{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;color:#8c86b8;text-transform:uppercase;white-space:nowrap;}
+.sess-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 28px;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sess-body.ani>*{animation:slin .5s ease both;}
+@keyframes slin{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.sess-ey{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--pm);margin-bottom:14px;}
+.sess-quote{font-size:22px;line-height:1.75;font-style:italic;font-weight:400;max-width:330px;color:#efecff;}
+.sess-quote.med{font-size:16.5px;line-height:1.8;text-align:left;}
+.sess-quote.long{font-size:14.5px;line-height:1.8;text-align:left;}
+#sess .bvring{border-color:rgba(255,255,255,.14);}
+#sess .bvc.idle{animation:orbidle 6s ease-in-out infinite;}
+@keyframes orbidle{0%,100%{transform:scale(.42);}50%{transform:scale(.47);}}
+#sess .bvphase{font-weight:600;letter-spacing:.22em;font-size:13px;}
+#sess .bvcount{color:#8c86b8;}
+#sess .bvhint{color:#7d77a8;}
+.sess-title{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:-.01em;}
+.sess-bodytxt{font-size:15px;line-height:1.7;color:#cfc9ee;max-width:320px;margin-top:12px;}
+.sess-small{font-size:12px;color:#8c86b8;margin-top:16px;font-style:italic;}
+.sess-who{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:#fff;margin:6px 0 14px;line-height:1.15;max-width:330px;}
+.sess-wishes{font-size:15px;line-height:1.9;font-style:italic;color:#e4e0fa;}
+.sess-zone{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;text-transform:uppercase;line-height:1;cursor:pointer;}
+.sess-in{width:100%;max-width:320px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#fff;padding:11px 12px;font-size:14px;margin-top:9px;outline:none;font-family:'Barlow',sans-serif;}
+.sess-in::placeholder{color:#7d77a8;}
+.sess-nav{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom));}
+.sess-back{width:84px;padding:14px 0;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:#bdb7e4;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.sess-next{flex:1;padding:14px 0;border:none;border-radius:10px;background:var(--p);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+.sess-next:active,.sess-back:active{opacity:.75;}
+/* ---- Belief-surfaced chips ---- */
+.bchips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 16px 6px;}
+.bchip{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1.5px solid var(--lt);color:var(--gr);cursor:pointer;background:transparent;transition:all .15s;}
+.bchip.on{background:var(--tr);border-color:var(--tr);color:#fff;}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="app-ttl">🧬 Well-Being OS</div><div class="tbr"><button class="bell" id="themeBtn" onclick="toggleTheme()" aria-label="Theme">🌙</button><button class="bell" id="bellBtn" onclick="openRem()" aria-label="Reminders">🔔</button><button class="bell" id="gearBtn" onclick="openSettings()" aria-label="Notion Sync">⚙</button><div class="sync s-idle" id="sync">Offline</div></div></div>
+<div class="mnav"><button class="mbtn on" onclick="setMode('day')">By Day</button><button class="mbtn" onclick="setMode('routine')">By Routine</button><button class="mbtn" onclick="setMode('goals')">Goals</button><button class="mbtn" onclick="setMode('wins')">Wins</button></div>
+<div class="dnav" id="dnav">
+<button class="dbtn on" onclick="setDay(0)" id="d0">Mon<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+<button class="dbtn" onclick="setDay(1)" id="d1">Tue<div class="dotrow"><div class="dot" style="background:#C8321A"></div></div></button>
+<button class="dbtn" onclick="setDay(2)" id="d2">Wed<div class="dotrow"><div class="dot" style="background:#1A6EC8"></div><div class="dot" style="background:#2E9E6B"></div></div></button>
+<button class="dbtn" onclick="setDay(3)" id="d3">Thu<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+<button class="dbtn" onclick="setDay(4)" id="d4">Fri<div class="dotrow"><div class="dot" style="background:#1A6EC8"></div></div></button>
+<button class="dbtn" onclick="setDay(5)" id="d5">Sat<div class="dotrow"><div class="dot" style="background:#C8321A"></div><div class="dot" style="background:#2E9E6B"></div></div></button>
+<button class="dbtn" onclick="setDay(6)" id="d6">Sun<div class="dotrow"><div class="dot" style="background:#D4820A"></div><div class="dot" style="background:#5B4FE8"></div></div></button>
+</div>
+<div class="card vis" id="dayCard">
+<div class="lhd"><div class="ey" id="dEy">Day 1 of 7</div><div class="ct" id="dTt">Monday</div><div class="cs" id="dSb">Push 1 · Shave · Retinoid PM</div><div class="mr"><div class="ml">Log &amp; track</div><div class="bgs" id="dBg"></div></div></div>
+<div class="drow"><div class="dlbl">Log date</div><input type="date" id="logDate"></div>
+<div class="lbd" id="dBody"></div>
+<button class="sbtn" style="background:var(--p)" onclick="saveDay()"><span class="spin" id="dSpin" style="display:none"></span><span id="dTxt">Save to Notion</span></button>
+<div class="lft"><div class="prow"><span class="pl">Daily Consistency</span><span class="pc" id="dCnt">0/0</span></div><div class="pb"><div class="pf" id="dFill" style="width:0%;background:var(--p)"></div></div><div class="pp" id="dPct">0% complete</div></div>
+</div>
+<div id="rView" style="display:none;width:390px;">
+<div class="snav">
+<button class="snbtn on" style="background:var(--pr)" onclick="setR('practice')" id="rb-practice">Practice</button>
+<button class="snbtn" onclick="setR('supps')" id="rb-supps">Supps</button>
+<button class="snbtn" onclick="setR('skin')" id="rb-skin">Skin</button>
+<button class="snbtn" onclick="setR('train')" id="rb-train">Train</button>
+<button class="snbtn" onclick="setR('beliefs')" id="rb-beliefs">Beliefs</button>
+</div>
+<div class="card vis" id="c-practice">
+<div class="lhd" style="border-bottom-color:var(--pr)"><div class="ey">Every day · 5:00 am · Ch 8-9</div><div class="ct" style="color:var(--pr)">Metaphysical<br>Practice</div><div class="cs">Meditation · Prayer · Reflection</div><div class="mr"><div class="ml">20-40 min · Beginner</div><div class="bgs"><div class="bg f" style="background:var(--pr);border-color:var(--pr)">Daily</div></div></div></div>
+<div class="lbd">
+<button class="sbtn" style="background:linear-gradient(135deg,#5B4FE8,#8B3EC8);margin-top:10px;padding:13px" onclick="openSess()">✦ Begin Guided Session · 20–40 min</button>
+<div class="anchor" id="anchorTxt"></div>
+<div class="bvwrap">
+<div class="bvmodes"><button class="bvm" id="bvm-calm" onclick="setBv('calm')">4-7 Breath</button><button class="bvm" id="bvm-gap" onclick="setBv('gap')">The Gap</button><button class="bvm" id="bvm-heart" onclick="setBv('heart')">Heart</button></div>
+<div class="bvstage" onclick="toggleBv()"><div class="bvring"></div><div class="bvc" id="bvc"></div></div>
+<div class="bvlabel"><div class="bvphase" id="bvPhase">Tap the circle to begin</div><div class="bvcount" id="bvCount"></div></div>
+<div class="bvhint" id="bvHint"></div>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Session</span><span class="ss">log completion</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Daily Anchor — read aloud</div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 1 — Breath Focus<span class="sub">10 breaths (4 in / 7 out) · observe natural breath · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 2 — Inner Body Scan<span class="sub">Feet to scalp · 10-15 sec per zone · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 3 — Enter the Gap<span class="sub">In / Out / 2-5 sec silence at emptiness · 5-10 min</span></div></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Step 4 — Awaken the Heart (Metta)<span class="sub">Heart breathing · Five Wishes · Thank you x3</span></div><div class="rv gv" style="background:#EAF7F1;color:#2E9E6B" onclick="event.stopPropagation();togEx('gd-metta')">guide ▾</div></div>
+<div class="gd" id="gd-metta">
+<h5>Part A — Heart Breathing</h5>
+Breathe <b>into your heart</b> to a count of 4 — visualize breath entering through the center of your chest. Breathe out to a count of 7, exiting through the same point. Repeat 5–10 times (use the <b>Heart</b> visualizer above). Then return to natural breath and repeat:
+<div class="q">"I now open my heart fully to all living things. I love all of life."</div>
+<h5>Part B — The Five Wishes</h5>
+For each person, visualize them clearly and offer:
+<div class="q">1. May you be happy<br>2. May you be healthy and strong<br>3. May you be safe, on the inside and out<br>4. May you awaken to your highest potential<br>5. May you live with ease<br><br>Conclude each person: "I love you, I love you, I love you."</div>
+<h5>Send the wishes to, in order</h5>
+<b>1 · Loved ones</b> — <span id="rotLoved"></span><br><span style="color:var(--gr)">Deceased (†): visualize them in their highest, most luminous state.</span><br>
+<b>2 · Yourself</b> — <i>"[Your name], may you be happy…"</i><br>
+<b>3 · A stranger</b> and <b>4 · Someone difficult</b> — today's rotation:
+<div class="rot"><span class="rotl">Stranger today</span><span class="rotv" id="rotStranger"></span></div>
+<div class="rot"><span class="rotl">Difficult person today</span><span class="rotv" id="rotDifficult"></span></div>
+<b>5 · All of humanity</b> — visualize the whole planet and shift to "we": <i>May we all be happy… healthy… safe… awaken… live with ease.</i>
+<h5>Part C — Close with gratitude</h5>
+<div class="q">"Thank you. Thank you. Thank you."</div>
+<h5>Edit your rotation lists</h5>
+<div class="el" style="margin-top:4px">Loved ones (comma-separated)</div><input class="ef" id="mettaLoved" placeholder="Names, comma-separated († for those passed)">
+<div class="el" style="margin-top:8px">Strangers (rotates daily)</div><input class="ef" id="mettaStrangers" placeholder="People you pass daily, comma-separated">
+<div class="el" style="margin-top:8px">Difficult people (rotates daily)</div><input class="ef" id="mettaDifficult" placeholder="Names, comma-separated">
+</div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Scientific Prayer — 7 Steps<span class="sub">Surrender · Know · Ready · Forgive+Love · Declare · Thank · Devote</span></div><div class="rv gv" style="background:var(--pl);color:var(--pr)" onclick="event.stopPropagation();togEx('gd-prayer')">guide ▾</div></div>
+<div class="gd" id="gd-prayer"></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">3 Gratitudes + Intention Review</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Gratitudes</span></div>
+<div class="er"><div class="el">Gratitude 1</div><input class="ef" id="g1" placeholder="I am grateful for..."></div>
+<div class="er"><div class="el">Gratitude 2</div><input class="ef" id="g2" placeholder="I am grateful for..."></div>
+<div class="er"><div class="el">Gratitude 3</div><input class="ef" id="g3" placeholder="I am grateful for..."></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--pr)">Evening</span><span class="ss">8:30 pm</span></div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Limiting Belief Check<span class="sub">Tap any belief that surfaced today — it goes into your practice log</span></div><div class="rv gv" style="background:#FEF0ED;color:var(--tr)" onclick="event.stopPropagation();togEx('gd-bcheck')">guide ▾</div></div>
+<div class="bchips" id="bChips"></div>
+<div class="gd" id="gd-bcheck">
+The evening check is deactivation work (Ch 12): noticing a belief <i>as it operates</i> is what weakens it. The five under active work:
+<h5>The 5 beliefs</h5>
+1. Money is difficult to accumulate<br>2. Money is difficult to keep<br>3. Time must be sacrificed in exchange for money<br>4. Money requires constant monitoring to prevent loss<br>5. Ambition can drive wealth, but requires sacrificing other life areas
+<h5>When one surfaces</h5>
+Label it aloud ("that's Belief 3 talking"), ask whether it is actually true, and recall one of your enshrined counter-examples. Then write the fuller deactivation work in the <b>Beliefs</b> tab on Wed / Fri / Sun evenings.
+</div>
+<div class="row" onclick="tog(this,'pr')" style="color:var(--pr)"><div class="chk"></div><div class="rn">Evening Reflection</div></div>
+<div class="er"><div class="el">Evening notes</div><textarea class="ef" id="eNotes" placeholder="What did you release? What peace did you find?"></textarea></div>
+<button class="sbtn" style="background:var(--pr)" onclick="savePractice()"><span class="spin" id="prSpin" style="display:none"></span><span id="prTxt">Save Session to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Session Progress</span><span class="pc" id="prCnt">0/0</span></div><div class="pb"><div class="pf" id="prFill" style="width:0%;background:var(--pr)"></div></div><div class="pp" id="prPct">0% complete</div></div>
+</div>
+<div class="card" id="c-supps">
+<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">Daily · 4 timing windows</div><div class="ct" style="color:var(--su)">Supplements</div><div class="cs">Your live stack · tap a row to edit</div><div class="mr"><div class="ml">What · dose · time · with food</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)" id="spChip">12 items</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--su)" id="spFormLabel">Add to stack</span><span class="ss">what · how much · when · with food?</span></div>
+<div class="sp-add">
+<div class="r2"><input id="sp_name" placeholder="Supplement name"><input id="sp_dose" placeholder="Dose (e.g. 500 mg)"></div>
+<div class="r3"><input id="sp_time" type="time" value="06:00" aria-label="Time of day"><select id="sp_food" aria-label="With food?"><option>Empty stomach</option><option>With food</option><option>With food (needs fat)</option><option>30–60 min before food</option><option>With or after food</option><option>Anytime</option></select><select id="sp_days" aria-label="Which days"><option>Daily</option><option>Mon–Fri</option><option>Sat + Sun</option><option>Sun only</option><option>Mon/Wed/Fri</option><option>As needed</option></select></div>
+<button class="sbtn" style="background:var(--su);margin:4px 0 2px" id="spBtn" onclick="spSubmit()">+ Add to Stack</button>
+</div>
+<div class="thk"></div>
+<div id="spList"></div>
+<div class="tip">Tap any row to edit it · × removes it. Save writes the whole stack to Notion.</div>
+<button class="sbtn" style="background:var(--su)" onclick="saveSupps()"><span class="spin" id="suSpin" style="display:none"></span><span id="suTxt">Save Dose Updates to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Supplement Stack</span><span class="pc" style="color:var(--su)" id="spFoot">12 items</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">Tap a row to edit · Save syncs to Notion</div></div>
+</div>
+<div class="card" id="c-skin">
+<div class="lhd" style="border-bottom-color:var(--sk)"><div class="ey">AM every day · PM varies by night</div><div class="ct" style="color:var(--sk)">Skincare</div><div class="cs">10 products · AM + PM protocols</div><div class="mr"><div class="ml">Check off steps</div><div class="bgs"><div class="bg f" style="background:var(--sk);border-color:var(--sk)">10 products</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--sk)">AM</span><span class="ss">every day · 6:15 am</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">1. CeraVe Hydrating Cleanser</div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 1</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Topicals High Roller<span class="sub">Mon/Wed/Fri only — after shave, before mist</span></div><div class="rv" style="background:#FBEAF0;color:#993556">shave</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">2. ATOBARRIER365 Mist<span class="sub">Spritz on damp skin</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 2</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">3. Hyaluronic Acid (The Ordinary)<span class="sub">Pat into misted skin immediately</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 3</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">4. ATOBARRIER365 Cream<span class="sub">Ceramides + niacinamide</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">5. Elta MD UV Clear Tinted SPF 46<span class="sub">Always last — non-negotiable</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Rx</span><span class="ss">Mon + Thu</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser (double) to Mist to HA</div><div class="rv" style="background:#EAF7F1;color:var(--sk)">1-3</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Anua Azelaic Acid 10%<span class="sub">Wait 5 min before retinoid</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 4</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Rx Retinoid 0.025%<span class="sub">Pea-size · dry skin · avoid eye/lip corners</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 5</div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">ATOBARRIER365 Cream<span class="sub">Wait 20-30 min after retinoid</span></div><div class="rv" style="background:#EAF7F1;color:var(--sk)">step 6</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Exfol</span><span class="ss">Wed + Sat</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to BHA or Glycolic (alternate weekly)<span class="sub">Wait 5-10 min · one exfoliant only</span></div></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Mist to HA to ATOBARRIER365 Cream</div></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--sk)">PM Rest</span><span class="ss">Tue + Fri + Sun</span></div><div class="thn"></div>
+<div class="row" onclick="tog(this,'sk')" style="color:var(--sk)"><div class="chk"></div><div class="rn">Cleanser to Mist to HA to ATOBARRIER365 Cream<span class="sub">No actives — barrier repair only</span></div></div>
+<div class="tip">Never use exfoliants on retinoid nights. Never use both BHA and glycolic on the same night.</div>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Skincare Checklist</span><span class="pc" id="skCnt">0/0</span></div><div class="pb"><div class="pf" id="skFill" style="width:0%;background:var(--sk)"></div></div><div class="pp" id="skPct">0% complete</div></div>
+</div>
+<div class="card" id="c-train">
+<div class="lhd" style="border-bottom-color:var(--tr)"><div class="ey">4x / week · 7:00 am · PPL split</div><div class="ct" style="color:var(--tr)">Training</div><div class="cs">6 workouts · tap weights to update</div><div class="mr"><div class="ml">Edit inline · Save logs to Notion</div><div class="bgs"><div class="bg f" style="background:var(--tr);border-color:var(--tr)">PPLx2</div></div></div></div>
+<div class="lbd">
+<div class="wbtns"><button class="wbtn on" id="wb-p1" onclick="showW('p1')">Push 1</button><button class="wbtn off" id="wb-l1" onclick="showW('l1')">Pull 1</button><button class="wbtn off" id="wb-legs1" onclick="showW('legs1')">Legs 1</button><button class="wbtn off" id="wb-p2" onclick="showW('p2')">Push 2</button><button class="wbtn off" id="wb-pull2" onclick="showW('pull2')">Pull 2</button><button class="wbtn off" id="wb-legs2" onclick="showW('legs2')">Legs 2</button></div>
+<div class="thn" style="margin-top:4px"></div>
+<div id="w-p1"><div class="sh"><span class="stg" style="background:var(--tr)">Push 1</span><span class="ss">Monday</span></div><table class="ext"><tr><td class="exn">Bench Press</td><td class="exv">4x10 @</td><td><input value="70 lbs" data-e="bench"></td></tr><tr><td class="exn">Seated DB OHP</td><td class="exv">3x10 @</td><td><input value="30 lbs" data-e="ohp"></td></tr><tr><td class="exn">Incline Chest Press</td><td class="exv">3x10 @</td><td><input value="95 lbs" data-e="incline"></td></tr><tr><td class="exn">Seated Cable Fly</td><td class="exv">3x10 @</td><td><input value="80 lbs" data-e="fly"></td></tr><tr><td class="exn">Tricep Pulldowns Rope</td><td class="exv">3x10 @</td><td><input value="70 lbs" data-e="tricep"></td></tr><tr><td class="exn">Egyptian Lateral Raise</td><td class="exv">4x10 @</td><td><input value="20 lbs" data-e="lateral"></td></tr></table></div>
+<div id="w-l1" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Pull 1</span><span class="ss">Tuesday</span></div><table class="ext"><tr><td class="exn">Straight Arm Pulldown</td><td class="exv">4x10 @</td><td><input value="70 lbs" data-e="s_pull"></td></tr><tr><td class="exn">Cable Face Pulls</td><td class="exv">4x10 @</td><td><input value="20 lbs" data-e="face_pull"></td></tr><tr><td class="exn">Lat Pulldown Wide</td><td class="exv">4x10 @</td><td><input value="85 lbs" data-e="lat_pull"></td></tr><tr><td class="exn">Hammer Curl DB</td><td class="exv">4x10 @</td><td><input value="60 lbs" data-e="hammer"></td></tr><tr><td class="exn">Bayesian Curl</td><td class="exv">4x10 @</td><td><input value="30 lbs" data-e="bayesian"></td></tr><tr><td class="exn">Landmine / SA Row</td><td class="exv">4x10 @</td><td><input value="15 lbs" data-e="landmine"></td></tr><tr><td class="exn">Chest Supported Row</td><td class="exv">4x10 @</td><td><input value="15 lbs" data-e="cs_row"></td></tr></table></div>
+<div id="w-legs1" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Legs 1</span><span class="ss">Thursday</span></div><table class="ext"><tr><td class="exn">Elliptical</td><td class="exv">10 min</td><td><input value="Level 6" data-e="elliptical"></td></tr><tr><td class="exn">Seated Leg Press</td><td class="exv">12/10/8/6</td><td><input value="240 lbs" data-e="leg_press"></td></tr><tr><td class="exn">Goblet Squat</td><td class="exv">4x10 @</td><td><input value="30 lbs" data-e="goblet"></td></tr><tr><td class="exn">Leg Extension</td><td class="exv">3x10 @</td><td><input value="85 lbs" data-e="leg_ext"></td></tr><tr><td class="exn">Glute Kickback</td><td class="exv">6x10 ea @</td><td><input value="17 lbs" data-e="kickback"></td></tr><tr><td class="exn">Calf Raise (Smith)</td><td class="exv">3x20 @</td><td><input value="50 lbs" data-e="calf"></td></tr><tr><td class="exn">Reverse Lunge</td><td class="exv">4x10 @</td><td><input value="50 lbs" data-e="lunge"></td></tr></table></div>
+<div id="w-p2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Push 2</span><span class="ss">Saturday Week A</span></div><table class="ext"><tr><td class="exn">Chest Press (Incline)</td><td class="exv">1x10 @</td><td><input value="60 lbs" data-e="cp_inc"></td></tr><tr><td class="exn">Chest Press (Flat)</td><td class="exv">1x10 @</td><td><input value="60 lbs" data-e="cp_flat"></td></tr><tr><td class="exn">Incline DB Press</td><td class="exv">sets @</td><td><input value="TBD" data-e="inc_db"></td></tr><tr><td class="exn">Lateral Raise Cable R</td><td class="exv">sets @</td><td><input value="TBD" data-e="lat_r"></td></tr><tr><td class="exn">Lateral Raise Cable L</td><td class="exv">sets @</td><td><input value="TBD" data-e="lat_l"></td></tr><tr><td class="exn">Overhead Rope Tri Ext</td><td class="exv">sets @</td><td><input value="TBD" data-e="oh_tri"></td></tr><tr><td class="exn">Straight Bar Pushdown</td><td class="exv">sets @</td><td><input value="TBD" data-e="bar_push"></td></tr></table></div>
+<div id="w-pull2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Pull 2</span><span class="ss">Saturday Week B</span></div><table class="ext"><tr><td class="exn">Close Grip Chinups</td><td class="exv">sets</td><td><input value="BW" data-e="chinups"></td></tr><tr><td class="exn">Wide Grip Seated Row</td><td class="exv">sets @</td><td><input value="TBD" data-e="wg_row"></td></tr><tr><td class="exn">Reverse Fly DB</td><td class="exv">sets @</td><td><input value="TBD" data-e="rev_fly"></td></tr><tr><td class="exn">Half Kneeling Row</td><td class="exv">sets @</td><td><input value="TBD" data-e="hk_row"></td></tr><tr><td class="exn">Standing Shrugs DB</td><td class="exv">sets @</td><td><input value="TBD" data-e="shrugs"></td></tr><tr><td class="exn">Bicep Curl Cable</td><td class="exv">sets @</td><td><input value="TBD" data-e="bic_cable"></td></tr><tr><td class="exn">Preacher Curl</td><td class="exv">sets @</td><td><input value="TBD" data-e="preacher"></td></tr></table></div>
+<div id="w-legs2" style="display:none"><div class="sh"><span class="stg" style="background:var(--tr)">Legs 2</span><span class="ss">Saturday Week C</span></div><table class="ext"><tr><td class="exn">Stiff Leg Deadlift</td><td class="exv">4x10 @</td><td><input value="90 lbs" data-e="sldl"></td></tr><tr><td class="exn">Hip Thrust (Smith)</td><td class="exv">4x10 @</td><td><input value="50 lbs" data-e="hip_thrust"></td></tr><tr><td class="exn">Travelling Lunge L</td><td class="exv">4x5 @</td><td><input value="50 lbs" data-e="lunge_l"></td></tr><tr><td class="exn">Travelling Lunge R</td><td class="exv">4x5 @</td><td><input value="50 lbs" data-e="lunge_r"></td></tr><tr><td class="exn">Leg Curl L</td><td class="exv">3x10 @</td><td><input value="50 lbs" data-e="curl_l"></td></tr><tr><td class="exn">Leg Curl R</td><td class="exv">3x10 @</td><td><input value="50 lbs" data-e="curl_r"></td></tr><tr><td class="exn">Hip Abduction</td><td class="exv">3 sets @</td><td><input value="TBD" data-e="hip_abd"></td></tr><tr><td class="exn">Calf Raise</td><td class="exv">3 sets @</td><td><input value="TBD" data-e="calf2"></td></tr></table></div>
+<div class="er" style="margin-top:6px"><div class="el">Session notes / PRs</div><textarea class="ef" id="wNotes" placeholder="Personal records, form notes, how you felt..."></textarea></div>
+<button class="sbtn" style="background:var(--tr)" onclick="saveWorkout()"><span class="spin" id="trSpin" style="display:none"></span><span id="trTxt">Save Workout to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Training Log</span><span class="pc" style="color:var(--tr)">Edit weights above</span></div><div class="pb"><div class="pf" style="width:60%;background:var(--tr)"></div></div><div class="pp">Tap Save to log to Notion</div></div>
+</div>
+<div class="card" id="c-beliefs">
+<div class="lhd" style="border-bottom-color:var(--p)"><div class="ey">Ch 12 · Active Work · Dec 2025</div><div class="ct">Limiting <span style="color:var(--p)">Beliefs</span></div><div class="cs">5 beliefs · write + save to Notion</div><div class="mr"><div class="ml">Wed / Fri / Sun evenings</div><div class="bgs"><div class="bg f" style="background:var(--p);border-color:var(--p)">5 Beliefs</div></div></div></div>
+<div class="lbd">
+<div style="padding:8px 16px 2px;font-size:12px;color:var(--gr);line-height:1.55;">Tap a belief to expand and write your deactivation work. Save appends to your Notion Limiting Beliefs page.</div>
+<div class="thk"></div>
+<div class="bc" style="background:#FEF0ED;border-color:var(--b1)" onclick="tb('b1')"><div class="bnum" style="color:var(--b1)">Belief 1</div><div class="btxt">Money is difficult to accumulate</div><div class="barr" id="ba-b1">Oprah · C.J. Walker · Koum · Schultz · Gardner · Sanders · Carnegie</div></div>
+<div id="bw-b1" style="display:none"><div class="er"><div class="el" style="color:var(--b1)">Alternative explanations / Is it true?</div><textarea class="ef" id="b1a" placeholder="Think of Oprah, Madam C.J. Walker, Jan Koum, Howard Schultz..."></textarea></div><div class="er"><div class="el" style="color:var(--b1)">Where did this belief come from?</div><textarea class="ef" id="b1o" placeholder="What experience or person planted this?"></textarea></div><div class="er"><div class="el" style="color:var(--b1)">New replacement belief</div><input class="ef" id="b1r" placeholder="Money accumulates naturally when I..."></div></div>
+<div class="bc" style="background:#FEF5E7;border-color:var(--b2);margin-top:5px" onclick="tb('b2')"><div class="bnum" style="color:var(--b2)">Belief 2</div><div class="btxt">Money is difficult to keep</div><div class="barr" id="ba-b2">Rowling · Blakely · Lauren · DeJoria · Parton · Perry · Ortega</div></div>
+<div id="bw-b2" style="display:none"><div class="er"><div class="el" style="color:var(--b2)">Alternative explanations / Is it true?</div><textarea class="ef" id="b2a" placeholder="Think of J.K. Rowling, Sara Blakely, Ralph Lauren, DeJoria..."></textarea></div><div class="er"><div class="el" style="color:var(--b2)">Where did this come from?</div><textarea class="ef" id="b2o"></textarea></div><div class="er"><div class="el" style="color:var(--b2)">New replacement belief</div><input class="ef" id="b2r" placeholder="Money stays and grows because I..."></div></div>
+<div class="bc" style="background:#EAF7F1;border-color:var(--b3);margin-top:5px" onclick="tb('b3')"><div class="bnum" style="color:var(--b3)">Belief 3</div><div class="btxt">Time must be sacrificed for money</div><div class="barr" id="ba-b3">Kiyosaki · Buffett · Naval · Ferriss · Sting · Read · Jordan</div></div>
+<div id="bw-b3" style="display:none"><div class="er"><div class="el" style="color:var(--b3)">What assets earn without your time?</div><textarea class="ef" id="b3a" placeholder="Rental income · licensing · what else?"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">Where did this come from?</div><textarea class="ef" id="b3o"></textarea></div><div class="er"><div class="el" style="color:var(--b3)">New replacement belief</div><input class="ef" id="b3r" placeholder="My assets work so my time is..."></div></div>
+<div class="bc" style="background:#EAF2FD;border-color:var(--b4);margin-top:5px" onclick="tb('b4')"><div class="bnum" style="color:var(--b4)">Belief 4</div><div class="btxt">Money requires constant monitoring</div><div class="barr" id="ba-b4">Bogle · Sethi · Housel · Munger · Scheiber · Groner · Lynch</div></div>
+<div id="bw-b4" style="display:none"><div class="er"><div class="el" style="color:var(--b4)">What would you automate if you trusted the system?</div><textarea class="ef" id="b4a" placeholder="Think of Bogle, Sethi, Housel, Munger..."></textarea></div><div class="er"><div class="el" style="color:var(--b4)">Where did this come from?</div><textarea class="ef" id="b4o"></textarea></div><div class="er"><div class="el" style="color:var(--b4)">New replacement belief</div><input class="ef" id="b4r" placeholder="My financial system runs well without..."></div></div>
+<div class="bc" style="background:#F4EDFB;border-color:var(--b5);margin-top:5px" onclick="tb('b5')"><div class="bnum" style="color:var(--b5)">Belief 5</div><div class="btxt">Ambition requires sacrificing life</div><div class="barr" id="ba-b5">Branson · Rihanna · Li Ka-shing · Huffington · Chouinard · Dalio · LeBron</div></div>
+<div id="bw-b5" style="display:none"><div class="er"><div class="el" style="color:var(--b5)">Where has ambition coexisted with living well?</div><textarea class="ef" id="b5a" placeholder="Think of Branson, Rihanna, Li Ka-shing, Huffington..."></textarea></div><div class="er"><div class="el" style="color:var(--b5)">Where did this come from?</div><textarea class="ef" id="b5o"></textarea></div><div class="er"><div class="el" style="color:var(--b5)">New replacement belief</div><input class="ef" id="b5r" placeholder="My ambition and my life are..."></div></div>
+<button class="sbtn" style="background:var(--p);margin-top:8px" onclick="saveBeliefs()"><span class="spin" id="blSpin" style="display:none"></span><span id="blTxt">Save Belief Work to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">Deactivation Work</span><span class="pc" id="blCnt" style="color:var(--p)">0/5 beliefs</span></div><div class="pb"><div class="pf" id="blFill" style="width:0%;background:var(--p)"></div></div><div class="pp" id="blPct">Write responses · tap Save</div></div>
+</div>
+</div>
+<div id="remOverlay" class="ov" onclick="closeRem(event)">
+<div id="remSheet" class="sheet" onclick="event.stopPropagation()">
+<div class="rs-grab"></div>
+<div class="rs-hd">🔔 Reminders</div>
+<div class="rs-sub" id="rsStatus">—</div>
+<button class="sbtn" id="remToggleBtn" style="background:var(--p)" onclick="toggleReminders()">Enable Reminders</button>
+<button class="sbtn" style="background:#333" onclick="testNotif()">Send Test Notification</button>
+<button class="sbtn" style="background:var(--sh)" onclick="testPush()">Test Background Push (closed-app)</button>
+<div class="rs-note" id="rsNote"></div>
+<div class="rs-lh">Today's reminder times</div>
+<div id="rsList"></div>
+<button class="sbtn" style="background:var(--sk)" onclick="exportICS()">⤓ Add Week to Calendar (.ics)</button>
+<button class="rs-close" onclick="closeRem()">Close</button>
+</div>
+</div>
+<div id="setOverlay" class="ov" onclick="closeSettings(event)">
+<div id="setSheet" class="sheet" onclick="event.stopPropagation()">
+<div class="rs-grab"></div>
+<div class="rs-hd">⚙ Notion Sync</div>
+<div class="rs-sub">Connect the backend so the Save buttons write to your Notion pages. One-time setup — see <b>docs/backend/README.md</b>.</div>
+<div class="er"><div class="el">Backend URL</div><input class="ef" id="setUrl" placeholder="https://your-worker.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+<div class="er"><div class="el">Shared secret</div><input class="ef" id="setSecret" placeholder="the APP_SECRET you set on the backend" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+<button class="sbtn" style="background:var(--p)" onclick="saveSettings()">Save Connection</button>
+<button class="sbtn" style="background:#333" onclick="testBackend()">Test Connection</button>
+<div class="rs-note" id="setNote"></div>
+<div class="rs-lh" style="padding-top:14px">Backup</div>
+<div class="rs-sub">Your check-offs, weights and notes live on this device. Export a backup so clearing Safari data can't lose them.</div>
+<button class="sbtn" style="background:#333" onclick="exportBackup()">⤓ Export Backup (.json)</button>
+<label class="sbtn" style="background:#555;cursor:pointer">⤒ Import Backup<input type="file" accept="application/json" style="display:none" onchange="importBackup(this)"></label>
+<a class="rs-close" href="./greenroom/" style="display:block;text-align:center;text-decoration:none;line-height:1.4">🎙 Green Room · story rehearsal →</a>
+<button class="rs-close" onclick="closeSettings()">Close</button>
+</div>
+</div>
+<div class="card" id="goalsCard" style="width:390px">
+<div class="lhd" style="border-bottom-color:var(--b5)"><div class="ey">Plan the life like a business</div><div class="ct" style="color:var(--b5)">The Operating<br>Plan</div><div class="cs">Decade · Years · Quarters · Goals</div><div class="mr"><div class="ml">After Emma Grede · revisit every Sunday review</div><div class="bgs"><div class="bg f" style="background:var(--b5);border-color:var(--b5)">Goals</div></div></div></div>
+<div class="lbd">
+<div class="sh"><span class="stg" style="background:var(--b5)">01 · The Decade</span><span class="ss">name it</span></div>
+<div class="gl-note">A headline separates who you were from who you're becoming — that's what makes the change feel possible.</div>
+<div class="gl-decade"><span>It's the</span><input id="gl_decade" placeholder="…" aria-label="Name your decade"><span>decade.</span></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">02 · The Years</span><span class="ss">one direction each</span></div>
+<div id="glYears"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">03 · The Quarters</span><span class="ss">this year, close enough to act on</span></div>
+<div class="gl-q">
+<div><div class="el">Q1 · Jan–Mar</div><textarea class="ef" id="gl_q1" placeholder="…"></textarea></div>
+<div><div class="el">Q2 · Apr–Jun</div><textarea class="ef" id="gl_q2" placeholder="…"></textarea></div>
+<div><div class="el">Q3 · Jul–Sep</div><textarea class="ef" id="gl_q3" placeholder="…"></textarea></div>
+<div><div class="el">Q4 · Oct–Dec</div><textarea class="ef" id="gl_q4" placeholder="…"></textarea></div>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">04 · The Goals</span><span class="ss">six to ten, stated plainly</span></div>
+<div class="gl-note">Categories: Personal · Professional · Health · Finances · Learning · Relationships</div>
+<div id="glGoals"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">05 · The Trade-offs</span><span class="ss">name the sacrifice on purpose</span></div>
+<div class="gl-split">
+<div><div class="el">What I'll give up</div><input id="gl_give1" placeholder="…"><input id="gl_give2" placeholder="…"><input id="gl_give3" placeholder="…"></div>
+<div><div class="el">What I'll say no to</div><input id="gl_no1" placeholder="…"><input id="gl_no2" placeholder="…"><input id="gl_no3" placeholder="…"></div>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">06 · The Habit</span><span class="ss">anchor it to a routine you keep</span></div>
+<div class="gl-habit">I'll start <input id="gl_habit" placeholder="a new habit"> <span class="arr">→</span> anchored to <input id="gl_anchorto" placeholder="e.g. the 5:00am practice">.</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--b5)">07 · The Anchor</span><span class="ss">same day every week</span></div>
+<div class="gl-split">
+<div><div class="el">Weekly review day</div><input id="gl_revday" placeholder="Sunday 8:30pm"></div>
+<div><div class="el">Landmark start date</div><input id="gl_startdate" placeholder="the day I begin"></div>
+</div>
+<button class="sbtn" style="background:var(--b5)" onclick="saveGoals()"><span class="spin" id="glSpin" style="display:none"></span><span id="glTxt">Save Plan to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">The Plan</span><span class="pc" id="glCnt" style="color:var(--b5)">0/9 goals</span></div><div class="pb"><div class="pf" id="glFill" style="width:0%;background:var(--b5)"></div></div><div class="pp" id="glPct">Fill it in · revisit weekly</div></div>
+</div>
+<div class="card" id="winsCard" style="width:390px">
+<div class="lhd" style="border-bottom-color:var(--su)"><div class="ey">The evidence file</div><div class="ct" style="color:var(--su)">Achieve<wbr>ments</div><div class="cs">Enshrined proof · read when doubt speaks</div><div class="mr"><div class="ml">Ch 12 method, pointed at yourself</div><div class="bgs"><div class="bg f" style="background:var(--su);border-color:var(--su)" id="winCount">0 wins</div></div></div></div>
+<div class="lbd">
+<div class="gl-note">You did these. They are not opinions — they are records. When a limiting belief surfaces, this page is the counter-evidence.</div>
+<div class="win-today" id="winToday"></div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Add evidence</span><span class="ss">plainly, like a fact</span></div>
+<div class="win-add">
+<input id="win_text" placeholder="What did you do / build / become?">
+<div class="row2"><input id="win_month" type="month" aria-label="When"><select id="win_cat"><option>Business</option><option>Clients</option><option>Finances</option><option>Recognition</option><option>Relationships</option><option>Growth</option><option>Life</option><option>Craft</option></select></div>
+<button class="sbtn" style="background:var(--su);margin:4px 0 2px" onclick="addWin()">+ Add to the file</button>
+</div>
+<div class="thk"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Milestones</span><span class="ss">dated</span></div>
+<div id="winDated"></div>
+<div class="sh"><span class="stg" style="background:var(--su)">Standing evidence</span><span class="ss">who you've become</span></div>
+<div id="winStanding"></div>
+<button class="sbtn" style="background:var(--su)" onclick="saveWins()"><span class="spin" id="wnSpin" style="display:none"></span><span id="wnTxt">Save Evidence File to Notion</span></button>
+<div style="height:10px"></div>
+</div>
+<div class="lft"><div class="prow"><span class="pl">The Evidence File</span><span class="pc" id="winFoot" style="color:var(--su)">—</span></div><div class="pb"><div class="pf" style="width:100%;background:var(--su)"></div></div><div class="pp">One rotates through Today's Reflection daily</div></div>
+</div>
+<div id="exOverlay" class="ov" onclick="closeEx(event)">
+<div class="sheet" onclick="event.stopPropagation()"><div class="rs-grab"></div><div id="exBody"></div><button class="rs-close" onclick="closeEx()">Close</button></div>
+</div>
+<div id="sess">
+<div class="sess-top"><button class="sess-x" onclick="closeSess()">✕</button><div class="sess-bar"><div class="sess-fill" id="sessFill"></div></div><div class="sess-step" id="sessStep"></div></div>
+<div class="sess-body ani" id="sessBody"></div>
+<div class="sess-nav"><button class="sess-back" id="sessBack" onclick="prevSl()">Back</button><button class="sess-next" id="sessNext" onclick="nextSl()">Continue</button></div>
+</div>
+<div id="toast"></div>
+<script>
+var NOTION_OS='',NOTION_BELIEFS='',NOTION_DB='';
+function loadPersonal(){try{var o=JSON.parse(localStorage.getItem('wb_personal'));if(o&&typeof o==='object')return o;}catch(e){}return {};}
+function applyPersonal(){var pd=loadPersonal();NOTION_OS=pd.notionOS||'';NOTION_BELIEFS=pd.notionBeliefs||'';NOTION_DB=pd.notionDB||'';
+var a=document.getElementById('anchorTxt');if(a)a.textContent=pd.anchorText||'Your Daily Anchor lives on this device, never in the code. Import your personal file in \u2699 to restore it \u2014 or begin writing your own.';
+var f=loadFields(),ch=false;['mettaLoved','mettaStrangers','mettaDifficult'].forEach(function(k){if(!f[k]&&pd[k]){f[k]=pd[k];ch=true;}});if(ch)localStorage.setItem('wb_fields',JSON.stringify(f));}
+function anchorText(){var pd=loadPersonal();return pd.anchorText?('"'+pd.anchorText+'"'):'"I am building the life I intend. I keep my word to myself. Good things are already in motion."';}
+var VAPID_PUBLIC='BF4o9EdC0Pj0k5KscwlHs9iDAQGyiB9Hl7oMj0otmDoIwsmiLLU12AyR5aMX7nOy49Ho4yzZVvUzuMxxNKisuU0';
+var curDay=0,curR='practice',curW='p1';
+var DAYS=[
+{n:'Monday',ey:'Day 1 of 7 — Training Day',sb:'Push 1 · Shave · Retinoid PM',bg:[{t:'Push 1',c:'#C8321A'},{t:'Shave',c:'#1A6EC8'},{t:'Rx PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full 4-step + Scientific Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb fully before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > Elta MD SPF'},{t:'tr',l:'7:00am — Push 1',s:'Bench · OHP · Incline · Cable Fly · Tricep · Lateral Raise'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With oatmeal + nuts + hemp'},{t:'su',l:'12:30pm — ColonBroom',s:'30-60 min before lunch'},{t:'su',l:'1:00pm — Vitamin C + B12',s:'With lunch'},{t:'su',l:'8:00pm — Ashwagandha',s:'With or after dinner'},{t:'sk',l:'8:00pm — PM Skincare (Retinoid night)',s:'Cleanser > Mist > HA > Azelaic Acid > Rx Retinoid > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:'Limiting belief check + what did you release?'}]},
+{n:'Tuesday',ey:'Day 2 of 7 — Training Day',sb:'Pull 1 · Rest PM',bg:[{t:'Pull 1',c:'#C8321A'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Pull 1',s:'Pulldown · Face Pulls · Lat Pull · Hammer · Bayesian · Row x2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
+{n:'Wednesday',ey:'Day 3 of 7 — Rest Day',sb:'Shave · Exfoliant PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'sk',l:'6:30am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Best night for Ch 12 deactivation work'}]},
+{n:'Thursday',ey:'Day 4 of 7 — Training Day',sb:'Legs 1 · Retinoid PM',bg:[{t:'Legs 1',c:'#2E9E6B'},{t:'Rx PM',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Legs 1',s:'Elliptical · Leg Press · Goblet Squat · Leg Ext · Glute Kickback · Calf · Reverse Lunge'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:''},{t:'sk',l:'8:00pm — PM Skincare (Retinoid night)',s:'Cleanser > Mist > HA > Azelaic Acid > Rx Retinoid > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection',s:''}]},
+{n:'Friday',ey:'Day 5 of 7 — Rest Day',sb:'Shave · Rest PM',bg:[{t:'Shave',c:'#1A6EC8'},{t:'Rest PM',c:'#888'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'Empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'sh',l:'6:15am — Shave + Topicals High Roller',s:'Absorb before mist'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'su',l:'8:00pm — Ashwagandha',s:'Last dose this week'},{t:'sk',l:'8:00pm — PM Skincare (Rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Evening Reflection + Belief Work',s:'Good night for Ch 12 work'}]},
+{n:'Saturday',ey:'Day 6 of 7 — Training Day',sb:'Rotating Workout · Exfoliant PM',bg:[{t:'Rotating',c:'#C8321A'},{t:'Exfol PM',c:'#2E9E6B'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'4-step + Prayer + Gratitude'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine',s:'No Ashwagandha today'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'tr',l:'7:00am — Rotating Workout',s:'Week A: Push 2 · Week B: Pull 2 · Week C: Legs 2'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Exfoliant night)',s:'Cleanser > BHA or Glycolic > Mist > HA > ATOBARRIER Cream'},{t:'pr',l:'8:30pm — Weekly Review',s:'Consistency · intentions · what shifts next week'}]},
+{n:'Sunday',ey:'Day 7 of 7 — Full Rest',sb:'Weekly Rx Day · Rest PM',bg:[{t:'Rx',c:'#D4820A'},{t:'Full Rest',c:'#5B4FE8'}],items:[{t:'pr',l:'5:00am — Metaphysical Practice',s:'Full rest day — run a longer session'},{t:'su',l:'6:00am — AG1 + Tru Niagen + L-Theanine + Weekly Rx',s:'Weekly Rx dose · empty stomach'},{t:'sk',l:'6:15am — AM Skincare',s:'Cleanser > Mist > HA > ATOBARRIER Cream > SPF'},{t:'su',l:'8:00am — D3/K2 · CoQ10 · Krill · One A Day',s:'With breakfast · No Ashwagandha'},{t:'su',l:'12:30pm + 1:00pm — ColonBroom · Vit C · B12',s:''},{t:'sk',l:'8:00pm — PM Skincare (Full rest night)',s:'Cleanser > Mist > HA > ATOBARRIER Cream · Complete weekly reset'},{t:'pr',l:'8:30pm — Weekly Review + Belief Work',s:'Best night for Ch 12 research and writing'}]}
+];
+var TC={pr:'#5B4FE8',su:'#D4820A',sk:'#2E9E6B',tr:'#C8321A',sh:'#1A6EC8'};
+var TL={pr:'practice',su:'supps',sk:'skincare',tr:'gym',sh:'shave'};
+function renderDay(i){var d=DAYS[i];document.getElementById('dEy').textContent=d.ey;document.getElementById('dTt').textContent=d.n;document.getElementById('dSb').textContent=d.sb;document.getElementById('dBg').innerHTML=d.bg.map(function(b){return '<div class="bg f" style="background:'+b.c+';border-color:'+b.c+'">'+b.t+'</div>';}).join('');var isToday=(i===realTodayIdx());var nowMin=new Date().getHours()*60+new Date().getMinutes();var nowIdx=-1;if(isToday){var best=1e9;d.items.forEach(function(it,idx){var t=parseTime(it.l);if(t!=null&&t>=nowMin&&t<best){best=t;nowIdx=idx;}});}var html='';d.items.forEach(function(it,idx){var c=TC[it.t]||'#888',lb=TL[it.t]||'';var nc=(idx===nowIdx)?' now':'',nid=(idx===nowIdx)?' id="nowRow"':'';html+='<div class="row'+nc+'"'+nid+' onclick="togDay(this)" style="color:'+c+'"><div class="chk"></div><div class="rn">'+it.l+(it.s?'<span class="sub">'+it.s+'</span>':'')+'</div><div class="rv" style="background:'+c+'18;color:'+c+'">'+lb+'</div></div><div class="thn"></div>';});html+='<div class="er" style="margin-top:6px"><div class="el">Day notes</div><textarea class="ef" id="dNotes" placeholder="Observations, how you feel..."></textarea></div><div style="height:6px"></div>';document.getElementById('dBody').innerHTML=html;updDP();var n=new Date(),y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0'),dd=String(n.getDate()).padStart(2,'0');document.getElementById('logDate').value=y+'-'+m+'-'+dd;syncUI();if(nowIdx>=0)setTimeout(scrollToNow,80);}
+function scrollToNow(){var el=document.getElementById('nowRow');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});}
+function togDay(r){r.classList.toggle('dn');updDP();saveChecks();}
+function updDP(){var rows=document.getElementById('dBody').querySelectorAll('.row');var done=document.getElementById('dBody').querySelectorAll('.row.dn').length,tot=rows.length;var p=tot?Math.round(done/tot*100):0;document.getElementById('dCnt').textContent=done+'/'+tot;document.getElementById('dFill').style.width=p+'%';document.getElementById('dPct').textContent=p+'% complete';}
+function setMode(m){var modes=['day','routine','goals','wins'];document.querySelectorAll('.mbtn').forEach(function(b,i){b.classList.toggle('on',modes[i]===m);});document.getElementById('dnav').style.display=m==='day'?'flex':'none';document.getElementById('dayCard').style.display=m==='day'?'flex':'none';document.getElementById('rView').style.display=m==='routine'?'block':'none';var g=document.getElementById('goalsCard');if(g){g.style.display=m==='goals'?'flex':'none';g.classList.toggle('vis',m==='goals');}var w=document.getElementById('winsCard');if(w){w.style.display=m==='wins'?'flex':'none';w.classList.toggle('vis',m==='wins');}if(m!=='routine')stopBv();if(m==='routine')setR(curR);}
+function setDay(i){curDay=i;for(var j=0;j<7;j++){document.getElementById('d'+j).classList.toggle('on',j===i);}renderDay(i);}
+var RC={practice:'#5B4FE8',supps:'#D4820A',skin:'#2E9E6B',train:'#C8321A',beliefs:'#5B4FE8'};
+function setR(r){curR=r;if(r!=='practice')stopBv();['practice','supps','skin','train','beliefs'].forEach(function(id){var c=document.getElementById('c-'+id),b=document.getElementById('rb-'+id);var on=id===r;c.style.display=on?'flex':'none';c.classList.toggle('vis',on);if(b){b.style.background=on?RC[id]:'transparent';b.style.color=on?'white':'#555';}});syncUI();}
+function showW(w){curW=w;['p1','l1','legs1','p2','pull2','legs2'].forEach(function(id){var el=document.getElementById('w-'+id),btn=document.getElementById('wb-'+id);if(el)el.style.display=id===w?'block':'none';if(btn){btn.classList.toggle('on',id===w);btn.classList.toggle('off',id!==w);}});restoreFields();}
+function tog(r,cat){r.classList.toggle('dn');if(cat==='pr')updPR();if(cat==='sk')updSK();saveChecks();}
+function updPR(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var p=tot?Math.round(done/tot*100):0;document.getElementById('prCnt').textContent=done+'/'+tot;document.getElementById('prFill').style.width=p+'%';document.getElementById('prPct').textContent=p+'% complete';}
+function updSK(){var c=document.getElementById('c-skin');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var p=tot?Math.round(done/tot*100):0;document.getElementById('skCnt').textContent=done+'/'+tot;document.getElementById('skFill').style.width=p+'%';document.getElementById('skPct').textContent=p+'% complete';}
+function tb(b){var w=document.getElementById('bw-'+b),a=document.getElementById('ba-'+b);var open=w.style.display!=='none';w.style.display=open?'none':'block';a.textContent=open?'tap to expand':'close';}
+function setSt(s,l){var el=document.getElementById('sync');el.className='sync s-'+s;el.textContent=l;}
+function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('show');},ms||2500);}
+function setSv(sid,tid,saving,lbl){var sp=document.getElementById(sid),tx=document.getElementById(tid);if(sp)sp.style.display=saving?'inline-block':'none';if(tx&&lbl)tx.textContent=lbl;}
+/* ---- Notion sync via your backend proxy (see docs/backend) ---- */
+function notionCfg(){return {url:(localStorage.getItem('wb_notion_url')||'').replace(/\/+$/,''),secret:localStorage.getItem('wb_notion_secret')||''};}
+async function postBackend(cfg,payload){try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify(payload)});var data=await res.json().catch(function(){return {};});if(!res.ok||(data&&data.error))return {err:(data&&data.error)||('HTTP '+res.status)};return {ok:true};}catch(e){return {err:e.message};}}
+async function callBackend(payload,spId,txId,ok,def){var cfg=notionCfg();if(!cfg.url){toast('Set up Notion Sync first (⚙)');openSettings();return;}setSv(spId,txId,true);setSt('load','Syncing...');var r=await postBackend(cfg,payload);
+// Older deployed workers don't know logEntry — fall back to creating a page
+// under the Well-Being OS parent so saves still land in Notion.
+if(r.err&&/Unknown action/i.test(r.err)&&payload.action==='logEntry'){var title=payload.name||(payload.date+' · '+payload.category);var md='## '+title+'\n\n'+(payload.completed!=null?'**Completion:** '+payload.completed+'/'+payload.total+'\n\n':'')+(payload.markdown||'')+(payload.notes?'\n\n### Notes\n'+payload.notes:'');r=await postBackend(cfg,{action:'createPage',parentId:NOTION_OS,title:title,markdown:md});}
+if(r.err){setSt('err','Error');setSv(spId,txId,false,'Retry');toast('Error: '+r.err,7000);setTimeout(function(){setSv(spId,txId,false,def);},3500);return;}
+setSt('ok','Synced');setSv(spId,txId,false,ok);toast('Saved to Notion');setTimeout(function(){setSv(spId,txId,false,def);},2000);}
+function createPage(parentId,title,markdown,spId,txId,ok,def){return callBackend({action:'createPage',parentId:parentId,title:title,markdown:markdown},spId,txId,ok,def);}
+function appendBlocks(pageId,markdown,spId,txId,ok,def){return callBackend({action:'appendBlocks',pageId:pageId,markdown:markdown},spId,txId,ok,def);}
+function logEntry(category,date,name,opts,spId,txId,ok,def){var p={action:'logEntry',databaseId:NOTION_DB,date:date,category:category,name:name};opts=opts||{};if(opts.completed!=null)p.completed=opts.completed;if(opts.total!=null)p.total=opts.total;if(opts.completion!=null)p.completion=opts.completion;if(opts.notes)p.notes=opts.notes;if(opts.markdown)p.markdown=opts.markdown;return callBackend(p,spId,txId,ok,def);}
+function openSettings(){renderSettings();document.getElementById('setOverlay').classList.add('show');}
+function closeSettings(e){if(e&&e.target&&e.target.id&&e.target.id!=='setOverlay')return;document.getElementById('setOverlay').classList.remove('show');}
+function renderSettings(){var c=notionCfg();document.getElementById('setUrl').value=c.url;document.getElementById('setSecret').value=c.secret;var n=document.getElementById('setNote');n.innerHTML=c.url?('Connected to: '+c.url):'Not connected yet. Deploy the backend (free Cloudflare Worker) using the guide in <b>docs/backend/README.md</b>, then paste its URL + secret here.';}
+function saveSettings(){var u=document.getElementById('setUrl').value.trim().replace(/\/+$/,'');var s=document.getElementById('setSecret').value.trim();localStorage.setItem('wb_notion_url',u);localStorage.setItem('wb_notion_secret',s);toast('Connection saved');renderSettings();}
+async function testBackend(){saveSettings();var cfg=notionCfg();if(!cfg.url){toast('Enter a backend URL');return;}var n=document.getElementById('setNote');n.textContent='Testing...';try{var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify({action:'ping'})});var data=await res.json().catch(function(){return {};});if(res.ok&&data&&data.ok){n.innerHTML='✅ Connected — backend reachable and secret accepted.';toast('Backend OK');}else{n.innerHTML='⚠️ Reached backend but got: '+((data&&data.error)||('HTTP '+res.status));}}catch(err){n.innerHTML='❌ Could not reach backend: '+err.message;}}
+async function saveDay(){var d=DAYS[curDay];var date=document.getElementById('logDate').value||new Date().toISOString().split('T')[0];var notes=(document.getElementById('dNotes')||{value:''}).value||'';var rows=document.getElementById('dBody').querySelectorAll('.row');var done=[],todo=[];rows.forEach(function(r){var txt=r.querySelector('.rn');if(!txt)return;var label=txt.childNodes[0].textContent.trim();(r.classList.contains('dn')?done:todo).push(label);});var pct=done.length+todo.length>0?Math.round(done.length/(done.length+todo.length)*100):0;var total=done.length+todo.length,completion=total?done.length/total:0;var md='### Completed\n'+done.map(function(x){return '- '+x;}).join('\n')+'\n\n### Not completed\n'+todo.map(function(x){return '- '+x;}).join('\n');await logEntry('Day',date,date+' · '+d.n,{completed:done.length,total:total,completion:completion,notes:notes,markdown:md},'dSpin','dTxt','Saved','Save to Notion');}
+async function savePractice(){var c=document.getElementById('c-practice');var done=c.querySelectorAll('.row.dn').length,tot=c.querySelectorAll('.row').length;var g1=document.getElementById('g1').value,g2=document.getElementById('g2').value,g3=document.getElementById('g3').value;var ev=document.getElementById('eNotes').value;var date=new Date().toISOString().split('T')[0];var completion=tot?done/tot:0;var surf=getBSurf();var md='### 3 Gratitudes\n1. '+(g1||'-')+'\n2. '+(g2||'-')+'\n3. '+(g3||'-')+'\n\n### Limiting beliefs surfaced today\n'+(surf.length?surf.sort().map(function(i){return '- '+BELIEFS_FULL[i];}).join('\n'):'- None')+(ev?'\n\n### Evening Reflection\n'+ev:'');await logEntry('Practice',date,date+' · Practice',{completed:done,total:tot,completion:completion,notes:ev,markdown:md},'prSpin','prTxt','Saved','Save Session to Notion');}
+async function saveSupps(){var s=loadSupps();if(!s.length){toast('Stack is empty');return;}var date=new Date().toISOString().split('T')[0];
+var sorted=s.slice().sort(function(a,b){return (a.time||'99').localeCompare(b.time||'99');});
+var md='',lastT=null;sorted.forEach(function(x){if(x.time!==lastT){lastT=x.time;md+='\n### '+fmtHM(x.time)+'\n';}md+='- **'+x.n+'** — '+(x.dose||'—')+' · '+x.food+' · '+x.days+'\n';});
+await logEntry('Supplements',date,date+' · Supplement Stack',{completed:s.length,markdown:md.trim()},'suSpin','suTxt','Saved','Save Dose Updates to Notion');}
+async function saveWorkout(){var wname={p1:'Push 1',l1:'Pull 1',legs1:'Legs 1',p2:'Push 2',pull2:'Pull 2',legs2:'Legs 2'};var inputs=document.querySelectorAll('#w-'+curW+' [data-e]'),lines=[];inputs.forEach(function(inp){lines.push('- '+inp.getAttribute('data-e').replace(/_/g,' ')+': '+inp.value);});var notes=document.getElementById('wNotes').value;var date=new Date().toISOString().split('T')[0];var md='### Weights\n'+lines.join('\n')+(notes?'\n\n### Notes\n'+notes:'');await logEntry('Workout',date,date+' · '+wname[curW],{notes:notes,markdown:md},'trSpin','trTxt','Saved','Save Workout to Notion');}
+async function saveBeliefs(){var date=new Date().toISOString().split('T')[0];var labels=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed for money','Money requires constant monitoring','Ambition requires sacrificing life'];var sections='',count=0;['b1','b2','b3','b4','b5'].forEach(function(b,i){var alt=document.getElementById(b+'a'),orig=document.getElementById(b+'o'),rep=document.getElementById(b+'r');if(!alt)return;if(alt.value||orig.value||rep.value){count++;sections+='\n\n### Belief '+(i+1)+' - '+labels[i];if(alt.value)sections+='\n\n**Alternative explanations:**\n'+alt.value;if(orig.value)sections+='\n\n**Origin:**\n'+orig.value;if(rep.value)sections+='\n\n**New belief:**\n> '+rep.value;}});if(!sections){toast('Write something first');return;}document.getElementById('blCnt').textContent=count+'/5 beliefs';document.getElementById('blFill').style.width=(count/5*100)+'%';document.getElementById('blPct').textContent=count+' of 5 beliefs written';var md=sections;await logEntry('Beliefs',date,date+' · Beliefs',{completed:count,total:5,completion:count/5,markdown:md},'blSpin','blTxt','Saved','Save Belief Work to Notion');}
+
+/* ============================================================
+   LOCAL PERSISTENCE — checkboxes + inputs survive reloads.
+   Inputs (weights/doses/text) persist ongoing; checkbox
+   completion is scoped per calendar day so each morning is fresh.
+   ============================================================ */
+function todayKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function loadFields(){try{return JSON.parse(localStorage.getItem('wb_fields')||'{}');}catch(e){return {};}}
+function fieldKey(el){if(el.id==='dNotes')return 'wb_dnote_'+curDay;if(el.id&&(el.id.indexOf('win_')===0||el.id.indexOf('sp_')===0))return null;return el.id||el.getAttribute('data-s')||el.getAttribute('data-e')||null;}
+function restoreFields(){var f=loadFields();document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='date')return;var k=fieldKey(el);if(k&&f[k]!==undefined&&f[k]!=='')el.value=f[k];});}
+document.addEventListener('input',function(e){var el=e.target;if(!el.matches||!el.matches('input,textarea'))return;if(el.type==='date')return;var k=fieldKey(el);if(!k)return;var f=loadFields();f[k]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));if(el.id&&el.id.indexOf('metta')===0)updMettaRot();if(el.id&&el.id.indexOf('gl_')===0)updGL();});
+
+function checksKey(){return 'wb_checks_'+todayKey();}
+function rowKey(r){var card=r.closest('.card');var ctx=card?card.id:'x';if(ctx==='dayCard')ctx+='_'+curDay;var rn=r.querySelector('.rn');var t=rn?(rn.childNodes[0]?rn.childNodes[0].textContent:rn.textContent):r.textContent;return ctx+'|'+t.trim();}
+function saveChecks(){var done=[];document.querySelectorAll('.row.dn').forEach(function(r){done.push(rowKey(r));});localStorage.setItem(checksKey(),JSON.stringify(done));}
+function restoreChecks(){var set;try{set=JSON.parse(localStorage.getItem(checksKey())||'[]');}catch(e){set=[];}var s={};set.forEach(function(k){s[k]=1;});document.querySelectorAll('.row').forEach(function(r){if(s[rowKey(r)])r.classList.add('dn');else r.classList.remove('dn');});}
+function syncUI(){restoreFields();restoreChecks();updDP();updPR();updSK();renderBChips();updMettaRot();updGL();}
+
+/* ============================================================
+   PWA + REMINDERS
+   ============================================================ */
+var swReg=null;
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(function(r){swReg=r;}).catch(function(){});}
+var REM_KEY='wb_rem_enabled';
+var remTimers=[];
+var WD=['MO','TU','WE','TH','FR','SA','SU'];
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent);}
+function remOn(){return localStorage.getItem(REM_KEY)==='1';}
+function realTodayIdx(){var map={1:0,2:1,3:2,4:3,5:4,6:5,0:6};return map[new Date().getDay()];}
+function parseTime(label){var m=label.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);if(!m)return null;var h=+m[1],mi=+m[2],ap=m[3].toLowerCase();if(ap==='pm'&&h!==12)h+=12;if(ap==='am'&&h===12)h=0;return h*60+mi;}
+function dayReminders(i){var d=DAYS[i],out=[];d.items.forEach(function(it){var t=parseTime(it.l);if(t==null)return;var title=it.l.replace(/^\s*\d{1,2}:\d{2}\s*(am|pm)[^—-]*[—-]\s*/i,'').trim()||it.l;out.push({min:t,hhmm:fmtMin(t),title:title,body:it.s||''});});out.sort(function(a,b){return a.min-b.min;});return out;}
+function fmtMin(m){var h=Math.floor(m/60),mi=m%60,ap=h>=12?'pm':'am',h12=h%12;if(h12===0)h12=12;return h12+':'+String(mi).padStart(2,'0')+' '+ap;}
+function fireNotif(title,body,tag){if(swReg&&swReg.active){swReg.active.postMessage({type:'notify',title:title,body:body,tag:tag});return true;}if('Notification' in window&&Notification.permission==='granted'){try{new Notification(title,{body:body,icon:'./icons/icon-192.png',tag:tag});return true;}catch(e){}}return false;}
+function scheduleReminders(){remTimers.forEach(clearTimeout);remTimers=[];if(!remOn())return;if(!('Notification' in window)||Notification.permission!=='granted')return;var now=new Date();var mins=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;dayReminders(realTodayIdx()).forEach(function(r){var delay=(r.min-mins)*60000;if(delay<=1000)return;if(delay>24*3600000)return;remTimers.push(setTimeout(function(){fireNotif('🧬 '+r.title,r.hhmm+' · '+(r.body||'Well-Being OS'),'wb-'+r.min);},delay));});}
+async function toggleReminders(){if(remOn()){localStorage.setItem(REM_KEY,'0');remTimers.forEach(clearTimeout);remTimers=[];toast('Reminders off');renderRem();return;}if(!('Notification' in window)){toast('Notifications not supported here');renderRem();return;}var p=Notification.permission;if(p!=='granted'){try{p=await Notification.requestPermission();}catch(e){p=Notification.permission;}}if(p==='granted'){localStorage.setItem(REM_KEY,'1');scheduleReminders();toast('Reminders on');subscribePush().then(function(r){if(r.ok)toast('Background alerts on too',3500);renderRem();});}else{toast('Permission blocked — enable in iOS Settings');}renderRem();}
+function testNotif(){if(!('Notification' in window)){toast('Notifications not supported');return;}if(Notification.permission!=='granted'){toast('Enable reminders first');return;}var ok=fireNotif('🧬 Well-Being OS','Test reminder — notifications are working.','wb-test');toast(ok?'Test sent':'Could not send');}
+/* ---- Web Push (background alerts when the app is closed) ---- */
+function pushOn(){return localStorage.getItem('wb_push')==='1';}
+function urlB64ToU8(s){var pad='='.repeat((4-s.length%4)%4);var b=(s+pad).replace(/-/g,'+').replace(/_/g,'/');var raw=atob(b);var arr=new Uint8Array(raw.length);for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
+function fullSchedule(){var out=[];for(var i=0;i<7;i++){dayReminders(i).forEach(function(r){out.push({wd:i,min:r.min,title:'🧬 '+r.title,body:r.hhmm+' · '+(r.body||'Well-Being OS')});});}return out;}
+async function subscribePush(){var cfg=notionCfg();if(!cfg.url)return {ok:false,msg:'Set up Notion Sync (⚙) first — push uses the same backend.'};if(!('serviceWorker' in navigator)||!('PushManager' in window))return {ok:false,msg:'Push not supported here. On iPhone, add the app to your Home Screen first.'};try{var reg=await navigator.serviceWorker.ready;var sub=await reg.pushManager.getSubscription();if(!sub){sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});}var tz=(Intl.DateTimeFormat().resolvedOptions().timeZone)||'UTC';var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify({action:'saveSub',subscription:sub.toJSON(),tz:tz,schedule:fullSchedule()})});var data=await res.json().catch(function(){return{};});if(res.ok&&data.ok){localStorage.setItem('wb_push','1');return {ok:true};}localStorage.removeItem('wb_push');return {ok:false,msg:(data&&data.error)||('HTTP '+res.status)};}catch(e){return {ok:false,msg:e.message};}}
+async function testPush(){var cfg=notionCfg();if(!cfg.url){toast('Set up Notion Sync (⚙) first');return;}if(!('Notification' in window)||Notification.permission!=='granted'){toast('Enable reminders first');return;}toast('Registering background push...');var r=await subscribePush();if(!r.ok){toast('Push: '+r.msg,7000);renderRem();return;}try{var sub=await (await navigator.serviceWorker.ready).pushManager.getSubscription();var res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-WB-Token':cfg.secret},body:JSON.stringify({action:'testPush',subscription:sub.toJSON()})});var data=await res.json().catch(function(){return{};});if(res.ok&&data.ok)toast('Background push sent — check your lock screen',5000);else toast('Push failed: '+((data&&data.error)||('status '+(data.status||res.status))),7000);}catch(e){toast('Push error: '+e.message,7000);}renderRem();}
+function openRem(){renderRem();document.getElementById('remOverlay').classList.add('show');}
+function closeRem(e){if(e&&e.target&&e.target.id&&e.target.id!=='remOverlay')return;document.getElementById('remOverlay').classList.remove('show');}
+function renderRem(){var on=remOn(),perm=('Notification' in window)?Notification.permission:'unsupported';var bell=document.getElementById('bellBtn');bell.classList.toggle('on',on&&perm==='granted');document.getElementById('remToggleBtn').textContent=(on&&perm==='granted')?'Turn Reminders Off':'Enable Reminders';var st=document.getElementById('rsStatus');st.textContent=((on&&perm==='granted')?('On — '+remTimers.length+' queued today'):(perm==='denied'?'Blocked in Settings':'Off'))+' · Background push: '+(pushOn()?'on':'off');var note=document.getElementById('rsNote'),msg='';if(isIOS()&&!isStandalone()){msg='To get notifications on iPhone you must install this first: tap the Share icon in Safari → <b>Add to Home Screen</b>, then open it from the new icon and enable reminders here.';}else{msg='<b>In-app reminders</b> fire while the app is open. <b>Background push</b> sends alerts even when it is fully closed — tap "Test Background Push" to set it up (needs the worker push config). <b>Add Week to Calendar</b> is the always-reliable fallback.';}note.innerHTML=msg;var list=document.getElementById('rsList'),html='';dayReminders(realTodayIdx()).forEach(function(r){html+='<div class="rs-item"><span>'+r.title+'</span><span class="rs-time">'+r.hhmm+'</span></div>';});list.innerHTML=html||'<div class="rs-item">No timed items today</div>';}
+function nextDateForWeekday(idx,h,mm){var jsTarget=[1,2,3,4,5,6,0][idx];var d=new Date();var add=(jsTarget-d.getDay()+7)%7;d.setDate(d.getDate()+add);d.setHours(h,mm,0,0);return d;}
+function icsLocal(d){function p(n){return String(n).padStart(2,'0');}return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';}
+function exportICS(){var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Well-Being OS//EN','CALSCALE:GREGORIAN'];var stamp=icsLocal(new Date())+'Z';var uid=0;for(var i=0;i<7;i++){dayReminders(i).forEach(function(r){var h=Math.floor(r.min/60),mm=r.min%60;var dt=nextDateForWeekday(i,h,mm);lines.push('BEGIN:VEVENT');lines.push('UID:wb-'+i+'-'+r.min+'-'+(uid++)+'@wellbeing');lines.push('DTSTAMP:'+stamp);lines.push('DTSTART:'+icsLocal(dt));lines.push('DURATION:PT10M');lines.push('RRULE:FREQ=WEEKLY;BYDAY='+WD[i]);lines.push('SUMMARY:'+icsEsc('🧬 '+r.title));if(r.body)lines.push('DESCRIPTION:'+icsEsc(r.body));lines.push('BEGIN:VALARM');lines.push('ACTION:DISPLAY');lines.push('DESCRIPTION:'+icsEsc(r.title));lines.push('TRIGGER:PT0M');lines.push('END:VALARM');lines.push('END:VEVENT');});}lines.push('END:VCALENDAR');var ics=lines.join('\r\n');var blob=new Blob([ics],{type:'text/calendar'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='wellbeing-reminders.ics';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);toast('Calendar file ready — open it to add');}
+function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+
+document.addEventListener('visibilitychange',function(){if(!document.hidden){scheduleReminders();renderRem();}});
+
+/* ============================================================
+   PRACTICE ENHANCEMENTS — breath visualizer, metta rotation,
+   prayer/belief guides
+   ============================================================ */
+var BV={
+calm:{c:'#5B4FE8',cl:'#A9A4F0',hint:'Step 1 — 10 guided breaths · in 4 · out 7 · then observe natural breath',target:10,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out — slowly',d:7,s:.42}]},
+gap:{c:'#1A6EC8',cl:'#7FB3E8',hint:'Step 3 — at complete emptiness, rest in pure silence. That is the gap.',target:0,ph:[{t:'Breathe in',d:4,s:1},{t:'Breathe out',d:6,s:.42},{t:'The gap — pure silence',d:3,s:.42}]},
+heart:{c:'#2E9E6B',cl:'#7FD3AC',hint:'Step 4 — breathe through the center of your chest · 5–10 rounds',target:10,ph:[{t:'Into your heart',d:4,s:1},{t:'Out through your heart',d:7,s:.45}]}};
+var bvMode='calm',bvOn=false,bvTimer=null,bvIdx=0,bvN=0,bvPrefix='';
+function bvEl(n){return document.getElementById(bvPrefix+n);}
+function setBv(m){stopBv();bvMode=m;var M=BV[m];if(!bvPrefix){['calm','gap','heart'].forEach(function(k){var b=document.getElementById('bvm-'+k);if(!b)return;var on=k===m;b.style.background=on?BV[k].c:'transparent';b.style.borderColor=on?BV[k].c:'';b.style.color=on?'#fff':'';});}var c=bvEl('bvc');if(c){c.style.background='radial-gradient(circle at 35% 30%, '+M.c+'d9, '+M.c+')';if(bvPrefix){c.style.boxShadow='0 0 70px -8px '+M.c+'aa, 0 0 150px -20px '+M.c+'55';c.classList.add('idle');}}var ph=bvEl('bvPhase');if(ph){ph.textContent='Tap the circle to begin';ph.style.color=bvPrefix?(M.cl||M.c):M.c;}var ct=bvEl('bvCount');if(ct)ct.textContent='';var h=bvEl('bvHint');if(h)h.textContent=M.hint;}
+function toggleBv(){bvOn?stopBv(true):startBv();}
+function startBv(){bvOn=true;bvN=0;bvIdx=0;var c=bvEl('bvc');if(c)c.classList.remove('idle');runBvPhase();}
+function runBvPhase(){var M=BV[bvMode],p=M.ph[bvIdx];var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(ph)ph.textContent=p.t;if(ct)ct.textContent=M.target?('Breath '+(bvN+1)+' of '+M.target):('Cycle '+(bvN+1)+' — tap to stop');if(c){c.style.transition='transform '+p.d+'s cubic-bezier(.4,0,.6,1)';c.style.transform='scale('+p.s+')';}bvTimer=setTimeout(function(){bvIdx=(bvIdx+1)%M.ph.length;if(bvIdx===0){bvN++;if(M.target&&bvN>=M.target){finishBv();return;}}runBvPhase();},p.d*1000);}
+function finishBv(){bvOn=false;clearTimeout(bvTimer);var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(ph)ph.textContent='Complete 🙏';if(ct)ct.textContent='Return to natural, uncontrolled breath';if(c){c.style.transition='transform 3s ease-out';c.style.transform='scale(.42)';c.classList.add('idle');}var nx=document.getElementById('sessNext');if(bvPrefix&&nx)nx.textContent='Continue ✓';}
+function stopBv(showPause){if(bvTimer)clearTimeout(bvTimer);bvTimer=null;if(!bvOn)return;bvOn=false;var ph=bvEl('bvPhase'),ct=bvEl('bvCount'),c=bvEl('bvc');if(showPause&&ph)ph.textContent='Paused — tap to restart';if(showPause&&ct)ct.textContent='';if(c){c.style.transition='transform 1s ease-out';c.style.transform='scale(.42)';if(bvPrefix)c.classList.add('idle');}}
+function togEx(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
+function dayOfYear(){var n=new Date();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5);}
+function rotPick(id){var el=document.getElementById(id);if(!el)return '';var list=el.value.split(',').map(function(s){return s.trim();}).filter(Boolean);if(!list.length)return '—';return list[dayOfYear()%list.length];}
+function updMettaRot(){var l=document.getElementById('rotLoved'),s=document.getElementById('rotStranger'),d=document.getElementById('rotDifficult');var lv=document.getElementById('mettaLoved');if(l&&lv)l.textContent=lv.value;if(s)s.textContent=rotPick('mettaStrangers');if(d)d.textContent=rotPick('mettaDifficult');}
+var BELIEFS_FULL=['Money is difficult to accumulate','Money is difficult to keep','Time must be sacrificed in exchange for money','Money requires constant monitoring to prevent loss','Ambition requires sacrificing other life areas'];
+var BELIEFS_SHORT=['Hard to accumulate','Hard to keep','Time = money','Needs monitoring','Ambition costs life'];
+function bSurfKey(){return 'wb_bsurf_'+todayKey();}
+function getBSurf(){try{return JSON.parse(localStorage.getItem(bSurfKey())||'[]');}catch(e){return [];}}
+function togBChip(i){var s=getBSurf();var at=s.indexOf(i);if(at>=0)s.splice(at,1);else s.push(i);localStorage.setItem(bSurfKey(),JSON.stringify(s));renderBChips();}
+function renderBChips(){var el=document.getElementById('bChips');if(!el)return;var s=getBSurf();el.innerHTML=BELIEFS_SHORT.map(function(t,i){return '<button class="bchip'+(s.indexOf(i)>=0?' on':'')+'" onclick="togBChip('+i+')">'+(i+1)+' · '+t+'</button>';}).join('');}
+
+/* ============================================================
+   GUIDED SESSION — full-screen slideshow through the practice
+   ============================================================ */
+var SCAN=['Left foot','Right foot','Right ankle','Left ankle','Lower left leg','Lower right leg','Left upper leg','Right upper leg','Right sit bone','Left sit bone','Lower back','Upper back','Groin','Abdominals','Chest','Left arm & hand','Right arm & hand','Neck','Jawline','Lips','Right ear','Left ear','Nose','Eyes','Right brow','Left brow','Forehead','Scalp'];
+var PRAYER=[
+{n:'I Surrender',q:'I Surrender—I now fully and completely let go and release all worries and desires. I surrender every aspect of my life to the infinite, loving intelligence of the Universe. I realize I cannot do everything myself or solve every problem—I need help. I now fully surrender my ego and all human logic. I open myself completely to the guidance and help of the Universe—I Surrender.'},
+{n:'I Know',q:'I Know—I know we are one and always connected, and I know you are fully present to me—and in me—in this moment and hear every word I speak. I know you are already helping me. I know you are fully aware of every aspect of my life and already know all my desires. We are one—I Know.'},
+{n:'I Am Ready',q:'I Am Ready—I understand I co-create my reality through my thoughts, words, actions, and vibrations. I know that my thinking is the cause of all my challenges. I am ready to have all of my limiting beliefs and thought patterns upgraded now. I give full permission for the Universe to change whatever needs to change for me to be the person the Universe needs me to be—I Am Ready.'},
+{n:'I Forgive and I Love',q:'I Forgive, and I Love—I know I am forgiven for any harm I have ever caused. I now forgive anyone who has ever hurt or harmed me. I love all people. No matter how anyone acts, I know we are all doing the best we can. I wish happiness and prosperity to all. I commit to using the power of love in all circumstances and in all situations—I Forgive and I Love.'},
+{n:'I Declare',q:'I Declare—Now, in this state of surrender, knowing, oneness, readiness, forgiveness, and Universal Love, I come into direct connection with the pure, creative intelligence of the Universe.<br><br>I declare that ______________________.<br>I give thanks, and so it is.<br><br>I declare that ______________________.<br>I give thanks, and so it is.'},
+{n:'I Thank',q:'I Thank—I now give thanks for the manifestation of these intentions. I fully accept their absolute reality in my life now.'},
+{n:'I Devote',q:'I Devote—I now devote myself to mastering the power of Universal Love, and I commit to using it in all circumstances, especially challenges. I now turn all my intentions over to the Universe for manifestation and know I am always being supplied with exactly what I need. I move forward in a spirit of joy, enthusiasm, excitement, expectancy, peace, and love. I dedicate myself to be of maximum service to all, to live in a manner that exemplifies love, and to always be responsive to Universal guidance.<br><br>I let go and let the Universe bring these co-creations—or creations even better—into reality now. This magnificent power created the galaxies, the moon, sun, stars, our beautiful planet, the sky, the mountains, the oceans, and everything in it. This is a power which knows no difficulty, for which nothing is hard. To this power, I submit these intentions with a firm knowing they shall all be made so.<br><br>I now let go—and go forth with 100% belief, 100% faith, 100% trust, and 100% knowing.<br><br>Thank you. Thank you. Thank you. And so it is.'}];
+var PRAYER_SMALL={4:'(Repeat until you have submitted all your requests.)'};function declareSmall(){var pd=loadPersonal();return PRAYER_SMALL[4]+(pd.declareText?' · Your standing declaration: "'+pd.declareText+'"':'');}
+var W5='May you be happy<br>May you be healthy and strong<br>May you be safe, on the inside and out<br>May you awaken to your highest potential<br>May you live with ease';
+
+var SL=[],slIdx=0,scanTimer=null,scanIdx=0;
+function buildSlides(){var loved=(document.getElementById('mettaLoved')||{value:''}).value;var lovedShort=loved.split(',').map(function(s){return s.trim();}).filter(Boolean).join(' · ');var out=[
+{t:'text',ey:'Metaphysical Practice',title:'Begin',body:'Find your spot. Sit tall — spine erect, feet flat on the floor. Phone on Do Not Disturb. If the body asks, take 1–2 minutes of light stretching first.',small:'20–40 min · same place, same time'},
+{t:'say',ey:'Set your intention — say aloud',quote:'"I now consciously connect to Universal Intelligence. I am open and receptive to guidance from the universe."',small:'Then let it go entirely, and begin.'},
+{t:'say',ey:'Daily Anchor — say aloud',quote:anchorText()},
+{t:'breath',mode:'calm',ey:'Step 1 · Breath Focus'},
+{t:'text',ey:'Step 1 · continued',title:'Natural breath',body:'Release all control. Observe the breath exactly as it is — the air passing over your upper lip, slightly warmer on the way out. When the mind wanders, note it without judgment and gently return to the next inhale.',small:'Noticing the wandering IS the practice.'},
+{t:'scan',ey:'Step 2 · Inner Body Scan'},
+{t:'text',ey:'Step 2 · close',title:'One field',body:'Widen your attention. Feel the whole body at once — a single, unified field of energy. Tingling, warmth, subtle waves: all normal, and stronger with practice.'},
+{t:'breath',mode:'gap',ey:'Step 3 · Enter the Gap',small:'The quiet between thoughts — the field from which all creative intelligence arises. Continue when ready.'},
+{t:'breath',mode:'heart',ey:'Step 4 · Heart Breathing'},
+{t:'say',ey:'Say aloud',quote:'"I now open my heart fully to all living things. I love all of life."'},
+{t:'metta',ey:'Five Wishes · 1 of 5',title:'Your loved ones',who:lovedShort||'Your loved ones',note:'Deceased (†): see them in their highest, most luminous state. One at a time.'},
+{t:'metta',ey:'Five Wishes · 2 of 5',title:'Yourself',who:(loadPersonal().firstName?'"'+loadPersonal().firstName+', may you be happy…"':'"May you be happy…"'),note:'Offer yourself the same tenderness.'},
+{t:'metta',ey:'Five Wishes · 3 of 5',title:'A stranger',who:rotPick('mettaStrangers'),note:'See them clearly. They want what you want.'},
+{t:'metta',ey:'Five Wishes · 4 of 5',title:'Someone difficult',who:rotPick('mettaDifficult'),note:'Rise above the memory. A sovereign soul doing their best.'},
+{t:'metta',ey:'Five Wishes · 5 of 5',title:'All of humanity',who:'The whole planet',wishes:'May we all be happy<br>May we all be healthy and strong<br>May we all be safe, on the inside and out<br>May we all awaken to our highest potential<br>May we all live with ease',note:'Shift to "we".'},
+{t:'say',ey:'Close the metta',quote:'"Thank you. Thank you. Thank you."'},
+{t:'grat',ey:'3 Gratitudes',title:'I am grateful for…'},
+{t:'done',ey:'Session complete',title:'Well held.',body:'Morning practice complete. This evening at 8:30: the belief check and reflection.',small:'Finishing will check off the session in your log.'+(function(){var tw=todaysWin();return tw?'<br><br>Today\'s evidence: "'+esc(tw.t)+'"':'';})()}
+];
+// Scientific Prayer: one full read-aloud screen per step, inserted before gratitudes.
+var pr=PRAYER.map(function(p,i){return {t:'pray',ey:'Scientific Prayer · '+(i+1)+' of 7',title:p.n,quote:p.q,small:(i===4?declareSmall():null)};});
+Array.prototype.splice.apply(out,[out.length-2,0].concat(pr));
+// Weekend sessions (Sat/Sun) close with a review of the Operating Plan.
+if(realTodayIdx()>=5)out.splice(out.length-1,0,{t:'plan'});
+return out;}
+function openSess(){stopBv();SL=buildSlides();slIdx=0;document.getElementById('sess').classList.add('show');document.body.style.overflow='hidden';renderSl();}
+function closeSess(){slCleanup();bvPrefix='';document.getElementById('sess').classList.remove('show');document.body.style.overflow='';}
+function slCleanup(){stopBv();if(scanTimer){clearInterval(scanTimer);scanTimer=null;}}
+function slHtml(s){
+if(s.t==='say')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-quote">'+s.quote+'</div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='text')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title">'+s.title+'</div>'+(s.body?'<div class="sess-bodytxt">'+s.body+'</div>':'')+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='breath')return '<div class="sess-ey">'+s.ey+'</div><div class="bvstage" onclick="toggleBv()" style="height:230px"><div class="bvring"></div><div class="bvc" id="sbvc"></div></div><div class="bvlabel"><div class="bvphase" id="sbvPhase"></div><div class="bvcount" id="sbvCount"></div></div><div class="bvhint" id="sbvHint"></div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');
+if(s.t==='scan')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-zone" id="sScanZone" onclick="tickScan(true)"></div><div class="sess-bodytxt" id="sScanN"></div><div class="sess-small">10–15 seconds per zone · auto-advances · tap the zone to skip ahead</div>';
+if(s.t==='metta')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:24px;color:#8c86b8">'+s.title+'</div><div class="sess-who">'+s.who+'</div><div class="sess-wishes">'+(s.wishes||W5)+'</div><div class="sess-small">'+(s.note?s.note+'<br>':'')+'Conclude: "I love you, I love you, I love you."</div>';
+if(s.t==='grat')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title" style="font-size:28px">'+s.title+'</div><input class="sess-in" placeholder="1." oninput="sgIn(this,1)" id="sg1"><input class="sess-in" placeholder="2." oninput="sgIn(this,2)" id="sg2"><input class="sess-in" placeholder="3." oninput="sgIn(this,3)" id="sg3"><div class="sess-small">Then review your declared intentions once.</div>';
+if(s.t==='done')return '<div class="sess-ey">'+s.ey+'</div><div class="sess-title">'+s.title+'</div><div class="sess-bodytxt">'+s.body+'</div><div class="sess-small">'+s.small+'</div>';
+if(s.t==='pray'){var cls=s.quote.length>700?' long':(s.quote.length>350?' med':'');return '<div class="sess-ey">'+s.ey+' — read aloud</div><div class="sess-title" style="font-size:24px;margin-bottom:12px">'+s.title+'</div><div class="sess-quote'+cls+'">'+s.quote+'</div>'+(s.small?'<div class="sess-small">'+s.small+'</div>':'');}
+if(s.t==='plan')return planSlideHtml();
+return '';}
+function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function planSlideHtml(){var y=new Date().getFullYear(),q=Math.floor(new Date().getMonth()/3)+1;var dec=glv('gl_decade'),yr=glv('gl_y'+y),qq=glv('gl_q'+q);var goals=[];for(var j=1;j<=9;j++){if(glv('gl_goal'+j))goals.push({c:glv('gl_cat'+j),g:glv('gl_goal'+j)});}
+var h='<div class="sess-ey">Weekly Review · The Operating Plan</div>';
+if(!dec&&!yr&&!qq&&!goals.length)return h+'<div class="sess-title" style="font-size:26px">The plan is empty</div><div class="sess-bodytxt">Open the Goals tab and fill in your Operating Plan — then this review appears here every weekend.</div>';
+if(dec)h+='<div class="sess-title" style="font-size:28px">The '+esc(dec)+' Decade</div>';
+if(yr)h+='<div class="sess-bodytxt"><b>'+y+':</b> '+esc(yr)+'</div>';
+if(qq)h+='<div class="sess-bodytxt"><b>Q'+q+':</b> '+esc(qq)+'</div>';
+if(goals.length){h+='<div class="sess-wishes" style="font-style:normal;text-align:left;font-size:13.5px;line-height:1.8;margin-top:12px">'+goals.map(function(g){return '• '+(g.c?'<b>'+esc(g.c)+'</b> — ':'')+esc(g.g);}).join('<br>')+'</div>';}
+if(glv('gl_habit'))h+='<div class="sess-small">Habit: '+esc(glv('gl_habit'))+' → '+esc(glv('gl_anchorto')||'…')+'</div>';
+var wn=loadWins();if(wn.length)h+='<div class="sess-small">Evidence file: '+wn.length+' wins on record — and counting.</div>';
+h+='<div class="sess-small">Did this week move the plan? What shifts next week? What win goes in the file?</div>';
+return h;}
+function renderSl(){slCleanup();var s=SL[slIdx];var b=document.getElementById('sessBody');b.innerHTML=slHtml(s);b.classList.remove('ani');void b.offsetWidth;b.classList.add('ani');document.getElementById('sessFill').style.width=Math.round((slIdx+1)/SL.length*100)+'%';document.getElementById('sessStep').textContent=(slIdx+1)+' / '+SL.length;document.getElementById('sessBack').style.visibility=slIdx?'visible':'hidden';document.getElementById('sessNext').textContent=(slIdx===SL.length-1)?'Finish & Log ✓':'Continue';
+if(s.t==='breath'){bvPrefix='s';setBv(s.mode);setTimeout(function(){if(SL[slIdx]===s&&document.getElementById('sbvc'))startBv();},900);}else{bvPrefix='';}
+if(s.t==='scan'){scanIdx=0;updScan();scanTimer=setInterval(function(){tickScan(false);},12000);}
+if(s.t==='grat'){[1,2,3].forEach(function(i){var src=document.getElementById('g'+i),dst=document.getElementById('sg'+i);if(src&&dst)dst.value=src.value;});}}
+function updScan(){var z=document.getElementById('sScanZone'),n=document.getElementById('sScanN');if(!z)return;if(scanIdx>=SCAN.length){z.textContent='Whole body';if(n)n.textContent='Scan complete — feel it all as one field, then continue.';if(scanTimer){clearInterval(scanTimer);scanTimer=null;}return;}z.textContent=SCAN[scanIdx];if(n)n.textContent='Zone '+(scanIdx+1)+' of '+SCAN.length;}
+function tickScan(manual){scanIdx++;updScan();}
+function sgIn(el,i){var t=document.getElementById('g'+i);if(t)t.value=el.value;var f=loadFields();f['g'+i]=el.value;localStorage.setItem('wb_fields',JSON.stringify(f));}
+function nextSl(){if(slIdx>=SL.length-1){finishSess();return;}slIdx++;renderSl();}
+function prevSl(){if(slIdx<1)return;slIdx--;renderSl();}
+function finishSess(){var marks=['Daily Anchor','Step 1','Step 2','Step 3','Step 4','Scientific Prayer','3 Gratitudes'];document.querySelectorAll('#c-practice .row').forEach(function(r){var rn=r.querySelector('.rn');if(!rn)return;var t=(rn.childNodes[0]?rn.childNodes[0].textContent:'').trim();if(marks.some(function(m){return t.indexOf(m)===0;}))r.classList.add('dn');});saveChecks();updPR();closeSess();toast('Practice logged ✓ — save to Notion when ready',4500);}
+
+/* ============================================================
+   SUPPLEMENT STACK — editable: what, dose, time, food, days
+   ============================================================ */
+var SUPP_SEED=[]; // personal stack is imported at runtime, never committed
+var spEditIdx=-1;
+function loadSupps(){try{var s=JSON.parse(localStorage.getItem('wb_supps'));if(Array.isArray(s))return s;}catch(e){}
+if(!localStorage.getItem('wb_supps_seeded')){var f=loadFields();var seed=SUPP_SEED.map(function(x){var o={n:x.n,dose:(f[x.k]||x.dose),time:x.time,food:x.food,days:x.days};return o;});localStorage.setItem('wb_supps',JSON.stringify(seed));localStorage.setItem('wb_supps_seeded','1');return seed;}
+return [];}
+function storeSupps(s){localStorage.setItem('wb_supps',JSON.stringify(s));}
+function fmtHM(t){if(!t)return '';var h=parseInt(t.slice(0,2),10),m=t.slice(3,5),ap=h>=12?'pm':'am',h12=h%12;if(h12===0)h12=12;return h12+':'+m+' '+ap;}
+function renderSupps(){var s=loadSupps().map(function(x,i){x._i=i;return x;}).sort(function(a,b){return (a.time||'99').localeCompare(b.time||'99');});
+var html='',lastT=null;
+s.forEach(function(x){if(x.time!==lastT){lastT=x.time;html+='<div class="sh"><span class="stg" style="background:var(--su)">'+fmtHM(x.time)+'</span></div>';}
+html+='<div class="sp-row'+(x._i===spEditIdx?' editing':'')+'" onclick="spEdit('+x._i+')"><div class="sp-main"><b>'+esc(x.n)+'</b><div class="sp-meta"><span class="fd">'+esc(x.food)+'</span> · '+esc(x.days)+'</div></div><span class="sp-dose">'+esc(x.dose||'—')+'</span><button class="win-x" onclick="event.stopPropagation();spDel('+x._i+')" aria-label="Remove">×</button></div>';});
+var el=document.getElementById('spList');if(el)el.innerHTML=html||'<div class="gl-note">Stack is empty — add your first supplement above.</div>';
+var n=loadSupps().length;var c=document.getElementById('spChip');if(c)c.textContent=n+' items';var ft=document.getElementById('spFoot');if(ft)ft.textContent=n+' items';}
+function spv(id){var el=document.getElementById(id);return el?el.value:'';}
+function spSubmit(){var n=spv('sp_name').trim();if(!n){toast('Name the supplement first');return;}
+var item={n:n,dose:spv('sp_dose').trim(),time:spv('sp_time')||'06:00',food:spv('sp_food'),days:spv('sp_days')};
+var s=loadSupps();if(spEditIdx>=0&&spEditIdx<s.length){s[spEditIdx]=item;toast('Updated ✓');}else{s.push(item);toast('Added to stack ✓');}
+storeSupps(s);spResetForm();renderSupps();}
+function spEdit(i){var s=loadSupps();var x=s[i];if(!x)return;spEditIdx=i;document.getElementById('sp_name').value=x.n;document.getElementById('sp_dose').value=x.dose||'';document.getElementById('sp_time').value=x.time||'06:00';document.getElementById('sp_food').value=x.food||'With food';document.getElementById('sp_days').value=x.days||'Daily';document.getElementById('spBtn').textContent='Update '+x.n;document.getElementById('spFormLabel').textContent='Editing';renderSupps();}
+function spResetForm(){spEditIdx=-1;['sp_name','sp_dose'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});var t=document.getElementById('sp_time');if(t)t.value='06:00';document.getElementById('spBtn').textContent='+ Add to Stack';document.getElementById('spFormLabel').textContent='Add to stack';}
+function spDel(i){var s=loadSupps();if(i<0||i>=s.length)return;var name=s[i].n;s.splice(i,1);storeSupps(s);if(spEditIdx===i)spResetForm();else if(spEditIdx>i)spEditIdx--;renderSupps();toast('Removed '+name);}
+
+/* ============================================================
+   WINS — the achievements evidence file
+   ============================================================ */
+var WINS_SEED=[]; // personal wins are imported at runtime, never committed
+var WIN_COLORS={Business:'#C8321A',Clients:'#1A6EC8',Finances:'#D4820A',Recognition:'#8B3EC8',Relationships:'#2E9E6B',Growth:'#5B4FE8',Life:'#993556',Craft:'#557'};
+function loadWins(){try{var w=JSON.parse(localStorage.getItem('wb_wins'));if(Array.isArray(w))return w;}catch(e){}if(!localStorage.getItem('wb_wins_seeded')){localStorage.setItem('wb_wins',JSON.stringify(WINS_SEED));localStorage.setItem('wb_wins_seeded','1');return WINS_SEED.slice();}return [];}
+function storeWins(w){localStorage.setItem('wb_wins',JSON.stringify(w));}
+function winDateLabel(d){if(!d)return '';if(d.length===4)return d;var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(d.slice(5,7),10)-1];return mo+' '+d.slice(0,4);}
+function todaysWin(){var w=loadWins();if(!w.length)return null;return w[dayOfYear()%w.length];}
+function renderWins(){var w=loadWins();var dated=w.map(function(x,i){x._i=i;return x;}).filter(function(x){return x.d;}).sort(function(a,b){return b.d.localeCompare(a.d);});var standing=w.map(function(x,i){x._i=i;return x;}).filter(function(x){return !x.d;});
+function row(x){var col=WIN_COLORS[x.c]||'#888';return '<div class="win"><span class="win-d">'+(winDateLabel(x.d)||'·')+'</span><span class="win-t">'+esc(x.t)+'</span><span class="win-c" style="color:'+col+'">'+esc(x.c||'')+'</span><button class="win-x" onclick="delWin('+x._i+')" aria-label="Remove">×</button></div>';}
+var wd=document.getElementById('winDated');if(wd)wd.innerHTML=dated.map(row).join('')||'<div class="gl-note">No dated milestones yet.</div>';
+var ws=document.getElementById('winStanding');if(ws)ws.innerHTML=standing.map(row).join('')||'<div class="gl-note">Nothing here yet.</div>';
+var tw=todaysWin();var t=document.getElementById('winToday');if(t)t.innerHTML=tw?'<div class="wt-l">Today\'s reflection</div><div class="wt-t">'+esc(tw.t)+'</div><div class="wt-s">'+(winDateLabel(tw.d)?winDateLabel(tw.d)+' · ':'')+'Sit with this one. It already happened — it\'s evidence, not opinion.</div>':'<div class="wt-l">Today\'s reflection</div><div class="wt-t">Add your first piece of evidence below.</div>';
+var cEl=document.getElementById('winCount');if(cEl)cEl.textContent=w.length+' wins';
+var fEl=document.getElementById('winFoot');if(fEl)fEl.textContent=w.length+' pieces of evidence';}
+function addWin(){var t=(document.getElementById('win_text')||{value:''}).value.trim();if(!t){toast('Write the win first');return;}var d=(document.getElementById('win_month')||{value:''}).value||'';var c=(document.getElementById('win_cat')||{value:'Growth'}).value;var w=loadWins();w.push({d:d,t:t,c:c});storeWins(w);document.getElementById('win_text').value='';renderWins();toast('Added to the evidence file ✓');}
+function delWin(i){var w=loadWins();if(i<0||i>=w.length)return;w.splice(i,1);storeWins(w);renderWins();toast('Removed');}
+async function saveWins(){var w=loadWins();if(!w.length){toast('The file is empty');return;}var date=new Date().toISOString().split('T')[0];var dated=w.filter(function(x){return x.d;}).sort(function(a,b){return b.d.localeCompare(a.d);});var standing=w.filter(function(x){return !x.d;});
+var md='';if(dated.length)md+='### Milestones\n'+dated.map(function(x){return '- **'+winDateLabel(x.d)+'** — '+x.t+(x.c?' _('+x.c+')_':'');}).join('\n')+'\n\n';
+if(standing.length)md+='### Standing evidence\n'+standing.map(function(x){return '- '+x.t+(x.c?' _('+x.c+')_':'');}).join('\n');
+await logEntry('Wins',date,date+' · Evidence File',{completed:w.length,markdown:md},'wnSpin','wnTxt','Saved','Save Evidence File to Notion');}
+
+/* ============================================================
+   GOALS — The Operating Plan (after Emma Grede)
+   ============================================================ */
+function renderGoalsUI(){var y0=new Date().getFullYear();var yh='';for(var i=0;i<10;i++){var y=y0+i;yh+='<div class="gl-yr"><b>'+y+'</b><input id="gl_y'+y+'" placeholder="direction for the year" aria-label="Direction for '+y+'"></div>';}var yw=document.getElementById('glYears');if(yw)yw.innerHTML=yh;var gh='';for(var j=1;j<=9;j++){gh+='<div class="gl-goal"><input class="cat" id="gl_cat'+j+'" placeholder="category"><input class="what" id="gl_goal'+j+'" placeholder="the goal, stated plainly"></div>';}var gw=document.getElementById('glGoals');if(gw)gw.innerHTML=gh;}
+function glv(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function updGL(){var n=0;for(var j=1;j<=9;j++)if(glv('gl_goal'+j))n++;var c=document.getElementById('glCnt');if(c)c.textContent=n+'/9 goals';var f=document.getElementById('glFill');if(f)f.style.width=Math.round(n/9*100)+'%';var p=document.getElementById('glPct');if(p)p.textContent=n?'The plan is taking shape':'Fill it in · revisit weekly';}
+async function saveGoals(){var date=new Date().toISOString().split('T')[0];var y0=new Date().getFullYear();var md='';
+if(glv('gl_decade'))md+='## The Decade\nIt\'s the **'+glv('gl_decade')+'** decade.\n\n';
+var yl=[];for(var i=0;i<10;i++){var y=y0+i;if(glv('gl_y'+y))yl.push('- **'+y+'** — '+glv('gl_y'+y));}
+if(yl.length)md+='## The Years\n'+yl.join('\n')+'\n\n';
+var ql=[];['1','2','3','4'].forEach(function(q){if(glv('gl_q'+q))ql.push('- **Q'+q+'** — '+glv('gl_q'+q));});
+if(ql.length)md+='## The Quarters ('+y0+')\n'+ql.join('\n')+'\n\n';
+var gl=[],n=0;for(var j=1;j<=9;j++){if(glv('gl_goal'+j)){n++;gl.push('- '+(glv('gl_cat'+j)?'**'+glv('gl_cat'+j)+'** — ':'')+glv('gl_goal'+j));}}
+if(gl.length)md+='## The Goals\n'+gl.join('\n')+'\n\n';
+var gv=[],no=[];[1,2,3].forEach(function(k){if(glv('gl_give'+k))gv.push('- '+glv('gl_give'+k));if(glv('gl_no'+k))no.push('- '+glv('gl_no'+k));});
+if(gv.length)md+='## What I\'ll give up\n'+gv.join('\n')+'\n\n';
+if(no.length)md+='## What I\'ll say no to\n'+no.join('\n')+'\n\n';
+if(glv('gl_habit')||glv('gl_anchorto'))md+='## The Habit\nI\'ll start **'+(glv('gl_habit')||'…')+'**, anchored to **'+(glv('gl_anchorto')||'…')+'**.\n\n';
+if(glv('gl_revday')||glv('gl_startdate'))md+='## The Anchor\n- Weekly review: '+(glv('gl_revday')||'—')+'\n- Landmark start: '+(glv('gl_startdate')||'—');
+if(!md){toast('Write something first');return;}
+await logEntry('Goals',date,date+' · Operating Plan',{completed:n,total:9,completion:n/9,markdown:md},'glSpin','glTxt','Saved','Save Plan to Notion');}
+
+/* ============================================================
+   EXERCISE GUIDE — muscle heat-map + cues + variations
+   ============================================================ */
+function muscleSvg(){function el(t,a){var s='<'+t;for(var k in a)s+=' '+k+'="'+a[k]+'"';return s+'/>';}
+var base='',m={};function mus(key,shape){m[key]=(m[key]||'')+shape;}
+function ell(cx,cy,rx,ry){return el('ellipse',{cx:cx,cy:cy,rx:rx,ry:ry});}
+function crc(cx,cy,r){return el('circle',{cx:cx,cy:cy,r:r});}
+function rct(x,y,w,h,rx){return el('rect',{x:x,y:y,width:w,height:h,rx:rx});}
+[60,200].forEach(function(cx){base+=crc(cx,14,9)+rct(cx-5,22,10,7,2)+rct(cx-20,29,40,68,13)+rct(cx-17,95,34,17,8)+rct(cx-33,32,11,66,5)+rct(cx+22,32,11,66,5)+rct(cx-19,110,17,84,8)+rct(cx+2,110,17,84,8);});
+mus('delts',crc(34,38,8)+crc(86,38,8));mus('chest',ell(50,50,11,8)+ell(70,50,11,8));
+mus('biceps',ell(32,66,5.5,10)+ell(88,66,5.5,10));mus('forearms',ell(30,89,4.5,11)+ell(90,89,4.5,11)+ell(170,89,4.5,11)+ell(230,89,4.5,11));
+mus('abs',rct(53,60,14,32,4));mus('obliques',ell(46,74,4,13)+ell(74,74,4,13));
+mus('adductors',ell(55,124,5,13)+ell(65,124,5,13));mus('quads',ell(48,131,7.5,20)+ell(72,131,7.5,20));
+mus('calves',ell(48,176,5,14)+ell(72,176,5,14)+ell(188,180,5.5,14)+ell(212,180,5.5,14));
+mus('traps','<path d="M200,26 L182,40 L200,52 L218,40 Z"/>');mus('rdelts',crc(174,38,8)+crc(226,38,8));
+mus('midback',rct(192,52,16,18,4));mus('lats','<path d="M186,50 L179,82 L193,92 L193,54 Z"/><path d="M214,50 L221,82 L207,92 L207,54 Z"/>');
+mus('lowback',rct(194,72,12,20,4));mus('triceps',ell(172,66,5.5,10)+ell(228,66,5.5,10));
+mus('abductors',ell(184,103,5,6)+ell(216,103,5,6));mus('glutes',ell(192,112,8,9)+ell(208,112,8,9));
+mus('hams',ell(188,140,7.5,19)+ell(212,140,7.5,19));
+var g='';for(var k in m)g+='<g data-m="'+k+'" fill="var(--lt)" opacity=".55">'+m[k]+'</g>';
+return '<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="var(--lt)" stroke-width="1.5">'+base+'</g>'+g+'<text x="60" y="212" text-anchor="middle" font-size="9" letter-spacing="2" fill="var(--gr)" font-family="Barlow Condensed">FRONT</text><text x="200" y="212" text-anchor="middle" font-size="9" letter-spacing="2" fill="var(--gr)" font-family="Barlow Condensed">BACK</text></svg>';}
+var EXALIAS={lat_l:'lat_r',lunge_r:'lunge_l',curl_r:'curl_l',calf2:'calf'};
+var EXDB={
+bench:{n:'Bench Press',t:'Chest · front delts · triceps',p:['chest'],s:['delts','triceps'],f:['Shoulder blades pinched back & down into the bench — chest stays proud all set','Feet planted, slight arch; bar path: mid-chest up to over the shoulders','Touch the chest under control — no bounce; exhale hard through the press'],m:['Elbows ~45–60° from the torso, never flared to 90° — protects the shoulders','Wrists stacked over elbows, bar in the heel of the palm','Near failure, use a spotter or safety pins'],v:[{n:'Dumbbell bench',d:'Deeper stretch, evens out left/right differences'},{n:'Incline bench',d:'Shifts to upper chest and front delts'},{n:'Close-grip bench',d:'Triceps take over',p:['triceps'],s:['chest','delts']},{n:'Machine chest press',d:'Fixed path — safest way to push to failure'}]},
+ohp:{n:'Seated DB Overhead Press',t:'Shoulders · triceps · upper traps',p:['delts'],s:['triceps','traps'],f:['Start at ear height; press slightly back so the DBs finish over the crown of your head','Brace abs into the backrest — ribs down','Lower to a full stretch at the ears every rep'],m:['Don\'t arch the lower back to grind a rep — drop weight instead','Forearms vertical under the dumbbells at all times'],v:[{n:'Standing OHP',d:'Adds core and stability demand',s:['triceps','traps','abs']},{n:'Arnold press',d:'Adds rotation — more front delt',p:['delts'],s:['triceps']},{n:'Single-arm press',d:'Fixes side-to-side imbalances'}]},
+incline:{n:'Incline Chest Press (machine)',t:'Upper chest · front delts · triceps',p:['chest'],s:['delts','triceps'],f:['Set the seat so handles meet your upper chest at nipple line','Drive the elbows through, not the hands; squeeze the upper chest 1s at lockout','Full stretch at the bottom without the shoulders rolling forward'],m:['Seat too low turns this into a shoulder press','Don\'t slam the stack between reps — keep tension'],v:[{n:'Incline DB press',d:'Free-weight version, deeper stretch'},{n:'Low incline (15–30°)',d:'Best upper-chest angle for most people'},{n:'Smith incline',d:'Fixed bar path, easy to progress'}]},
+fly:{n:'Seated Cable Fly',t:'Chest (stretch + squeeze)',p:['chest'],s:['delts'],f:['A big hug motion — arms wrapping a barrel, slight elbow bend held constant','Feel the stretch across the chest at the back of the rep','Squeeze hands an inch past touching, pause 1s'],m:['It\'s a stretch-and-squeeze, not a press — go lighter, perfect the arc','Shoulders stay pinned back and down the whole rep'],v:[{n:'Pec deck',d:'Fixed path — great mind-muscle option'},{n:'Low-to-high fly',d:'Biases the upper chest'},{n:'High-to-low fly',d:'Biases the lower chest'}]},
+tricep:{n:'Rope Tricep Pulldown',t:'Triceps',p:['triceps'],s:['forearms'],f:['Elbows pinned to your sides — only the forearms move','Split the rope apart at the bottom, full lockout, 1s squeeze','Control the way up to a full stretch'],m:['Leaning or shrugging into it = weight too heavy','Wrists stay neutral — don\'t flick at the bottom'],v:[{n:'Straight-bar pushdown',d:'Slightly stronger, less peak squeeze'},{n:'Overhead rope extension',d:'Loads the long head at stretch'},{n:'Single-arm reverse grip',d:'Isolates the lateral head'}]},
+lateral:{n:'Egyptian Lateral Raise',t:'Side delts',p:['delts'],s:['traps'],f:['Lean away from the working arm — tension from the very bottom','Lead with the elbow; wrist stays below elbow through the arc','Stop at shoulder height; 2-second negative'],m:['Any body swing = drop 5 lbs','No need to tilt the pinky up — neutral hand is safer'],v:[{n:'Standing DB lateral',d:'Classic — do both arms at once'},{n:'Cable Y-raise',d:'Smooth tension, traps stay quieter'},{n:'Machine lateral',d:'Zero cheating possible'}]},
+s_pull:{n:'Straight-Arm Pulldown',t:'Lats (isolation)',p:['lats'],s:['abs','triceps'],f:['Arms nearly straight; sweep the bar in an arc to your thighs','Feel the lats from armpit to waist — squeeze 1s at the thighs','Slight forward hinge, proud chest'],m:['Don\'t bend the elbows into a pressdown','Ribs down; resist the return'],v:[{n:'Rope version',d:'Bigger arc, better peak squeeze'},{n:'Single-arm kneeling',d:'Feel each lat separately'},{n:'DB pullover',d:'Same idea lying on a bench'}]},
+face_pull:{n:'Cable Face Pulls',t:'Rear delts · traps · rotator cuff',p:['rdelts'],s:['traps','midback'],f:['Anchor at face height; pull the rope to the bridge of your nose','Elbows high and wide — finish like a double-biceps pose','Squeeze the shoulder blades 1s'],m:['This is shoulder-health work: light and strict, always','Don\'t lean back and turn it into a row'],v:[{n:'Band face pull',d:'Do these anywhere, great warm-up'},{n:'Reverse pec-deck',d:'Same muscles, fixed path'},{n:'Seated face pull',d:'Removes all body english'}]},
+lat_pull:{n:'Lat Pulldown (wide)',t:'Lats · biceps · mid-back',p:['lats'],s:['biceps','midback'],f:['Drive the elbows down into your back pockets','Bar to the collarbone; lift the chest up to meet it','Full stretch at the top — unshrug, then pull'],m:['Don\'t lean way back and row it','Thighs locked under the pads before you start'],v:[{n:'Close/neutral grip',d:'More lower-lat and biceps',p:['lats'],s:['biceps']},{n:'Single-arm pulldown',d:'Even out both sides'},{n:'Assisted pull-up',d:'Builds toward bodyweight chin-ups'}]},
+hammer:{n:'Hammer Curl',t:'Biceps · brachialis · forearms',p:['biceps'],s:['forearms'],f:['Thumbs-up neutral grip; elbows glued to your sides','This builds the brachialis — the width muscle between biceps and triceps','2–3 second negatives'],m:['No hip swing — strict or lighter','Alternate arms if grip gives out first'],v:[{n:'Cross-body hammer',d:'Stronger brachialis bias'},{n:'Rope hammer curl',d:'Constant cable tension'},{n:'Incline DB curl',d:'Loads the biceps at full stretch'}]},
+bayesian:{n:'Bayesian Curl',t:'Biceps (loaded stretch)',p:['biceps'],s:['forearms'],f:['Cable behind you, step forward — arm slightly behind the torso','The stretched position is the point: full range every rep','Curl without letting the elbow drift forward; hard pause at top'],m:['Keep the shoulder pinned back throughout','Lighter than a normal curl is correct'],v:[{n:'Incline DB curl',d:'Same stretch principle with dumbbells'},{n:'Standard cable curl',d:'Simpler setup, even tension'},{n:'Preacher curl',d:'Opposite: peak tension near the top'}]},
+landmine:{n:'Landmine / Single-Arm Row',t:'Lats · mid-back',p:['lats','midback'],s:['biceps','rdelts'],f:['Row to the hip, not the armpit — elbow sweeps back','Pause 1s at the top; let the shoulder blade reach fully forward at the bottom','Flat back, braced split stance'],m:['No torso twist to heave the weight up','Neck neutral — look at the floor ahead'],v:[{n:'DB row on bench',d:'Classic supported one-arm row'},{n:'Meadows row',d:'Landmine variation with overhand grip'},{n:'Barbell row',d:'Both sides, more load, more lower-back demand'}]},
+cs_row:{n:'Chest-Supported DB Row',t:'Mid-back · lats · rear delts',p:['midback'],s:['lats','biceps','rdelts'],f:['Chest glued to the incline pad — it never leaves','Row with elbows ~45°, squeeze the blades together at the top','Full hang and stretch at the bottom'],m:['The pad exists to kill cheating — if you bounce off it, go lighter'],v:[{n:'Machine seated row',d:'Same pattern, stack-loaded'},{n:'T-bar chest supported',d:'Heavier loading'},{n:'Incline prone shrug',d:'Finisher for lower traps'}]},
+elliptical:{n:'Elliptical (warm-up)',t:'Warm-up · quads · calves',p:['quads'],s:['calves','glutes'],f:['10 min at level 6 — conversational pace, RPE 4–5','Whole-foot pressure, tall posture','Purpose: warm knees and hips for leg work'],m:['Don\'t skip it on leg day — your knees will thank you'],v:[{n:'Incline treadmill walk',d:'Same effect, more glutes'},{n:'Bike',d:'Easier on cranky knees'}]},
+leg_press:{n:'Seated Leg Press',t:'Quads · glutes · hamstrings',p:['quads'],s:['glutes','hams','adductors'],f:['Feet mid-platform, shoulder width; knees track over the toes','Lower until knees near 90° — or the moment before your hips/tailbone start to curl off the pad. That\'s YOUR range','Push through the whole foot (heel + big toe), exhale out','Resist the sled back — don\'t let it ride you'],m:['Never slam into locked knees at the top — finish soft','Lower back must stay on the pad; if it rounds, you went too deep','Knees caving inward = too heavy, full stop'],v:[{n:'Feet high on platform',d:'More hip drive — glutes & hamstrings take over',p:['glutes','hams'],s:['quads']},{n:'Feet low on platform',d:'More knee travel — maximum quad. Extra mindful of knees',p:['quads'],s:['glutes']},{n:'Wide stance',d:'Inner thigh + glutes',p:['adductors','glutes'],s:['quads']},{n:'Narrow stance',d:'Outer-quad sweep',p:['quads'],s:[]},{n:'Single leg',d:'Fixes left/right gaps — use about half the load',p:['quads'],s:['glutes','hams']}]},
+goblet:{n:'Heel-Elevated Goblet Squat',t:'Quads · glutes · core',p:['quads'],s:['glutes','abs'],f:['Hold the DB tight to the chest, elbows down','Heels on the plate let the knees travel — sit straight down between the thighs','Push the floor away to stand; knees out over the toes'],m:['Torso stays near vertical — folding forward means lighten it','Depth is the whole point of the heel raise'],v:[{n:'Cyclist squat (narrow)',d:'Even more quad bias',p:['quads'],s:[]},{n:'Landmine squat',d:'Guided path, easy on the back'},{n:'Front squat',d:'The barbell progression'}]},
+leg_ext:{n:'Leg Extension',t:'Quads (isolation)',p:['quads'],s:[],f:['Knees aligned with the machine\'s pivot; pad just above the ankles','Squeeze to a dead-straight knee, pause 1s','3-second negatives'],m:['Hips stay down — don\'t let them lift as you kick','Knees grumpy? Shorten the bottom range, keep the squeeze'],v:[{n:'Single-leg',d:'Balance out each quad'},{n:'Toes slightly in/out',d:'Small emphasis shifts, comfort first'},{n:'Drop set finisher',d:'One heavy set, strip twice'}]},
+kickback:{n:'Cable Glute Kickback',t:'Glutes',p:['glutes'],s:['hams'],f:['Slight forward hinge holding the frame; kick back and UP through the heel','1s glute squeeze at full extension — no lower-back arch','Resist the cable on the way home'],m:['A small strict arc beats a big swing','Hips stay square to the machine'],v:[{n:'Machine kickback',d:'Easier to load progressively'},{n:'Cable side abduction',d:'Hits the upper/outer glute',p:['abductors'],s:['glutes']},{n:'Frog pumps',d:'High-rep burnout'}]},
+calf:{n:'Calf Raise',t:'Calves',p:['calves'],s:[],f:['Balls of feet on the edge; sink to a FULL 2s stretch at the bottom','Drive to tip-toes, 1s squeeze at the top','Knees straight but never locked (Smith) / seated hits the deeper soleus'],m:['Bouncing is the Achilles working, not the calf','Full range light beats half-range heavy'],v:[{n:'Seated calf raise',d:'Targets the soleus underneath',p:['calves'],s:[]},{n:'Single-leg DB raise',d:'Fixes imbalances, needs balance'},{n:'Leg-press calf press',d:'Heavy stretch-focused option'}]},
+lunge:{n:'Reverse Lunge',t:'Quads · glutes',p:['quads','glutes'],s:['hams','abs'],f:['Step back; drop the back knee straight down under the hip','Front shin vertical; drive through the front heel to stand','Slight forward torso lean loads the glute more'],m:['Front knee caving inward is the #1 error — track it over the toes','Soft landings; no crashing knees'],v:[{n:'Travelling lunge',d:'Continuous walking version — more glute',p:['glutes','quads'],s:['hams']},{n:'Bulgarian split squat',d:'Rear foot elevated — brutal and effective'},{n:'Deficit reverse lunge',d:'Front foot on a plate for extra depth'}]},
+cp_inc:{n:'Chest Press Machine (Incline)',t:'Upper chest · triceps',p:['chest'],s:['delts','triceps'],f:['Handles meet the upper chest; elbows drive through','1s squeeze at lockout, full stretch back'],m:['Adjust the seat before loading — geometry is everything on machines'],v:[{n:'Flat setting',d:'Mid-chest emphasis'},{n:'DB incline press',d:'Free-weight progression'}]},
+cp_flat:{n:'Chest Press Machine (Flat)',t:'Chest · triceps',p:['chest'],s:['triceps','delts'],f:['Handles at mid-chest height','Push to full lockout without shoulders rolling forward','Slow return, keep stack tension'],m:['Grip width where forearms stay parallel'],v:[{n:'Incline setting',d:'Upper-chest emphasis'},{n:'Single-arm press',d:'Anti-rotation core bonus'}]},
+inc_db:{n:'Incline DB Press',t:'Upper chest · front delts',p:['chest'],s:['delts','triceps'],f:['Bench 30–45°; press from armpit level to over the upper chest','Elbows tucked ~45°','The deep stretch at the bottom is the growth zone — sink into it'],m:['Kick the DBs up with your knees to start — don\'t wrestle them','No clanging at the top; keep tension'],v:[{n:'Low incline (15°)',d:'Sweet spot for many lifters'},{n:'Neutral grip',d:'Friendlier on the shoulders'},{n:'Machine incline',d:'Safe to push to failure'}]},
+lat_r:{n:'Cable Lateral Raise',t:'Side delts',p:['delts'],s:['traps'],f:['Cable runs behind the body; lead with the elbow to shoulder height','Constant tension is the cable\'s gift — use a slow negative','Non-working hand braced on the machine'],m:['Body completely still — no hip bump'],v:[{n:'Behind-the-back cable',d:'Even more side-delt isolation'},{n:'DB lateral raise',d:'Classic version'},{n:'Machine lateral',d:'Strictest option'}]},
+oh_tri:{n:'Overhead Rope Tricep Extension',t:'Triceps (long head)',p:['triceps'],s:['abs'],f:['Face away from the stack, rope behind your head, elbows by the ears','The deep stretch behind the head is what makes this special','Extend to full lockout and split the rope'],m:['Elbows flaring wide = too heavy','Ribs down — don\'t arch the lower back'],v:[{n:'Single-arm DB overhead',d:'One arm at a time, deep stretch'},{n:'EZ-bar skullcrusher',d:'Lying version, heavier'},{n:'Cable skullcrusher',d:'Constant tension version'}]},
+bar_push:{n:'Straight-Bar Pushdown',t:'Triceps',p:['triceps'],s:['forearms'],f:['Elbows pinned; press to full lockout, 1s squeeze','Slight forward lean; bar finishes at the thighs','Control the way up'],m:['Shoulders creeping up = trim the weight'],v:[{n:'V-bar',d:'Wrist-friendly middle ground'},{n:'Rope pushdown',d:'Best peak contraction'},{n:'Reverse grip',d:'Bias the medial head'}]},
+chinups:{n:'Close-Grip Chin-ups',t:'Lats · biceps',p:['lats','biceps'],s:['midback','abs'],f:['Underhand, shoulder width; start from a dead hang','Unshrug the shoulders first, then pull chest to the bar','The slow full negative is where you grow'],m:['Half reps and kipping build little — band-assist full reps instead'],v:[{n:'Band-assisted',d:'Full range while building strength'},{n:'Negatives only',d:'Jump up, lower for 5s'},{n:'Neutral-grip pull-up',d:'Easier on elbows'}]},
+wg_row:{n:'Wide-Grip Seated Row',t:'Mid-back · rear delts',p:['midback','rdelts'],s:['lats','biceps'],f:['Wide bar to the sternum, elbows flared ~60°','Squeeze the shoulder blades together 1s','Let the blades glide apart into a stretch'],m:['Torso rocks 10° max — no rowing the ocean'],v:[{n:'Close-grip V row',d:'Shifts to lats',p:['lats'],s:['midback','biceps']},{n:'Single-arm cable row',d:'Each side honestly'},{n:'Chest-supported machine row',d:'Zero momentum possible'}]},
+rev_fly:{n:'Reverse Fly (DB)',t:'Rear delts',p:['rdelts'],s:['midback','traps'],f:['Hinge to a flat back; sweep the arms wide like opening wings','Stop level with the back, pause 1s','Rear delts are stubborn — strictness is everything'],m:['Featherweight + strict beats heavy + traps','Neck stays neutral'],v:[{n:'Cable reverse fly',d:'Constant tension'},{n:'Reverse pec-deck',d:'Supported and strict'},{n:'Face pull',d:'Adds external rotation'}]},
+hk_row:{n:'Half-Kneeling 1-Arm Row',t:'Lats · core (anti-rotation)',p:['lats'],s:['midback','biceps','abs'],f:['Inside knee down; row low toward the hip in one line','Hips and shoulders stay square — the anti-rotation IS the exercise','Full stretch letting the blade reach forward'],m:['Twisting to yank the weight defeats the purpose'],v:[{n:'Standing single-arm row',d:'More load, less core focus'},{n:'Bench-supported DB row',d:'Classic heavy option'},{n:'Meadows row',d:'Landmine angle change'}]},
+shrugs:{n:'Standing DB Shrugs',t:'Traps',p:['traps'],s:['forearms'],f:['Straight up toward the ears; 2s squeeze at the top','Slow negative into a full hanging stretch','Chin slightly tucked'],m:['No rolling — straight vertical line only','Straps are fine once grip caps the set'],v:[{n:'Cable shrug',d:'Tension at the stretch'},{n:'Smith shrug',d:'Heaviest option'},{n:'Kirk shrug',d:'Slight lean, bigger range'}]},
+bic_cable:{n:'Standing Cable Curl',t:'Biceps',p:['biceps'],s:['forearms'],f:['Elbows at the sides; curl to a full squeeze','The cable keeps tension through the whole arc — use all of it','2–3 second negatives'],m:['Elbows drifting forward turns it into a front raise'],v:[{n:'Bayesian curl',d:'Step forward — loaded stretch'},{n:'EZ-bar cable curl',d:'Wrist-friendly grip'},{n:'Rope hammer curl',d:'Adds brachialis and forearm'}]},
+preacher:{n:'Preacher Curl',t:'Biceps (strict)',p:['biceps'],s:['forearms'],f:['Armpits snug over the pad; curl to peak and squeeze','Lower to just shy of straight — keep tension','The pad makes cheating impossible; embrace it'],m:['NEVER bounce out of the deep stretch — biceps tears live there','Wrists stay straight'],v:[{n:'Single-arm DB preacher',d:'One side at a time'},{n:'Machine preacher',d:'Smoothest resistance curve'},{n:'Spider curl',d:'Chest on the other side of the pad'}]},
+sldl:{n:'Stiff-Leg Deadlift',t:'Hamstrings · glutes',p:['hams'],s:['glutes','lowback'],f:['Hips ride straight back as the bar slides down the thighs','Legs nearly straight, soft knees; stop where the hamstring stretch peaks WITH a flat back','Stand by driving the hips forward — squeeze the glutes'],m:['A rounding lower back is the hard end of your range. Full stop','Bar touches the legs the entire path','This is a hinge, not a squat'],v:[{n:'Romanian DL',d:'More knee bend, a touch more glute',p:['hams','glutes'],s:['lowback']},{n:'DB RDL',d:'Same pattern with dumbbells'},{n:'Single-leg RDL',d:'Balance + glute med bonus',p:['hams'],s:['glutes','abductors']}]},
+hip_thrust:{n:'Hip Thrust (Smith)',t:'Glutes',p:['glutes'],s:['hams','quads'],f:['Upper back on the bench, bar padded over the hip crease','Drive through the heels to a flat table-top; chin tucked, ribs down','2s glute squeeze at the top — finish with a slight posterior tilt, not a back arch'],m:['Hyperextending the lower back at lockout is THE classic error','Set feet so shins are vertical at the top'],v:[{n:'Barbell hip thrust',d:'Free-bar version'},{n:'Single-leg hip thrust',d:'Each glute honestly',p:['glutes'],s:['hams']},{n:'Glute bridge',d:'From the floor, shorter range'}]},
+lunge_l:{n:'Travelling Lunge',t:'Glutes · quads',p:['glutes','quads'],s:['hams','abs'],f:['Long strides bias the glutes; back knee drops under the hip','Push off the front heel into the next stride — own the wobble','Tall torso with a slight forward lean'],m:['Short choppy steps shift everything into quads and knees','Control beats distance covered'],v:[{n:'Reverse lunge',d:'Easier on the knees',p:['quads','glutes'],s:['hams']},{n:'Bulgarian split squat',d:'Stationary and brutal'},{n:'Walking DB lunge',d:'The standard version'}]},
+curl_l:{n:'Standing Leg Curl',t:'Hamstrings',p:['hams'],s:['calves'],f:['Curl the heel toward the glute; 1s pause at peak','Hips stay square and pressed to the pad','3-second negatives — hamstrings respond to slow lengthening'],m:['Hip hiking up = stealing range','Point the toes to make the hamstrings work alone'],v:[{n:'Seated leg curl',d:'More stretch — arguably better for growth',p:['hams'],s:[]},{n:'Lying leg curl',d:'Classic version'},{n:'Nordic negatives',d:'Bodyweight, advanced'}]},
+hip_abd:{n:'Seated Hip Abduction',t:'Glute med (outer glutes)',p:['abductors'],s:['glutes'],f:['Press the knees apart; 1s squeeze at maximum width','Lean slightly forward to bias the upper glute','Slow return — never let the pads slam'],m:['Fast partial pumps do very little here'],v:[{n:'Cable standing abduction',d:'One side at a time'},{n:'Banded side steps',d:'Great activation warm-up'},{n:'Side-lying raises',d:'No equipment needed'}]}};
+var curEx=null;
+function openEx(key){var k=EXALIAS[key]||key;var e=EXDB[k];if(!e)return;curEx=e;var inp=document.querySelector('[data-e="'+key+'"]');var cur=inp?inp.value:'';
+var vars=[{n:'As programmed',d:e.t,p:e.p,s:e.s}].concat(e.v||[]);curEx._vars=vars;
+var html='<div class="rs-hd" style="color:var(--tr)">'+e.n+'</div><div class="rs-sub">'+e.t+(cur?' · Your log: <b>'+cur+'</b>':'')+'</div>';
+html+='<div class="ex-map" id="exMap">'+muscleSvg()+'</div><div class="ex-leg"><span><i style="background:#C8321A"></i>Primary</span><span><i style="background:#E8A13A"></i>Secondary</span></div>';
+html+='<div class="ex-sec"><h6>Focus on</h6><ul>'+e.f.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';
+html+='<div class="ex-sec"><h6>Be mindful</h6><ul>'+e.m.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';
+html+='<div class="ex-sec"><h6>Variations — tap to see the focus shift</h6></div>';
+vars.forEach(function(v,i){html+='<div class="ex-var'+(i===0?' on':'')+'" id="exv-'+i+'" onclick="selVar('+i+')"><b>'+v.n+'</b><span>'+v.d+'</span></div>';});
+document.getElementById('exBody').innerHTML=html;setMuscles(e.p,e.s);document.getElementById('exOverlay').classList.add('show');}
+function closeEx(ev){if(ev&&ev.target&&ev.target.id&&ev.target.id!=='exOverlay')return;document.getElementById('exOverlay').classList.remove('show');}
+function setMuscles(prim,sec){var svg=document.querySelector('#exMap svg');if(!svg)return;svg.querySelectorAll('[data-m]').forEach(function(g){var k=g.getAttribute('data-m');if((prim||[]).indexOf(k)>=0){g.setAttribute('fill','#C8321A');g.setAttribute('opacity','.92');}else if((sec||[]).indexOf(k)>=0){g.setAttribute('fill','#E8A13A');g.setAttribute('opacity','.85');}else{g.setAttribute('fill','var(--lt)');g.setAttribute('opacity','.55');}});}
+function selVar(i){if(!curEx)return;var v=curEx._vars[i];setMuscles(v.p||curEx.p,v.s!==undefined?v.s:curEx.s);curEx._vars.forEach(function(_,j){var el=document.getElementById('exv-'+j);if(el)el.classList.toggle('on',j===i);});}
+function wireExInfo(){document.querySelectorAll('#c-train tr').forEach(function(tr){var inp=tr.querySelector('[data-e]');var td=tr.querySelector('.exn');if(!inp||!td)return;var key=inp.getAttribute('data-e');if(!EXDB[EXALIAS[key]||key])return;td.classList.add('exlink');td.onclick=function(){openEx(key);};});}
+
+/* ============================================================
+   BELIEF EVIDENCE — the 20 researched counter-examples
+   ============================================================ */
+var EVID={
+b1:{alt:'~80% of US millionaires are first-generation (The Millionaire Next Door, Dr. Thomas Stanley). Accumulation is a learnable system — not a birthright or luck.',people:[
+{n:'Oprah Winfrey',tag:'$2.9B from poverty',s:'Born into poverty in rural Mississippi to a single teenage mother. Wore potato-sack dresses as a child; suffered abuse throughout childhood. Parlayed a local radio job into a national talk show through sheer skill at human connection, then built an empire across TV, film, publishing and philanthropy worth $2.9 billion.',k:'Accumulation began with one repeatable skilled act — a talent consistently applied. Not capital, not connections.',q:'"The biggest adventure you can take is to live the life of your dreams."'},
+{n:'Madam C.J. Walker',tag:'1st self-made female millionaire',s:'Born 1867 to formerly enslaved parents. Orphaned at 7, married at 14, widowed at 20. Worked as a washerwoman for $1.50/day for 18 years before developing a hair-care product for Black women. Built a door-to-door sales network and became America\'s first documented self-made female millionaire — under extreme legal and social oppression.',k:'She had every structural barrier against accumulation and still built it. Her starting point was objectively harder than yours.'},
+{n:'Jan Koum',tag:'welfare line → $19B',s:'Immigrated from a small Ukrainian village at 16 with almost nothing; he and his mother received food assistance. Cleaned grocery-store floors, taught himself programming from discarded manuals. Co-founded WhatsApp and sold it to Facebook for $19 billion — signing the papers leaning against the wall of the welfare office where he once queued.',k:'His accumulation came from leveraged skill — one piece of software built well. Not from trading time for money.'},
+{n:'Howard Schultz',tag:'217 rejections → Starbucks',s:'Grew up in a Brooklyn housing project. His father was injured on the job with no insurance and left with nothing. Schultz sold his blood to pay for college. Pitching Starbucks, 217 of 242 investors said no — the 25 who said yes funded 40,000 stores and a ~$85B company.',k:'He absorbed 217 rejections and kept moving. The belief evaporated when replaced with relentless movement toward a clear vision.',q:'"I\'ve tried to build the kind of company that my father never got a chance to work for."'},
+{n:'Chris Gardner',tag:'homeless → brokerage owner',s:'In early-1980s San Francisco he was homeless with his toddler son while grinding through a stockbroker training program — sleeping in shelters and BART station bathrooms, showing up first and leaving last every day. Founded the brokerage Gardner Rich & Co. in 1987 and became a multimillionaire (his story became "The Pursuit of Happyness").',k:'He accumulated from literal zero while carrying a child — with focus and a repeatable skill, not seed money.',q:'"Find something you love to do so much, you can\'t wait for the sun to rise to do it again."'},
+{n:'Harland Sanders',tag:'broke in his 60s → KFC',s:'His restaurant failed in his 60s when the new interstate bypassed it, leaving him living largely on small Social Security checks. He drove state to state sleeping in his car, pitching his fried-chicken recipe to restaurant owners — rejected over and over. By 1963 there were 600+ franchises; he sold KFC in 1964 for $2 million.',k:'Accumulation has no age limit and no permission slip. He started with a recipe and a car — past what most call retirement age.'},
+{n:'Andrew Carnegie',tag:'$1.20/week → richest man alive',s:'A Scottish immigrant who started as a bobbin boy in a cotton mill at $1.20 per week. Worked up through telegraphy and railroads, built Carnegie Steel, and sold it in 1901 for $480 million — then gave away roughly 90% of it, funding over 2,500 public libraries.',k:'From the very bottom of the wage ladder to the top of the world — accumulation is a climbable ladder of skills and reinvestment.',q:'"The man who dies thus rich dies disgraced."'}]},
+b2:{alt:'Keeping money is a structural question — ownership, compound holding, avoiding unnecessary dilution. A learnable system, not a personality trait.',people:[
+{n:'J.K. Rowling',tag:'welfare → $1B, kept by design',s:'At her lowest — divorced, clinically depressed, raising a daughter alone on welfare in Scotland — she wrote Harry Potter longhand in cafés and was rejected by 12 publishers. She then systematically retained film and merchandising control and structured royalties for long-term compounding, growing past $1 billion while deliberately giving enough away to fall off the Forbes list.',k:'Keeping money is not fear-based holding — it\'s intentional structuring and patient compounding.'},
+{n:'Sara Blakely',tag:'$5K → $1.2B, zero dilution',s:'Was selling fax machines door-to-door when she invented Spanx. Started with $5,000 of savings, no investors. Kept full ownership for two decades before selling a majority stake to Blackstone at a $1.2B valuation.',k:'Keeping is about ownership structure and patience — not anxious monitoring. Hold equity, not just cash.'},
+{n:'Ralph Lauren',tag:'hand-me-downs → $14B private',s:'Grew up in the Bronx in an immigrant family, wearing hand-me-downs. Started by selling ties from a small rack in Bloomingdale\'s. Kept Polo privately held for decades, reinvesting profits instead of chasing Wall Street valuations — a $14B+ empire without surrendering control.',k:'He kept money by keeping ownership. Private holding = retaining the compounding.',q:'"When I\'d get my brothers\' hand-me-downs, there was an energy in me that said: I want to make my own statement."'},
+{n:'John Paul DeJoria',tag:'27 cents → two fortunes',s:'Homeless twice — at his lowest, living in his car with 27 cents and a young son. Co-founded Paul Mitchell with $700, selling salon-to-salon from the trunk. Later co-founded Patrón, selling his stake for $5.1 billion. Method: keep businesses private, avoid unnecessary outside money, reinvest cash flow.',k:'He built and KEPT multiple fortunes from zero. Keeping money is a learnable system.'},
+{n:'Dolly Parton',tag:'kept the copyright',s:'In 1974 Elvis wanted to record "I Will Always Love You" — but Colonel Parker demanded half the publishing rights. She said no to Elvis, cried all night, and kept her copyright. When Whitney Houston\'s version exploded in 1992, the royalties made her many millions. She owns a catalog of 3,000+ songs that pays her forever.',k:'One painful "no" to protect ownership out-earned decades of easy yeses. Keeping is deciding what you never sell.'},
+{n:'Tyler Perry',tag:'owns 100% of his library',s:'Slept in his car during stretches of the early 1990s while staging his first play in Atlanta. As the work took off he refused every deal that took his intellectual property — he owns his films, shows, and studio outright (built on a former Confederate army base). Forbes declared him a billionaire in 2020.',k:'From homeless to billionaire on one principle: never surrender ownership of what you create.'},
+{n:'Amancio Ortega',tag:'delivery boy → ~59% of Inditex',s:'A railway worker\'s son who left school around 13 to run deliveries for a shirtmaker in A Coruña, Spain. Founded Zara in 1975 and kept roughly 59% of Inditex through its entire rise — briefly becoming the richest person in the world in 2016, while famously never giving interviews.',k:'He never diluted. Half a century of holding his own equity did the keeping for him.'}]},
+b3:{alt:'The wealthiest people do not trade time for money — they build assets, systems and leverage that earn without continuous labor. This belief describes earned income, the least efficient vehicle, as if it were the only one.',people:[
+{n:'Robert Kiyosaki',tag:'assets earn, not hours',s:'His central insight — from his time-poor educated father vs. his entrepreneurial mentor — was that most people trade hours for dollars and never escape. He modeled the alternative: real estate, businesses and royalties that generate income without trading time.',k:'Passive income is the structural alternative to trading time. It requires financial IQ, not more hours.',q:'"The poor and middle class work for money. The rich have money work for them."'},
+{n:'Warren Buffett',tag:'99% of wealth after age 50',s:'By his own account, 99% of his $140B+ net worth came after his 50th birthday — purely from compounding. He sleeps 8 hours, reads 5–6 hours a day, takes few meetings. Ideal holding period: forever.',k:'Compounding is time working FOR you, not time you give up. The asset works; you sleep.'},
+{n:'Naval Ravikant',tag:'leverage: code, media, capital',s:'Raised by a single immigrant mother with very little. Built his entire framework around escaping the time-for-money trap: renting out your time (salary) vs. owning equity that scales. Specific knowledge + leverage + accountability build wealth without selling hours.',k:'Leverage lets one decision earn for years with no additional time input.',q:'"Wealth is having assets that earn while you sleep."'},
+{n:'Tim Ferriss',tag:'systems + early equity',s:'Was working 80-hour weeks at his supplement company, burning out. Radically outsourced and automated, then made early investments in Uber, Twitter, Facebook and Alibaba — assets that compounded without his time. Cites Harvard research: people who prioritize time over money statistically earn more AND report more happiness.',k:'Decoupling money from time is a design problem, not a character virtue.'},
+{n:'Sting',tag:'a 1983 song still pays daily',s:'"Every Breath You Take," written in 1983, still reportedly earns him around $2,000 a day — over half a million dollars a year, four decades later — swelled further when Puff Daddy sampled it. One afternoon of writing, forty years of income.',k:'A royalty is time you spent once that pays forever. Assets don\'t clock in.'},
+{n:'Ronald Read',tag:'janitor who died with $8M',s:'A Vermont gas-station attendant and JCPenney janitor who quietly bought blue-chip dividend stocks for decades and let them ride — stock certificates in a safe-deposit box. He died in 2014 at 92 with $8 million, leaving $6 million to his local library and hospital.',k:'His wages were tiny; his hours were ordinary. Compounding — not labor — built the fortune.'},
+{n:'Michael Jordan',tag:'~90% earned after retiring',s:'His entire NBA playing career paid roughly $94 million in salary. The billions came after: Jordan Brand royalties now exceed $100M a year, and his Hornets stake bought around $275M valuation sold in 2023 near $3B. Most of his wealth arrived when he stopped trading his time.',k:'Even for the hardest worker alive, equity and royalties out-earned the hours by 30 to 1.'}]},
+b4:{alt:'Constant monitoring causes WORSE financial outcomes. The most successful long-term investors deliberately do as little as possible after correct initial decisions. Automation and structure replace vigilance.',people:[
+{n:'Jack Bogle',tag:'invented not-watching',s:'His family lost everything in the Great Depression. He founded Vanguard and invented the index fund — a product specifically designed to eliminate monitoring. Buy the whole market cheaply, hold forever, stop watching: most active investors underperform after fees.',k:'The best financial system requires the least monitoring. Set, automate, trust the structure.'},
+{n:'Ramit Sethi',tag:'checks twice a year',s:'Born to immigrant parents of modest means. Built a fully automated system — savings, investments and bills move with zero daily decisions. Design the system once; let it run for decades. He describes checking accounts twice a year as excessive.',k:'Automation replaces vigilance. A well-designed system needs oversight, not surveillance.'},
+{n:'Morgan Housel',tag:'boredom is the strategy',s:'The Psychology of Money documents how constant monitoring causes irrational selling during dips — the watching itself destroys returns. His personal strategy: index funds, long holding, no daily checking.',k:'Monitoring is the CAUSE of poor outcomes, not the prevention. Boredom is a feature of good wealth management.'},
+{n:'Charlie Munger',tag:'sit quietly, hold forever',s:'Born in Depression-era Omaha; worked in Buffett\'s grandfather\'s grocery store as a teen. His philosophy: hold a small number of exceptional businesses forever and resist the urge to act — do as close to nothing as possible after getting the decision right.',k:'Inactivity after a correct decision is the most powerful financial move. The anxiety is the problem, not the market.',q:'"It\'s not supposed to be easy. Anyone who finds it easy is stupid."'},
+{n:'Anne Scheiber',tag:'$5K → $22M, never sold',s:'A retired IRS auditor who invested about $5,000 in 1944 and then mostly did one thing for 50 years: nothing. She bought quality companies, reinvested dividends, and never sold. She died in 1995 at 101 with $22 million, left to Yeshiva University.',k:'Fifty years of NOT reacting built what constant trading almost never does.'},
+{n:'Grace Groner',tag:'$180 → $7M, one stock',s:'A secretary at Abbott Laboratories who bought three shares for $180 in 1935, reinvested every dividend, and simply held for 75 years. She lived modestly in a one-bedroom cottage and died in 2010 having turned $180 into $7 million for Lake Forest College.',k:'The ultimate unmonitored portfolio: one good decision plus 75 years of leaving it alone.'},
+{n:'Peter Lynch',tag:'his own investors lost money',s:'His Magellan Fund returned about 29% a year from 1977–1990 — the best run in mutual-fund history. Yet Fidelity found the AVERAGE investor in the fund lost money: they piled in after hot streaks and bailed during dips. The fund didn\'t fail them; the watching did.',k:'Same asset, opposite outcomes — the difference was monitoring and reacting.',q:'"The real key to making money in stocks is not to get scared out of them."'}]},
+b5:{alt:'The people with the most sustained ambition and largest outcomes also have the most deliberate personal lives. Ambition and life stop competing when the business is designed to run without you.',people:[
+{n:'Richard Branson',tag:'400 businesses + a full life',s:'Built 400+ businesses under Virgin while kite-surfing, ballooning across oceans and prioritizing family. Dyslexic, struggled through school. His framework: build businesses around life — delegate into management structures that run without him.',k:'Structural delegation lets ambition and life coexist. It\'s a systems-design problem, not a values trade-off.',q:'"I don\'t think of work as work and play as play — it\'s all living."'},
+{n:'Rihanna',tag:'paused, lived, returned richer',s:'Grew up in Barbados around her father\'s addiction, suffering debilitating childhood migraines. Became the first Black woman to head an LVMH luxury house; built Fenty Beauty to $1.4B. Openly paused music for years — had a child, ran her ventures — and emerged wealthier than before.',k:'She paused her primary career, lived fully, and came back richer. Not a zero-sum trade.'},
+{n:'Li Ka-shing',tag:'sacrifice was a phase, not a life',s:'Fled wartime China; his father died of tuberculosis when he was 14. Dropped out to work 16-hour factory days, started his own company at 22, expanded into 50+ countries — then built systems that gave him his life back and donated billions to education and medicine.',k:'He began in total sacrifice by necessity — then engineered his way out. Ambition and life are sequential, not a permanent trade.',q:'"Vision is perhaps our greatest strength."'},
+{n:'Arianna Huffington',tag:'$1B built on NOT sacrificing',s:'Born in Athens without money. Built HuffPost on 4–5 hours of sleep until she collapsed from exhaustion in 2007, breaking her cheekbone on her desk. That collapse became the pivot: she wrote Thrive, then founded Thrive Global — a $1B+ company built entirely on the insight that sacrificing life for ambition is structurally counterproductive.',k:'A billion-dollar business emerged from deciding NOT to sacrifice her life. The belief was the problem — not the ambition.'},
+{n:'Yvon Chouinard',tag:'gone surfing · gave away $3B',s:'Started as a climber forging pitons, living out of his car. Built Patagonia under a policy literally titled "Let My People Go Surfing" — when the waves were good, everyone went. In 2022 he transferred the ~$3B company to a trust so that, in his words, Earth is now the only shareholder.',k:'He built a billion-dollar company explicitly around living first. The surfing was policy, not a reward deferred to retirement.'},
+{n:'Ray Dalio',tag:'meditates twice daily · $15B+',s:'Founder of Bridgewater, the world\'s largest hedge fund. Has practiced Transcendental Meditation twice a day since 1968 — through every year of building the firm — and credits it above everything else for his results.',k:'The most successful investor-builders protect inner practice AS the performance strategy — exactly what your 5am practice is.',q:'"Meditation, more than anything in my life, was the biggest ingredient of whatever success I\'ve had."'},
+{n:'LeBron James',tag:'sleeps 10–12h · $1B+ active',s:'Reportedly spends about $1.5M a year on his body and treats 10–12 hours of sleep as non-negotiable. Two decades at the top, a family he\'s visibly present for, a school he founded — and he became a billionaire while still playing.',k:'Recovery, family, and longevity weren\'t what he traded away for ambition — they were the mechanism of it.'}]}};
+function injectEv(){['b1','b2','b3','b4','b5'].forEach(function(b){var host=document.getElementById('bw-'+b);if(!host||document.getElementById('ev-'+b))return;var d=EVID[b];if(!d)return;var html='<div id="ev-'+b+'"><div class="ev-alt"><b>Alternative explanation:</b> '+d.alt+'</div>';d.people.forEach(function(p,i){var id=b+'p'+i;html+='<div class="evp"><div class="evp-h" onclick="togEvp(\''+id+'\')"><span>'+p.n+'</span><small>'+p.tag+' ▾</small></div><div class="evp-d" id="evp-'+id+'">'+p.s+'<span class="kl">Key lesson: '+p.k+'</span>'+(p.q?'<span class="qq">'+p.q+'</span>':'')+'</div></div>';});html+='</div>';host.insertAdjacentHTML('afterbegin',html);});}
+function togEvp(id){var el=document.getElementById('evp-'+id);if(el)el.style.display=el.style.display==='block'?'none':'block';}
+function injectPrayer(){var el=document.getElementById('gd-prayer');if(!el||el.children.length)return;el.innerHTML='<i>Perform immediately after meditation, while vibration is elevated. Read each step aloud in full.</i>'+PRAYER.map(function(p,i){return '<h5>'+(i+1)+' · '+p.n+'</h5><div class="q">'+p.q+'</div>'+(i===4?'<div style="font-size:11px;color:var(--gr);margin:2px 0 4px">'+declareSmall()+'</div>':'');}).join('');}
+
+/* ---- Theme, workout rotation, backup ---- */
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wb_theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=(t==='dark')?'☀️':'🌙';}
+function toggleTheme(){setTheme((localStorage.getItem('wb_theme')||'light')==='dark'?'light':'dark');}
+function weekMod(){return Math.floor(Date.now()/(7*86400000))%3;}
+function defaultWorkout(){var t=realTodayIdx();if(t===5)return ['p2','pull2','legs2'][weekMod()];return ({0:'p1',1:'l1',3:'legs1'})[t]||'p1';}
+function exportBackup(){var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wb')===0)o[k]=localStorage.getItem(k);}var blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='wellbeing-backup-'+todayKey()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);toast('Backup downloaded');}
+function importBackup(input){var f=input.files&&input.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var o=JSON.parse(rd.result);Object.keys(o).forEach(function(k){localStorage.setItem(k,o[k]);});toast('Backup restored — reloading',3000);setTimeout(function(){location.reload();},900);}catch(e){toast('Invalid backup file',5000);}};rd.readAsText(f);input.value='';}
+
+/* ---- init ---- */
+setTheme(localStorage.getItem('wb_theme')||'light');
+applyPersonal();
+setBv('calm');
+var dow=new Date().getDay(),dayMap={1:0,2:1,3:2,4:3,5:4,6:5,0:6};
+var today=dayMap[dow]!==undefined?dayMap[dow]:0;
+setDay(today);
+['c-supps','c-skin','c-train','c-beliefs'].forEach(function(id){var c=document.getElementById(id);if(c){c.style.display='none';c.classList.remove('vis');}});
+curW=defaultWorkout();showW(curW);
+renderGoalsUI();
+renderWins();
+renderSupps();
+wireExInfo();
+injectEv();
+injectPrayer();
+syncUI();
+scheduleReminders();
+renderRem();
+</script>
+</body>
+</html>

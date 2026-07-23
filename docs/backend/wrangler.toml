@@ -1,0 +1,40 @@
+# Optional: only needed if you deploy with the Wrangler CLI instead of the
+# Cloudflare dashboard. See README.md in this folder.
+name = "wellbeing-notion"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+# Preserve dashboard-configured plain-text vars (e.g. ALLOW_ORIGIN, COACH_MODEL)
+# across CI deploys; secrets are always preserved.
+keep_vars = true
+
+# --- Background push (Web Push) ---
+# KV namespace storing push subscriptions (a namespace ID is a resource
+# identifier, not a secret). Declared here so Git auto-deploy keeps the binding.
+[[kv_namespaces]]
+binding = "SUBS"
+id = "dfc0b7beaa0b4767afbda151645ada99"
+
+# Cron: every 5 minutes, send any reminders due in each subscriber's local window.
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Do NOT put secrets here. Set them with:
+#   wrangler secret put NOTION_TOKEN
+#   wrangler secret put APP_SECRET
+#   wrangler secret put VAPID_PRIVATE_JWK   # for background push
+#   wrangler secret put VAPID_SUBJECT       # e.g. mailto:you@example.com
+# Optionally restrict CORS to your Pages origin:
+# [vars]
+# ALLOW_ORIGIN = "https://iriesparrow.github.io"
+
+# --- Background push (Web Push) ---
+# KV namespace to store push subscriptions. Create it once:
+#   wrangler kv:namespace create SUBS
+# then paste the returned id below.
+# [[kv_namespaces]]
+# binding = "SUBS"
+# id = "<your-kv-namespace-id>"
+
+# Cron trigger: check every 5 minutes for due reminders and push them.
+# [triggers]
+# crons = ["*/5 * * * *"]

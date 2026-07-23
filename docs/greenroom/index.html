@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Green Room</title>
+<meta name="theme-color" content="#1C1A19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Green Room">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#1C1A19; --panel:#262321; --panel2:#2C2926; --line:#3A3733;
+  --ink:#EDE7DD; --mut:#9A9288; --faint:#6B655C; --sage:#8FAF8B; --sage-dim:#5C7A5A;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,Menlo,'SF Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.55;
+  display:flex;justify-content:center;padding:calc(14px + env(safe-area-inset-top)) 14px 60px;}
+.wrap{width:100%;max-width:420px;}
+
+/* ---- masthead ---- */
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);margin-bottom:10px;}
+h1{font-size:34px;font-weight:500;letter-spacing:-.01em;line-height:1.05;}
+.sub{font-style:italic;color:var(--mut);font-size:14.5px;margin-top:8px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.backlink{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);text-decoration:none;padding:14px 0;min-height:44px;}
+.backlink:active{color:var(--mut);}
+
+/* ---- sections ---- */
+section{margin-top:26px;}
+.sh{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
+.sh .idx{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--sage);}
+.sh .t{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;}
+.note{font-style:italic;color:var(--mut);font-size:13px;margin-bottom:12px;max-width:60ch;}
+
+/* ---- beats editor ---- */
+.beat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;}
+.beat label{display:block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);}
+.beat .hint{font-size:12px;font-style:italic;color:var(--faint);margin:3px 0 8px;}
+.beat textarea{width:100%;min-height:72px;background:transparent;border:none;outline:none;resize:vertical;
+  color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;}
+.beat textarea::placeholder{color:var(--faint);font-style:italic;}
+.beat:focus-within{border-color:var(--sage-dim);}
+
+/* ---- buttons ---- */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:10px;
+  border:none;border-radius:10px;cursor:pointer;font-family:var(--mono);font-size:12.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;transition:opacity .15s;}
+.btn:active{opacity:.75;}
+.btn.primary{background:var(--sage);color:#15130f;}
+.btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line);}
+.btn.danger{background:transparent;color:#a06a5a;border:1px solid var(--line);}
+.saved{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  text-align:center;margin-top:10px;min-height:14px;}
+
+/* ---- overlays (rehearse / drill) ---- */
+.stage{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 90% at 50% 0%,#232019 0%,#161413 70%);
+  display:none;flex-direction:column;}
+.stage.show{display:flex;}
+.stage-top{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;}
+.stage-x{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;min-width:44px;min-height:44px;}
+.stage-bar{flex:1;height:2px;background:rgba(237,231,221,.12);border-radius:2px;overflow:hidden;}
+.stage-fill{height:100%;background:var(--sage);width:0;transition:width .3s;}
+.clock{font-family:var(--mono);font-size:12px;color:var(--sage);min-width:86px;text-align:right;}
+.stage-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 26px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;text-align:center;}
+.stage-ey{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--sage);margin-bottom:14px;}
+.stage-txt{font-size:21px;line-height:1.7;font-style:italic;color:#F2EDE3;white-space:pre-wrap;}
+.stage-txt.long{font-size:16.5px;text-align:left;}
+.stage-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:18px;}
+.stage-nav{display:flex;gap:10px;padding:10px 16px calc(16px + env(safe-area-inset-bottom));}
+.stage-nav .btn{margin-top:0;}
+.stage-nav .back{width:96px;flex:none;}
+
+/* ---- The Canon ---- */
+.canon-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.canon-tab{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;padding:0 14px;min-height:44px;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer;white-space:nowrap;}
+.canon-tab.on{background:var(--sage);border-color:var(--sage);color:#15130f;}
+.piece{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px;background:var(--panel);}
+.piece.line{border-left:3px solid var(--sage-dim);}
+.piece-top{display:flex;align-items:flex-start;gap:10px;}
+.piece-check{display:flex;align-items:flex-start;justify-content:center;padding-top:6px;min-width:44px;min-height:44px;margin:-4px 0 0 -6px;cursor:pointer;}
+.piece-check input{width:20px;height:20px;accent-color:var(--sage);}
+.piece-main{flex:1;cursor:pointer;min-width:0;}
+.piece-title{font-size:15px;font-weight:500;color:var(--ink);line-height:1.35;}
+.piece-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:3px;}
+.piece-body{font-size:14px;line-height:1.6;color:var(--mut);margin-top:7px;cursor:pointer;white-space:pre-wrap;}
+.piece.line .piece-body{font-style:italic;color:var(--ink);font-size:15.5px;}
+.piece-edit{border:1px solid var(--sage-dim);border-radius:10px;padding:12px;margin:6px 0 10px;background:var(--panel2);}
+.pe-row{display:flex;gap:6px;flex-wrap:wrap;}
+.ver-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink);}
+.ver-l{flex:1;min-width:0;}
+.ver-b{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;min-height:44px;padding:0 14px;font-family:var(--mono);font-size:11px;cursor:pointer;}
+/* ---- coach ---- */
+.coach-log{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+.cb{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;}
+.cb.u{align-self:flex-end;background:var(--sage-dim);color:#F2EDE3;border-bottom-right-radius:4px;}
+.cb.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px;font-style:italic;}
+.cb.err{align-self:flex-start;background:transparent;border:1px dashed #7a5548;color:#b08a7a;font-family:var(--mono);font-size:11.5px;font-style:normal;}
+.coach-in{width:100%;min-height:64px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:var(--serif);font-size:15px;line-height:1.55;padding:11px 13px;resize:vertical;outline:none;}
+.coach-in::placeholder{color:var(--faint);font-style:italic;}
+.coach-in:focus{border-color:var(--sage-dim);}
+.speakrow{display:flex;align-items:center;gap:10px;min-height:44px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--mut);cursor:pointer;margin-top:2px;}
+.speakrow input{width:18px;height:18px;accent-color:var(--sage);}
+.cfg summary{min-height:44px;display:flex;align-items:center;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);cursor:pointer;list-style:none;}
+.cfg summary::before{content:'\25B8\00A0';}
+.cfg[open] summary::before{content:'\25BE\00A0';}
+.cfg-in{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);
+  font-family:var(--mono);font-size:12.5px;padding:12px 2px;outline:none;}
+.cfg-in:focus{border-color:var(--sage-dim);}
+.colophon{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);line-height:1.9;}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="backlink" href="../">&larr; Well-Being OS</a>
+  <p class="kicker">Before the room hears it</p>
+  <h1>Green Room</h1>
+  <p class="sub">The story of why you build is told badly by accident and well by rehearsal. Write the beats. Say them out loud. Time it.</p>
+
+  <section>
+    <div class="sh"><span class="idx">01</span><span class="t">The Beats</span></div>
+    <p class="note">Six beats make a founder story. Write plainly &mdash; you're drafting speech, not copy. Everything stays on this device.</p>
+    <div id="beats"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">02</span><span class="t">The Canon</span></div>
+    <p class="note">Your living source-text &mdash; the manifesto and record you draw from. Keep <b>lines</b> (your quotable truths) and <b>passages</b> (stories, positions) filed under a lens, then check any of them and compose a record for a specific use. Everything stays on this device.</p>
+    <div class="canon-tabs" id="canonTabs"></div>
+    <div id="canonList"></div>
+    <div id="canonEditor"></div>
+    <button class="btn ghost" onclick="canonAddOpen()">+ Add a piece</button>
+    <div id="canonCompose"></div>
+    <details class="cfg">
+      <summary>Versions &amp; backup</summary>
+      <button class="btn ghost" onclick="canonSaveVersion()">Save a version (snapshot)</button>
+      <div id="canonVersions"></div>
+      <button class="btn ghost" onclick="exportGR()" style="margin-top:8px">Export everything (.json)</button>
+      <label class="btn ghost" style="cursor:pointer">Import story / canon seed<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
+    </details>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">03</span><span class="t">Rehearse</span></div>
+    <p class="note">One beat per screen, teleprompter-style, with the clock running. Aim to speak each beat, not read it.</p>
+    <button class="btn primary" onclick="startRun()">&#9654; Run the story</button>
+    <button class="btn ghost" onclick="startDrill()">? Question drill &mdash; the story (Part 1)</button>
+    <button class="btn ghost" onclick="startDrillP2()">? Question drill &mdash; the system &amp; the self (Part 2)</button>
+    <div class="saved" id="takeLine"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">04</span><span class="t">The Coach</span></div>
+    <p class="note">A sparring partner who reads your beats and asks the questions a journalist would. One question at a time. Replies can be spoken aloud &mdash; answer by voice with the mic key on your keyboard. Exchanges leave this device only through your own backend.</p>
+    <div class="coach-log" id="coachLog"></div>
+    <textarea class="coach-in" id="coachTxt" placeholder="Talk it through&hellip;"></textarea>
+    <button class="btn primary" id="coachBtn" onclick="coachSend()">Ask the coach</button>
+    <label class="speakrow"><input type="checkbox" id="coachSpeak" onchange="coachSpeakToggle()"> Speak replies aloud</label>
+    <button class="btn ghost" onclick="coachClear()">Clear the conversation</button>
+    <details class="cfg">
+      <summary>Notes for the coach (private &middot; read with every question)</summary>
+      <textarea class="coach-in" id="coachCtx" oninput="coachSaveCtx()" placeholder="Paste who you are beneath the story &mdash; a positioning survey, your tensions, what you're avoiding, what you want to get better at. The coach reads this every time, so it can push where it matters. Stays on this device." style="min-height:130px;margin-top:8px"></textarea>
+    </details>
+    <details class="cfg">
+      <summary>Backend connection (one-time)</summary>
+      <input class="cfg-in" id="coachUrl" placeholder="https://your-worker.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <input class="cfg-in" id="coachSecret" placeholder="shared secret" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button class="btn ghost" onclick="coachSaveCfg()">Save connection</button>
+    </details>
+  </section>
+
+  <section>
+    <div class="sh"><span class="idx">05</span><span class="t">Housekeeping</span></div>
+    <button class="btn ghost" onclick="exportGR()">&darr; Export this device's story (.json)</button>
+    <label class="btn ghost" style="cursor:pointer">&uarr; Import a story file<input type="file" accept="application/json" style="display:none" onchange="importGR(this)"></label>
+    <button class="btn danger" onclick="wipe()">Erase everything on this device</button>
+  </section>
+
+  <p class="colophon">Nothing you write here leaves this device &middot; localStorage only &middot; no accounts &middot; no analytics</p>
+</main>
+
+<div class="stage" id="stage">
+  <div class="stage-top">
+    <button class="stage-x" onclick="closeStage()">&#10005;</button>
+    <div class="stage-bar"><div class="stage-fill" id="stageFill"></div></div>
+    <div class="clock" id="clock">0:00</div>
+  </div>
+  <div class="stage-body" id="stageBody"></div>
+  <div class="stage-nav">
+    <button class="btn ghost back" id="stageBack" onclick="prevCard()">Back</button>
+    <button class="btn primary" id="stageNext" onclick="nextCard()">Next</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* Green Room — founder-story rehearsal.
+   All user content lives ONLY under this one localStorage key.
+   This surface must never touch Well-Being OS state (wb* keys). */
+var KEY='lifeos.narrative.v1';
+
+var BEATS=[
+ {k:'hook', t:'The Hook',   h:'One line. The change you make — not your job title.',           p:'The single sentence you could open any room with…'},
+ {k:'origin',t:'The Origin', h:'The moment this became inevitable. A scene, not a summary.',    p:'Where it actually started…'},
+ {k:'turn', t:'The Turn',   h:'The risk, the leap, or the hard call that made it real.',       p:'The decision that cost something…'},
+ {k:'craft',t:'The Craft',  h:'What you do differently — the thing imitators get wrong.',      p:'How the work is actually different…'},
+ {k:'proof',t:'The Proof',  h:'Evidence, plainly. Numbers, names, moments that landed.',       p:'How you know it’s working…'},
+ {k:'vision',t:'The Vision', h:'Where this goes. Big enough to matter, near enough to believe.',p:'What the next chapter is…'}
+];
+
+var QUESTIONS=[
+ 'Why does this company exist?',
+ 'What almost made you quit — and why didn’t you?',
+ 'What do people misunderstand about your work at first?',
+ 'What’s the hardest no you’ve had to say?',
+ 'What did the first year teach you that you couldn’t have learned any other way?',
+ 'Who is this not for?',
+ 'What would you tell yourself on day one?',
+ 'What does success look like beyond the numbers?',
+ 'What’s the win you’re proudest of — and the one nobody saw?',
+ 'Where is this in five years?',
+ 'What breaks first if you grow too fast?',
+ 'What part of the story do you usually leave out?'
+];
+
+/* Part 2 — the system you built, then the reckoning with yourself.
+   Runs in order (two movements) — the arc is the point. */
+var QUESTIONS_P2=[
+ {m:'The System',q:'What used to slow you down before you had a system — and what did you build to end it?'},
+ {m:'The System',q:'Walk through how the work actually runs now. What does each person on the project see?'},
+ {m:'The System',q:'What does it cost when a project drifts? Tell the moment it went wrong.'},
+ {m:'The System',q:'Once the system freed you from chasing the truth, what did you do with that energy instead?'},
+ {m:'The System',q:'What does everyone get wrong about staying in control?'},
+ {m:'The Reckoning',q:'Being visible doesn’t come naturally to you. So why do it at all — what’s worth the discomfort?'},
+ {m:'The Reckoning',q:'Where’s the line between showing up as yourself and performing a version of yourself?'},
+ {m:'The Reckoning',q:'What’s your real relationship with money — and what does it cost the work when you flinch at being paid for it?'},
+ {m:'The Reckoning',q:'Forget hedging: what are you actually certain of? Say what you’d defend if the room disagreed.'},
+ {m:'The Reckoning',q:'What does transparency cost you — and what do you keep private?'},
+ {m:'The Reckoning',q:'If you’re your own biggest obstacle, what’s the opportunity on the other side of you?'},
+ {m:'The Reckoning',q:'Five years out — who do you have to become for this to keep working? Not the company. You.'}
+];
+
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&typeof d==='object')return d;}catch(e){}return {v:1,beats:{},takes:0};}
+function store(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---- editor ---- */
+function renderBeats(){
+  var d=load(),html='';
+  BEATS.forEach(function(b){
+    html+='<div class="beat"><label for="b-'+b.k+'">'+b.t+'</label><div class="hint">'+b.h+'</div>'+
+      '<textarea id="b-'+b.k+'" placeholder="'+b.p+'"></textarea></div>';
+  });
+  document.getElementById('beats').innerHTML=html;
+  BEATS.forEach(function(b){
+    var el=document.getElementById('b-'+b.k);
+    el.value=(d.beats&&d.beats[b.k])||'';
+    el.addEventListener('input',save);
+  });
+  takeLine();
+}
+var saveT=null;
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    var d=load();d.beats={};
+    BEATS.forEach(function(b){d.beats[b.k]=document.getElementById('b-'+b.k).value;});
+    store(d);
+    var s=document.querySelector('.saved');
+  },250);
+}
+function takeLine(){
+  var d=load();
+  document.getElementById('takeLine').textContent=d.takes?('Takes so far: '+d.takes):'';
+}
+function wipe(){
+  if(!confirm('Erase every beat and take count from this device?'))return;
+  localStorage.removeItem(KEY);
+  renderBeats();
+}
+/* Export/import covers ONLY this surface's key — used when the site moves hosts. */
+function exportGR(){
+  var blob=new Blob([JSON.stringify({'lifeos.narrative.v1':localStorage.getItem(KEY)||''},null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='greenroom-story.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);
+}
+function importGR(input){
+  var f=input.files&&input.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var o=JSON.parse(rd.result);
+      // Full story export — replaces this device's Green Room state.
+      if(typeof o[KEY]==='string'&&o[KEY]){
+        JSON.parse(o[KEY]); // must itself be valid
+        localStorage.setItem(KEY,o[KEY]);
+        canonSel={};canonDraft=null;canonEdit=null;canonRecord=null;
+        renderBeats();renderCanon();
+        toast('Story imported');
+        return;
+      }
+      // Additive seed — adds canon pieces (and fills empty beats) without wiping anything.
+      if(Array.isArray(o.canonSeed)||o.beatsSeed){
+        var d=load();
+        if(!d.canon||typeof d.canon!=='object')d.canon={pieces:[],versions:[]};
+        if(!Array.isArray(d.canon.pieces))d.canon.pieces=[];
+        if(!Array.isArray(d.canon.versions))d.canon.versions=[];
+        var seen={};
+        d.canon.pieces.forEach(function(p){seen[(p.body||'').trim()]=true;});
+        var added=0;
+        (o.canonSeed||[]).forEach(function(s){
+          if(!s||!s.body)return;
+          var body=String(s.body).trim();
+          if(!body||seen[body])return;
+          seen[body]=true;
+          d.canon.pieces.push({
+            id:uid(),
+            kind:s.kind==='line'?'line':'passage',
+            lens:['who','about','why','next'].indexOf(s.lens)>=0?s.lens:'who',
+            themes:Array.isArray(s.themes)?s.themes.map(String):[],
+            title:s.title?String(s.title):'',
+            body:body,
+            pinned:!!s.pinned
+          });
+          added++;
+        });
+        if(o.beatsSeed&&typeof o.beatsSeed==='object'){
+          if(!d.beats)d.beats={};
+          BEATS.forEach(function(b){
+            if((!d.beats[b.k]||!d.beats[b.k].trim())&&o.beatsSeed[b.k])d.beats[b.k]=String(o.beatsSeed[b.k]);
+          });
+        }
+        store(d);
+        renderBeats();renderCanon();
+        toast(added+' piece'+(added===1?'':'s')+' added');
+        return;
+      }
+      throw new Error('unrecognized');
+    }catch(e){alert('That file isn’t a Green Room story export or canon seed.');}
+  };
+  rd.readAsText(f);input.value='';
+}
+
+/* ---- stage engine (rehearse + drill share it) ---- */
+var cards=[],cardIdx=0,mode='',t0=0,clockT=null,takeDone=false;
+function fmtClock(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function tick(){document.getElementById('clock').textContent=fmtClock(Date.now()-t0);}
+function openStage(){
+  document.getElementById('stage').classList.add('show');
+  document.body.style.overflow='hidden';
+  t0=Date.now();clockT=setInterval(tick,500);tick();
+}
+function closeStage(){
+  document.getElementById('stage').classList.remove('show');
+  document.body.style.overflow='';
+  clearInterval(clockT);
+  takeLine();
+}
+function renderCard(){
+  var c=cards[cardIdx],b=document.getElementById('stageBody');
+  var cls=(c.txt&&c.txt.length>260)?' long':'';
+  b.innerHTML='<div class="stage-ey">'+esc(c.ey)+'</div>'+
+    '<div class="stage-txt'+cls+'">'+esc(c.txt)+'</div>'+
+    (c.hint?'<div class="stage-hint">'+esc(c.hint)+'</div>':'');
+  document.getElementById('stageFill').style.width=Math.round((cardIdx+1)/cards.length*100)+'%';
+  document.getElementById('stageBack').style.visibility=cardIdx?'visible':'hidden';
+  document.getElementById('stageNext').textContent=(cardIdx===cards.length-1)?(mode==='run'?'End take':'Done'):'Next';
+}
+function nextCard(){
+  if(cardIdx>=cards.length-1){
+    if(mode==='run'&&!takeDone){takeDone=true;var d=load();d.takes=(d.takes||0)+1;store(d);}
+    closeStage();return;
+  }
+  cardIdx++;renderCard();
+}
+function prevCard(){if(cardIdx>0){cardIdx--;renderCard();}}
+
+/* ---- rehearse ---- */
+function startRun(){
+  var d=load();
+  cards=BEATS.filter(function(b){return d.beats&&d.beats[b.k]&&d.beats[b.k].trim();})
+    .map(function(b){return {ey:b.t,txt:d.beats[b.k].trim(),hint:'Say it — don’t read it'};});
+  if(!cards.length){alert('Write at least one beat first.');return;}
+  cards.push({ey:'Curtain',txt:'That’s the story. Once more, faster, warmer.',hint:'Ending the take logs it'});
+  mode='run';cardIdx=0;takeDone=false;openStage();renderCard();
+}
+
+/* ---- drill ---- */
+function startDrill(){
+  var q=QUESTIONS.slice();
+  for(var i=q.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=q[i];q[i]=q[j];q[j]=tmp;}
+  cards=q.slice(0,6).map(function(x,i){return {ey:'Question '+(i+1)+' of 6',txt:x,hint:'Answer out loud — 60 seconds, no notes'};});
+  mode='drill';cardIdx=0;openStage();renderCard();
+}
+/* Part 2 runs its twelve in order, labelled by movement. */
+function startDrillP2(){
+  var counts={},n={};
+  QUESTIONS_P2.forEach(function(x){counts[x.m]=(counts[x.m]||0)+1;});
+  cards=QUESTIONS_P2.map(function(x){
+    n[x.m]=(n[x.m]||0)+1;
+    return {ey:x.m+' — '+n[x.m]+' of '+counts[x.m],txt:x.q,hint:'Answer out loud — no notes'};
+  });
+  mode='drill';cardIdx=0;openStage();renderCard();
+}
+
+/* ---- coach (talks to your own backend; nothing else) ---- */
+function coachRender(){
+  var d=load(),log=document.getElementById('coachLog');
+  log.innerHTML=(d.coach||[]).map(function(m){
+    var cls=m.r==='a'?'a':(m.r==='e'?'err':'u');
+    return '<div class="cb '+cls+'">'+esc(m.t)+'</div>';
+  }).join('');
+  log.scrollTop=log.scrollHeight;
+  var sp=document.getElementById('coachSpeak');if(sp)sp.checked=!!d.speak;
+  var cfg=d.backend||{};
+  var u=document.getElementById('coachUrl');if(u&&!u.value)u.value=cfg.url||'';
+  var s=document.getElementById('coachSecret');if(s&&!s.value)s.value=cfg.secret||'';
+  var ctx=document.getElementById('coachCtx');if(ctx&&!ctx.value)ctx.value=d.context||'';
+}
+function coachSaveCtx(){var d=load();d.context=(document.getElementById('coachCtx').value||'');store(d);}
+function coachSaveCfg(){
+  var d=load();d.backend={
+    url:(document.getElementById('coachUrl').value||'').trim().replace(/\/+$/,''),
+    secret:(document.getElementById('coachSecret').value||'').trim()
+  };store(d);
+  var btn=document.getElementById('coachBtn');btn.textContent='Ask the coach';
+}
+function coachSpeakToggle(){var d=load();d.speak=document.getElementById('coachSpeak').checked;store(d);}
+function coachClear(){var d=load();d.coach=[];store(d);coachRender();}
+function speak(t){
+  if(!('speechSynthesis' in window))return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.rate=0.97;speechSynthesis.speak(u);}catch(e){}
+}
+async function coachSend(){
+  var box=document.getElementById('coachTxt'),txt=(box.value||'').trim();
+  if(!txt)return;
+  var d=load();
+  if(!d.backend||!d.backend.url){
+    document.querySelector('.cfg').open=true;
+    d.coach=(d.coach||[]).concat([{r:'e',t:'Connect your backend first (one-time, below).'}]);
+    store(d);coachRender();return;
+  }
+  d.coach=(d.coach||[]).concat([{r:'u',t:txt}]).slice(-40);
+  store(d);box.value='';coachRender();
+  var btn=document.getElementById('coachBtn');btn.disabled=true;btn.textContent='Thinking…';
+  var dig=canonDigest(),ctxOut=(d.context||'');
+  if(dig)ctxOut=(ctxOut?ctxOut+'\n\n':'')+dig;
+  try{
+    var res=await fetch(d.backend.url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WB-Token':d.backend.secret||''},
+      body:JSON.stringify({
+        action:'coach',
+        messages:d.coach.filter(function(m){return m.r!=='e';}).map(function(m){return {role:m.r==='a'?'assistant':'user',content:m.t};}),
+        beats:d.beats||{},
+        context:ctxOut
+      })
+    });
+    var data=await res.json().catch(function(){return {};});
+    d=load();
+    if(!res.ok||data.error||!data.reply){
+      d.coach=(d.coach||[]).concat([{r:'e',t:(data.error||('HTTP '+res.status))}]);
+    }else{
+      d.coach=(d.coach||[]).concat([{r:'a',t:data.reply}]).slice(-40);
+      if(d.speak)speak(data.reply);
+    }
+    store(d);coachRender();
+  }catch(e){
+    d=load();d.coach=(d.coach||[]).concat([{r:'e',t:e.message}]);store(d);coachRender();
+  }
+  btn.disabled=false;btn.textContent='Ask the coach';
+}
+
+/* ---- The Canon (manifesto + record you draw pieces from) ---- */
+var CANON_LENSES=[['who','Who I am'],['about','What I’m about'],['why','Why I do it'],['next','What’s next']];
+var CANON_TABS=[['all','All'],['who','Who I am'],['about','What I’m about'],['why','Why I do it'],['next','What’s next'],['manifesto','Manifesto']];
+var canonTab='all', canonSel={}, canonDraft=null, canonEdit=null, canonRecord=null, canonRecName='';
+
+function uid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function grDate(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function canonData(){
+  var d=load();
+  if(!d.canon||typeof d.canon!=='object')d.canon={pieces:[],versions:[]};
+  if(!Array.isArray(d.canon.pieces))d.canon.pieces=[];
+  if(!Array.isArray(d.canon.versions))d.canon.versions=[];
+  return d.canon;
+}
+function canonSave(c){var d=load();d.canon=c;store(d);}
+function lensLabel(l){for(var i=0;i<CANON_LENSES.length;i++)if(CANON_LENSES[i][0]===l)return CANON_LENSES[i][1];return '';}
+function toast(msg){
+  var t=document.createElement('div');t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--sage);color:#15130f;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border-radius:22px;z-index:300;';
+  document.body.appendChild(t);setTimeout(function(){t.remove();},1500);
+}
+
+function renderCanon(){renderCanonTabs();renderCanonList();renderCanonCompose();renderCanonVersions();}
+
+function renderCanonTabs(){
+  var c=canonData();
+  document.getElementById('canonTabs').innerHTML=CANON_TABS.map(function(t){
+    var n;
+    if(t[0]==='all')n=c.pieces.length;
+    else if(t[0]==='manifesto')n=c.pieces.filter(function(p){return p.kind==='line';}).length;
+    else n=c.pieces.filter(function(p){return p.lens===t[0];}).length;
+    return '<button class="canon-tab'+(canonTab===t[0]?' on':'')+'" onclick="canonSetTab(\''+t[0]+'\')">'+esc(t[1])+(n?' '+n:'')+'</button>';
+  }).join('');
+}
+function canonSetTab(t){canonTab=t;renderCanon();}
+
+function canonFiltered(){
+  var c=canonData(),list=c.pieces.slice();
+  if(canonTab==='manifesto')list=list.filter(function(p){return p.kind==='line';});
+  else if(canonTab!=='all')list=list.filter(function(p){return p.lens===canonTab;});
+  list.sort(function(a,b){return (b.pinned?1:0)-(a.pinned?1:0);});
+  return list;
+}
+function renderCanonList(){
+  var list=canonFiltered(),el=document.getElementById('canonList');
+  if(!list.length){
+    el.innerHTML='<p class="note" style="opacity:.7">Nothing here yet. Add a <b>line</b> (a truth you want to be able to say) or a <b>passage</b> (a story or position) &mdash; or import a seed under Versions &amp; backup.</p>';
+    return;
+  }
+  el.innerHTML=list.map(function(p){
+    var meta=[p.kind==='line'?'Line':'Passage',lensLabel(p.lens)].concat(p.themes||[]).filter(Boolean).join(' · ');
+    var checked=canonSel[p.id]?' checked':'';
+    return '<div class="piece'+(p.kind==='line'?' line':'')+'">'+
+      '<div class="piece-top">'+
+        '<label class="piece-check"><input type="checkbox"'+checked+' onchange="canonToggleSel(\''+p.id+'\')"></label>'+
+        '<div class="piece-main" onclick="canonEditOpen(\''+p.id+'\')">'+
+          (p.title?'<div class="piece-title">'+(p.pinned?'★ ':'')+esc(p.title)+'</div>':(p.pinned?'<div class="piece-title">★</div>':''))+
+          '<div class="piece-meta">'+esc(meta)+'</div>'+
+          (p.body?'<div class="piece-body">'+esc(p.body)+'</div>':'')+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function canonToggleSel(id){if(canonSel[id])delete canonSel[id];else canonSel[id]=true;renderCanonCompose();}
+function canonClearSel(){canonSel={};canonRecord=null;renderCanon();}
+
+function renderCanonCompose(){
+  var ids=Object.keys(canonSel),el=document.getElementById('canonCompose');
+  if(canonRecord){
+    el.innerHTML='<div class="piece-edit"><div class="piece-meta" style="margin-bottom:6px">'+esc(canonRecord.name)+'</div>'+
+      '<textarea class="coach-in" id="canonRecText" style="min-height:180px">'+esc(canonRecord.text)+'</textarea>'+
+      '<div class="pe-row" style="margin-top:8px">'+
+        '<button class="btn primary" style="flex:1" onclick="canonCopyRecord()">Copy</button>'+
+        '<button class="btn ghost" style="flex:1" onclick="canonExportRecord()">Save .txt</button>'+
+      '</div>'+
+      '<button class="btn ghost" onclick="canonClearSel()">Done</button>'+
+    '</div>';
+    return;
+  }
+  if(!ids.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="margin-top:4px">'+
+    '<div class="piece-meta" style="margin-bottom:6px">'+ids.length+' selected &mdash; assemble into a record</div>'+
+    '<input class="cfg-in" id="canonRecName" placeholder="Name this record — e.g. Investor intro, About page, Podcast bio" value="'+esc(canonRecName)+'" oninput="canonRecName=this.value" style="margin-bottom:8px">'+
+    '<button class="btn primary" onclick="canonCompose()">Assemble record</button>'+
+    '<button class="btn ghost" onclick="canonClearSel()">Clear selection</button>'+
+  '</div>';
+}
+function canonCompose(){
+  var c=canonData();
+  var picked=c.pieces.filter(function(p){return canonSel[p.id];});
+  if(!picked.length)return;
+  var name=(canonRecName||'').trim()||'Record';
+  var out=picked.map(function(p){
+    if(p.kind==='line')return '“'+p.body.trim()+'”';
+    return (p.title?p.title.trim()+'\n':'')+p.body.trim();
+  }).join('\n\n');
+  canonRecord={name:name,text:out};
+  renderCanonCompose();
+}
+function canonCopyRecord(){
+  var ta=document.getElementById('canonRecText');if(!ta)return;var t=ta.value;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('Copied');},function(){fallbackCopy(ta);});}
+  else fallbackCopy(ta);
+}
+function fallbackCopy(ta){ta.focus();ta.select();try{document.execCommand('copy');toast('Copied');}catch(e){toast('Select & copy');}}
+function canonExportRecord(){
+  var ta=document.getElementById('canonRecText');if(!ta)return;
+  var nm=(canonRecord&&canonRecord.name||'record').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()||'record';
+  var blob=new Blob([ta.value],{type:'text/plain'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=nm+'.txt';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);
+}
+
+/* ---- add / edit a piece ---- */
+function canonAddOpen(){
+  canonDraft={id:null,kind:'line',lens:(canonTab!=='all'&&canonTab!=='manifesto')?canonTab:'who',themes:[],title:'',body:'',pinned:false};
+  canonEdit='new';renderCanonEditor();
+  document.getElementById('canonEditor').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function canonEditOpen(id){
+  var c=canonData(),p=c.pieces.filter(function(x){return x.id===id;})[0];
+  if(!p)return;
+  canonDraft={id:p.id,kind:p.kind,lens:p.lens,themes:(p.themes||[]).slice(),title:p.title||'',body:p.body||'',pinned:!!p.pinned};
+  canonEdit=id;renderCanonEditor();
+  document.getElementById('canonEditor').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function canonSyncDraft(){
+  if(!canonDraft)return;
+  var t=document.getElementById('ceTitle'),b=document.getElementById('ceBody'),th=document.getElementById('ceThemes'),pn=document.getElementById('cePin');
+  if(b)canonDraft.body=b.value;
+  if(t)canonDraft.title=t.value;
+  if(th)canonDraft.themes=th.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  if(pn)canonDraft.pinned=pn.checked;
+}
+function canonEK(k){canonSyncDraft();canonDraft.kind=k;renderCanonEditor();}
+function canonEL(l){canonSyncDraft();canonDraft.lens=l;renderCanonEditor();}
+function renderCanonEditor(){
+  var p=canonDraft,el=document.getElementById('canonEditor');
+  if(!p){el.innerHTML='';return;}
+  var kindRow=[['line','Line'],['passage','Passage']].map(function(k){
+    return '<button class="btn '+(p.kind===k[0]?'primary':'ghost')+'" style="flex:1;margin-top:0" onclick="canonEK(\''+k[0]+'\')">'+k[1]+'</button>';
+  }).join('');
+  var lensRow=CANON_LENSES.map(function(l){
+    return '<button class="canon-tab'+(p.lens===l[0]?' on':'')+'" onclick="canonEL(\''+l[0]+'\')">'+esc(l[1])+'</button>';
+  }).join('');
+  el.innerHTML='<div class="piece-edit">'+
+    '<div class="pe-row" style="margin-bottom:8px">'+kindRow+'</div>'+
+    '<div class="canon-tabs" style="margin-bottom:8px">'+lensRow+'</div>'+
+    (p.kind==='passage'?'<input class="cfg-in" id="ceTitle" placeholder="Title — how you refer to this passage" value="'+esc(p.title||'')+'" style="margin-bottom:6px">':'')+
+    '<textarea class="coach-in" id="ceBody" placeholder="'+(p.kind==='line'?'The line, exactly as you’d say it.':'The passage — a story, a position, a paragraph of belief.')+'" style="min-height:120px">'+esc(p.body||'')+'</textarea>'+
+    '<input class="cfg-in" id="ceThemes" placeholder="Themes (comma-separated) — optional" value="'+esc((p.themes||[]).join(', '))+'" style="margin-top:6px">'+
+    '<label class="speakrow"><input type="checkbox" id="cePin"'+(p.pinned?' checked':'')+'> Pin to top</label>'+
+    '<div class="pe-row" style="margin-top:8px">'+
+      '<button class="btn primary" style="flex:1;margin-top:0" onclick="canonEditSave()">Save piece</button>'+
+      '<button class="btn ghost" style="flex:1;margin-top:0" onclick="canonEditCancel()">Cancel</button>'+
+    '</div>'+
+    (p.id?'<button class="btn danger" onclick="canonEditDelete()">Delete this piece</button>':'')+
+  '</div>';
+}
+function canonEditSave(){
+  canonSyncDraft();
+  if(!canonDraft.body.trim()){alert('Write the line or passage first.');return;}
+  var c=canonData();
+  var rec={id:canonDraft.id||uid(),kind:canonDraft.kind,lens:canonDraft.lens,themes:canonDraft.themes,title:canonDraft.title.trim(),body:canonDraft.body.trim(),pinned:canonDraft.pinned};
+  if(canonDraft.id){
+    for(var i=0;i<c.pieces.length;i++)if(c.pieces[i].id===canonDraft.id){c.pieces[i]=rec;break;}
+  }else{c.pieces.unshift(rec);}
+  canonSave(c);canonDraft=null;canonEdit=null;
+  renderCanon();
+}
+function canonEditCancel(){canonDraft=null;canonEdit=null;document.getElementById('canonEditor').innerHTML='';}
+function canonEditDelete(){
+  if(!canonDraft||!canonDraft.id)return;
+  if(!confirm('Delete this piece?'))return;
+  var c=canonData();c.pieces=c.pieces.filter(function(p){return p.id!==canonDraft.id;});
+  delete canonSel[canonDraft.id];
+  canonSave(c);canonDraft=null;canonEdit=null;
+  renderCanon();
+}
+
+/* ---- versions (snapshot beats + canon; roll back) ---- */
+function canonSaveVersion(){
+  var label=prompt('Name this version (e.g. “Pre-raise draft”, “v2 after the podcast”):','');
+  if(label===null)return;
+  var d=load(),c=canonData();
+  c.versions.unshift({id:uid(),label:(label||'').trim()||('Snapshot '+grDate()),date:grDate(),
+    beats:JSON.parse(JSON.stringify(d.beats||{})),pieces:JSON.parse(JSON.stringify(c.pieces))});
+  canonSave(c);renderCanonVersions();toast('Version saved');
+}
+function renderCanonVersions(){
+  var c=canonData(),el=document.getElementById('canonVersions');if(!el)return;
+  if(!c.versions.length){el.innerHTML='<p class="note" style="opacity:.7;margin:8px 0 0">No versions yet. A version snapshots your beats + canon so you can watch the story evolve &mdash; and roll back.</p>';return;}
+  el.innerHTML=c.versions.map(function(v){
+    return '<div class="ver-row"><div class="ver-l"><div>'+esc(v.label)+'</div><div class="piece-meta">'+esc(v.date)+' · '+(v.pieces?v.pieces.length:0)+' pieces</div></div>'+
+      '<button class="ver-b" onclick="canonRestore(\''+v.id+'\')">Restore</button>'+
+      '<button class="ver-b" onclick="canonDelVer(\''+v.id+'\')">✕</button></div>';
+  }).join('');
+}
+function canonRestore(id){
+  var c=canonData(),v=c.versions.filter(function(x){return x.id===id;})[0];if(!v)return;
+  if(!confirm('Restore “'+v.label+'”? This replaces your current beats and canon pieces. Your saved versions are kept.'))return;
+  var d=load();
+  d.beats=JSON.parse(JSON.stringify(v.beats||{}));
+  if(!d.canon)d.canon={pieces:[],versions:c.versions};
+  d.canon.pieces=JSON.parse(JSON.stringify(v.pieces||[]));
+  store(d);
+  canonSel={};canonDraft=null;canonEdit=null;canonRecord=null;
+  renderBeats();renderCanon();toast('Restored');
+}
+function canonDelVer(id){
+  var c=canonData();c.versions=c.versions.filter(function(v){return v.id!==id;});
+  canonSave(c);renderCanonVersions();
+}
+
+/* ---- canon digest handed to the coach with each question ---- */
+function canonDigest(){
+  var c=canonData();if(!c.pieces.length)return '';
+  var byLens={};
+  c.pieces.forEach(function(p){(byLens[p.lens]||(byLens[p.lens]=[])).push(p);});
+  var out=['— THE CANON (the founder’s own source-text; quote and build on these, never contradict them) —'];
+  CANON_LENSES.forEach(function(l){
+    var arr=byLens[l[0]]||[];if(!arr.length)return;
+    out.push('\n['+l[1]+']');
+    arr.forEach(function(p){
+      if(p.kind==='line')out.push('• “'+p.body.trim()+'”');
+      else out.push('• '+(p.title?p.title.trim()+': ':'')+p.body.trim().slice(0,400));
+    });
+  });
+  return out.join('\n');
+}
+
+renderBeats();
+coachRender();
+renderCanon();
+</script>
+</body>
+</html>
